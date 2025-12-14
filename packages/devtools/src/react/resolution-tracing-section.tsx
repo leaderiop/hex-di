@@ -26,6 +26,8 @@ import {
   type TracingExportFormat,
 } from "./tracing-controls-bar.js";
 import { SummaryStatsView } from "./summary-stats-view.js";
+import { TimelineView } from "./timeline-view.js";
+import { TreeView, type TimeDisplayMode } from "./tree-view.js";
 
 // =============================================================================
 // Types
@@ -350,66 +352,6 @@ function ViewToggleTabs({
 }
 
 // =============================================================================
-// Placeholder View Components
-// =============================================================================
-
-/**
- * Placeholder for Timeline view (to be implemented in Task Group 8).
- */
-function TimelineViewPlaceholder(): ReactElement {
-  return (
-    <div data-testid="timeline-view" style={emptyStyles.container}>
-      <div style={{ fontWeight: 500, marginBottom: "8px" }}>Timeline View</div>
-      <div
-        style={{
-          fontSize: "12px",
-          color: "var(--hex-devtools-text-muted, #a6adc8)",
-        }}
-      >
-        Horizontal time-axis visualization with duration bars.
-      </div>
-      <div
-        style={{
-          fontSize: "11px",
-          marginTop: "12px",
-          color: "var(--hex-devtools-text-muted, #a6adc8)",
-        }}
-      >
-        (Implementation in Task Group 8)
-      </div>
-    </div>
-  );
-}
-
-/**
- * Placeholder for Tree view (to be implemented in Task Group 9).
- */
-function TreeViewPlaceholder(): ReactElement {
-  return (
-    <div data-testid="tree-view" style={emptyStyles.container}>
-      <div style={{ fontWeight: 500, marginBottom: "8px" }}>Tree View</div>
-      <div
-        style={{
-          fontSize: "12px",
-          color: "var(--hex-devtools-text-muted, #a6adc8)",
-        }}
-      >
-        Hierarchical dependency chain visualization.
-      </div>
-      <div
-        style={{
-          fontSize: "11px",
-          marginTop: "12px",
-          color: "var(--hex-devtools-text-muted, #a6adc8)",
-        }}
-      >
-        (Implementation in Task Group 9)
-      </div>
-    </div>
-  );
-}
-
-// =============================================================================
 // Empty State Component
 // =============================================================================
 
@@ -492,6 +434,9 @@ export function ResolutionTracingSection({
   const [traces, setTraces] = useState<readonly TraceEntry[]>([]);
   const [stats, setStats] = useState<TraceStats>(createEmptyStats);
   const [isRecording, setIsRecording] = useState<boolean>(true);
+
+  // TreeView state
+  const [timeDisplayMode, setTimeDisplayMode] = useState<TimeDisplayMode>("self");
 
   // Subscribe to trace updates when tracingAPI is provided
   useEffect(() => {
@@ -581,6 +526,50 @@ export function ResolutionTracingSection({
     []
   );
 
+  // TimelineView handlers
+  const handleTogglePin = useCallback(
+    (traceId: string) => {
+      if (tracingAPI === undefined) {
+        return;
+      }
+      // Find the trace to check its current pin status
+      const trace = traces.find((t) => t.id === traceId);
+      if (trace === undefined) {
+        return;
+      }
+      if (trace.isPinned) {
+        tracingAPI.unpin(traceId);
+      } else {
+        tracingAPI.pin(traceId);
+      }
+      // Refresh traces to reflect the updated pin status
+      setTraces(tracingAPI.getTraces());
+    },
+    [tracingAPI, traces]
+  );
+
+  const handleViewInTree = useCallback((traceId: string) => {
+    setActiveView("tree");
+    // In the future, this could focus/expand the trace in tree view
+    void traceId;
+  }, []);
+
+  // TreeView handlers
+  const handleViewInTimeline = useCallback((traceId: string) => {
+    setActiveView("timeline");
+    // In the future, this could highlight the trace in timeline view
+    void traceId;
+  }, []);
+
+  const handleTraceSelect = useCallback((traceId: string) => {
+    // For now, just log selection - could be used for cross-view highlighting
+    void traceId;
+  }, []);
+
+  const handleTimeDisplayModeChange = useCallback((mode: TimeDisplayMode) => {
+    setTimeDisplayMode(mode);
+  }, []);
+
   // Determine if we have traces to display
   const hasTraces = traces.length > 0;
 
@@ -597,13 +586,30 @@ export function ResolutionTracingSection({
         if (!hasTraces) {
           return <EmptyState />;
         }
-        return <TimelineViewPlaceholder />;
+        return (
+          <TimelineView
+            traces={processedTraces}
+            threshold={threshold}
+            totalDuration={totalDuration}
+            onTogglePin={handleTogglePin}
+            onViewInTree={handleViewInTree}
+          />
+        );
 
       case "tree":
         if (!hasTraces) {
           return <EmptyState />;
         }
-        return <TreeViewPlaceholder />;
+        return (
+          <TreeView
+            traces={processedTraces}
+            threshold={threshold}
+            timeDisplayMode={timeDisplayMode}
+            onTraceSelect={handleTraceSelect}
+            onViewInTimeline={handleViewInTimeline}
+            onTimeDisplayModeChange={handleTimeDisplayModeChange}
+          />
+        );
 
       case "summary":
         return (
