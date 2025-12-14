@@ -15,7 +15,7 @@
 import { describe, it, expect } from "vitest";
 import { createPort } from "@hex-di/ports";
 import { GraphBuilder, createAdapter } from "@hex-di/graph";
-import { createContainer, TRACING_ACCESS } from "@hex-di/runtime";
+import { TRACING_ACCESS } from "@hex-di/runtime";
 import {
   createTracingContainer,
   MemoryCollector,
@@ -98,8 +98,7 @@ function createTestGraph() {
 describe("Resolution Tracing End-to-End Data Flow", () => {
   it("captures trace data through createTracingContainer -> resolve -> getTraces", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = tracingContainer[TRACING_ACCESS];
 
     // Perform resolutions
@@ -125,8 +124,7 @@ describe("Resolution Tracing End-to-End Data Flow", () => {
 
   it("flows data through subscription mechanism for real-time updates", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = tracingContainer[TRACING_ACCESS];
 
     const receivedTraces: TraceEntry[] = [];
@@ -156,8 +154,7 @@ describe("Resolution Tracing End-to-End Data Flow", () => {
 describe("Resolution Tracing Filter Integration", () => {
   it("applies lifetime filter correctly across trace data", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = tracingContainer[TRACING_ACCESS];
 
     // Resolve services of different lifetimes
@@ -186,8 +183,7 @@ describe("Resolution Tracing Filter Integration", () => {
 
   it("applies cache status filter correctly", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = tracingContainer[TRACING_ACCESS];
 
     // First resolution - cache miss
@@ -212,8 +208,7 @@ describe("Resolution Tracing Filter Integration", () => {
 
   it("combines multiple filter criteria with AND logic", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = tracingContainer[TRACING_ACCESS];
 
     // Resolve various services
@@ -242,8 +237,7 @@ describe("Resolution Tracing Filter Integration", () => {
 describe("Resolution Tracing Pause/Resume Integration", () => {
   it("pause stops recording and resume restarts it", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = tracingContainer[TRACING_ACCESS];
 
     // Record one trace
@@ -269,10 +263,10 @@ describe("Resolution Tracing Pause/Resume Integration", () => {
 
   it("pause state is independent per container", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
 
-    const tracingContainer1 = createTracingContainer(baseContainer);
-    const tracingContainer2 = createTracingContainer(baseContainer);
+    // Each tracing container creates its own internal container
+    const tracingContainer1 = createTracingContainer(graph);
+    const tracingContainer2 = createTracingContainer(graph);
 
     const api1 = tracingContainer1[TRACING_ACCESS];
     const api2 = tracingContainer2[TRACING_ACCESS];
@@ -309,8 +303,7 @@ describe("Resolution Tracing Pinned Traces Integration", () => {
     });
 
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer, {
+    const tracingContainer = createTracingContainer(graph, {
       collector,
     });
     const tracingAPI = tracingContainer[TRACING_ACCESS];
@@ -332,8 +325,7 @@ describe("Resolution Tracing Pinned Traces Integration", () => {
     });
 
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer, {
+    const tracingContainer = createTracingContainer(graph, {
       collector,
     });
 
@@ -372,8 +364,7 @@ describe("Resolution Tracing Pinned Traces Integration", () => {
     });
 
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer, {
+    const tracingContainer = createTracingContainer(graph, {
       collector,
     });
 
@@ -412,8 +403,7 @@ describe("Resolution Tracing Pinned Traces Integration", () => {
 describe("Resolution Tracing Export Integration", () => {
   it("provides trace data in correct format for JSON export", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = tracingContainer[TRACING_ACCESS];
 
     // Generate some traces
@@ -433,8 +423,7 @@ describe("Resolution Tracing Export Integration", () => {
 
   it("provides trace data with all required fields for CSV export", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = tracingContainer[TRACING_ACCESS];
 
     // Generate traces
@@ -458,8 +447,7 @@ describe("Resolution Tracing Export Integration", () => {
 
   it("provides summary data for clipboard export", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = tracingContainer[TRACING_ACCESS];
 
     // Generate traces
@@ -485,8 +473,7 @@ describe("Resolution Tracing Export Integration", () => {
 describe("Resolution Tracing Scope Integration", () => {
   it("tracks scoped service resolutions with scope context", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = tracingContainer[TRACING_ACCESS];
 
     // Create scope and resolve scoped service
@@ -503,8 +490,7 @@ describe("Resolution Tracing Scope Integration", () => {
 
   it("differentiates traces from different scopes", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = tracingContainer[TRACING_ACCESS];
 
     // Create two scopes

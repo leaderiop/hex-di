@@ -118,4 +118,22 @@ export interface TraceCollector {
    * @returns Unsubscribe function
    */
   subscribe(callback: TraceSubscriber): Unsubscribe;
+
+  /**
+   * Manually pins a trace to protect it from FIFO eviction.
+   *
+   * Optional method - collectors that don't support pinning can omit this.
+   *
+   * @param traceId - ID of the trace to pin
+   */
+  pin?(traceId: string): void;
+
+  /**
+   * Unpins a trace, making it eligible for FIFO eviction.
+   *
+   * Optional method - collectors that don't support unpinning can omit this.
+   *
+   * @param traceId - ID of the trace to unpin
+   */
+  unpin?(traceId: string): void;
 }

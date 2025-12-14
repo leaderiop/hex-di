@@ -8,7 +8,7 @@
  * @packageDocumentation
  */
 
-import { GraphBuilder } from "@hex-di/graph";
+import { GraphBuilder, type Graph } from "@hex-di/graph";
 import {
   ConfigAdapter,
   LoggerAdapter,
@@ -66,6 +66,11 @@ export const appGraph = GraphBuilder.create()
   // Request-scoped adapter
   .provide(NotificationServiceAdapter)
   .build();
+
+/**
+ * Type representing all ports provided by the application graph.
+ */
+export type AppPorts = typeof appGraph extends Graph<infer P> ? P : never;
 
 /**
  * Type assertion to verify the graph is complete.

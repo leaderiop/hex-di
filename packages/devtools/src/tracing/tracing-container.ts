@@ -1,17 +1,26 @@
 /**
- * TracingContainer - Decorator wrapper for resolution tracing.
+ * TracingContainer - Container wrapper with resolution tracing.
  *
- * This module provides the createTracingContainer function that wraps a base
- * container with tracing capabilities using the Decorator pattern. The wrapper
- * intercepts resolve() calls to capture timing data without mutating the base
- * container.
+ * This module provides the createTracingContainer function that creates a
+ * container with resolution hooks for capturing timing data. The hooks API
+ * enables capturing ALL resolutions including nested dependencies, providing
+ * proper parent-child hierarchy in trace data.
  *
  * @packageDocumentation
  */
 
 import type { Port, InferService } from "@hex-di/ports";
-import type { Container, Scope, Lifetime } from "@hex-di/runtime";
-import { INTERNAL_ACCESS, TRACING_ACCESS } from "@hex-di/runtime";
+import type { Graph } from "@hex-di/graph";
+import {
+  createContainer,
+  TRACING_ACCESS,
+  type Container,
+  type Scope,
+  type Lifetime,
+  type ResolutionHooks,
+  type ResolutionHookContext,
+  type ResolutionResultContext,
+} from "@hex-di/runtime";
 import type { TraceCollector } from "./collector.js";
 import type {
   TraceEntry,
@@ -51,71 +60,40 @@ export type TracingContainer<TProvides extends Port<unknown, string>> = Containe
   readonly [TRACING_ACCESS]: TracingAPI;
 };
 
-/**
- * Extended scope type with tracing capabilities.
- */
-type TracingScope<TProvides extends Port<unknown, string>> = Scope<TProvides>;
-
-// =============================================================================
-// Resolution Context for Trace Hierarchy
-// =============================================================================
-
-/**
- * Tracks the current resolution context for building trace hierarchy.
- * Uses a stack to track nested resolutions.
- */
-interface ResolutionTraceContext {
-  /** Stack of trace IDs for tracking parent-child relationships */
-  readonly traceStack: string[];
-  /** Counter for generating unique trace IDs */
-  traceIdCounter: number;
-  /** Counter for global resolution order */
-  orderCounter: number;
-}
-
 // =============================================================================
 // Tracing State
 // =============================================================================
 
 /**
- * Internal state for the tracing wrapper.
+ * Active trace entry being built during resolution.
+ */
+interface ActiveTrace {
+  /** Unique trace ID */
+  readonly traceId: string;
+  /** Parent trace ID (null for root resolutions) */
+  readonly parentTraceId: string | null;
+  /** Start time of resolution */
+  readonly startTime: number;
+  /** Child trace IDs collected during resolution */
+  readonly childTraceIds: string[];
+}
+
+/**
+ * Internal state for the tracing hooks.
  */
 interface TracingState {
   /** The trace collector */
   readonly collector: TraceCollector;
   /** Whether tracing is currently paused */
   isPaused: boolean;
-  /** The resolution context for hierarchy tracking */
-  readonly context: ResolutionTraceContext;
-  /** Map of trace ID to its child trace IDs (for updating after child resolves) */
-  readonly childTraceMap: Map<string, string[]>;
-}
-
-// =============================================================================
-// Internal Access Types
-// =============================================================================
-
-/**
- * Internal state accessor type for containers.
- */
-interface ContainerInternalAccessor {
-  readonly singletonMemo: {
-    readonly size: number;
-  };
-  readonly adapterMap: ReadonlyMap<Port<unknown, string>, {
-    readonly portName: string;
-    readonly lifetime: Lifetime;
-  }>;
-}
-
-/**
- * Internal state accessor type for scopes.
- */
-interface ScopeInternalAccessor {
-  readonly id: string;
-  readonly scopedMemo: {
-    readonly size: number;
-  };
+  /** Counter for generating unique trace IDs */
+  traceIdCounter: number;
+  /** Counter for global resolution order */
+  orderCounter: number;
+  /** Map from port instance to active trace (for correlation) */
+  readonly activeTraces: Map<Port<unknown, string>, ActiveTrace>;
+  /** Stack of current trace IDs for parent tracking */
+  readonly traceStack: string[];
 }
 
 // =============================================================================
@@ -125,216 +103,8 @@ interface ScopeInternalAccessor {
 /**
  * Generates a unique trace ID.
  */
-function generateTraceId(context: ResolutionTraceContext): string {
-  return `trace-${++context.traceIdCounter}`;
-}
-
-/**
- * Gets the current parent trace ID from the stack, or null if at root.
- */
-function getCurrentParentTraceId(context: ResolutionTraceContext): string | null {
-  const stack = context.traceStack;
-  return stack.length > 0 ? stack[stack.length - 1] ?? null : null;
-}
-
-/**
- * Checks if a service was already cached before resolution.
- * This requires checking if the instance exists in the memoization map
- * before the factory would be called.
- */
-function checkCacheHit(
-  baseContainer: Container<Port<unknown, string>>,
-  scope: Scope<Port<unknown, string>> | null,
-  portName: string,
-  lifetime: Lifetime
-): boolean {
-  try {
-    if (lifetime === "request") {
-      // Request lifetime is never cached
-      return false;
-    }
-
-    if (scope !== null) {
-      // Check scope's internal state
-      const scopeAccessor = scope as unknown as { [key: symbol]: () => ScopeInternalAccessor };
-      const scopeState = scopeAccessor[INTERNAL_ACCESS]?.();
-
-      if (lifetime === "singleton") {
-        // For singletons, check the container's singleton memo
-        const containerAccessor = baseContainer as unknown as { [key: symbol]: () => ContainerInternalAccessor };
-        const containerState = containerAccessor[INTERNAL_ACCESS]?.();
-        if (containerState !== undefined) {
-          // Check if there's an entry for this port
-          for (const [port] of containerState.adapterMap) {
-            if (port.__portName === portName) {
-              // We need to check if the singleton was already resolved
-              // by checking the memo size before vs after
-              return false; // We'll detect cache hits differently
-            }
-          }
-        }
-      }
-    }
-  } catch {
-    // If we can't access internal state, assume no cache hit
-  }
-
-  return false;
-}
-
-/**
- * Gets adapter info for a port from the container.
- */
-function getAdapterInfo(
-  baseContainer: Container<Port<unknown, string>>,
-  port: Port<unknown, string>
-): { lifetime: Lifetime } | undefined {
-  try {
-    const accessor = baseContainer as unknown as { [key: symbol]: () => ContainerInternalAccessor };
-    const state = accessor[INTERNAL_ACCESS]?.();
-    if (state !== undefined) {
-      const adapterInfo = state.adapterMap.get(port);
-      if (adapterInfo !== undefined) {
-        return { lifetime: adapterInfo.lifetime };
-      }
-    }
-  } catch {
-    // Ignore errors
-  }
-  return undefined;
-}
-
-// =============================================================================
-// Tracing Resolution Logic
-// =============================================================================
-
-/**
- * Wraps a resolve call with tracing.
- */
-function traceResolve<P extends Port<unknown, string>>(
-  state: TracingState,
-  baseContainer: Container<Port<unknown, string>>,
-  scope: Scope<Port<unknown, string>> | null,
-  port: P,
-  resolveImpl: () => InferService<P>,
-  scopeId: string | null
-): InferService<P> {
-  // Skip tracing if paused (zero overhead)
-  if (state.isPaused) {
-    return resolveImpl();
-  }
-
-  const portName = port.__portName;
-  const traceId = generateTraceId(state.context);
-  const parentTraceId = getCurrentParentTraceId(state.context);
-  const order = ++state.context.orderCounter;
-
-  // Get lifetime info
-  const adapterInfo = getAdapterInfo(baseContainer, port);
-  const lifetime: Lifetime = adapterInfo?.lifetime ?? "singleton";
-
-  // Check if this will be a cache hit before resolving
-  // We track this by checking if the resolve actually calls the factory
-  // For now, we'll track it by checking singleton/scoped resolution counts
-  const preResolveCheckResult = getCacheHitStatus(state, baseContainer, scope, port, lifetime);
-
-  // Push this trace onto the stack for hierarchy tracking
-  state.context.traceStack.push(traceId);
-
-  // Initialize child trace array for this trace
-  state.childTraceMap.set(traceId, []);
-
-  // If we have a parent, register ourselves as a child of the parent
-  if (parentTraceId !== null) {
-    const parentChildren = state.childTraceMap.get(parentTraceId);
-    if (parentChildren !== undefined) {
-      parentChildren.push(traceId);
-    }
-  }
-
-  const startTime = performance.now();
-
-  try {
-    const result = resolveImpl();
-    const duration = performance.now() - startTime;
-
-    // Determine cache hit - if duration is very fast and it's a cached lifetime, likely a cache hit
-    // Better approach: track resolution count changes
-    const isCacheHit = preResolveCheckResult;
-
-    // Get child trace IDs
-    const childTraceIds = state.childTraceMap.get(traceId) ?? [];
-
-    // Create trace entry
-    const entry: TraceEntry = {
-      id: traceId,
-      portName,
-      lifetime,
-      startTime,
-      duration,
-      isCacheHit,
-      parentTraceId,
-      childTraceIds: Object.freeze([...childTraceIds]),
-      scopeId,
-      order,
-      isPinned: false,
-    };
-
-    // Collect the trace
-    state.collector.collect(entry);
-
-    return result;
-  } finally {
-    // Pop this trace from the stack
-    state.context.traceStack.pop();
-
-    // Clean up child map entry (we've already collected, so we don't need it)
-    // Keep it for potential future reference
-  }
-}
-
-/**
- * Determines if the upcoming resolve will be a cache hit.
- * This is a heuristic based on checking if we've already traced this port.
- */
-function getCacheHitStatus(
-  state: TracingState,
-  baseContainer: Container<Port<unknown, string>>,
-  scope: Scope<Port<unknown, string>> | null,
-  port: Port<unknown, string>,
-  lifetime: Lifetime
-): boolean {
-  // Request lifetime is never cached
-  if (lifetime === "request") {
-    return false;
-  }
-
-  // Check existing traces to see if this port has been resolved before
-  const portName = port.__portName;
-  const traces = state.collector.getTraces();
-
-  if (lifetime === "singleton") {
-    // For singleton, check if any trace exists for this port
-    return traces.some((t) => t.portName === portName && !t.isCacheHit);
-  }
-
-  if (lifetime === "scoped" && scope !== null) {
-    // For scoped, check if this port was resolved in the same scope
-    try {
-      const scopeAccessor = scope as unknown as { [key: symbol]: () => ScopeInternalAccessor };
-      const scopeState = scopeAccessor[INTERNAL_ACCESS]?.();
-      if (scopeState !== undefined) {
-        const currentScopeId = scopeState.id;
-        return traces.some(
-          (t) => t.portName === portName && t.scopeId === currentScopeId && !t.isCacheHit
-        );
-      }
-    } catch {
-      // Fall through
-    }
-  }
-
-  return false;
+function generateTraceId(state: TracingState): string {
+  return `trace-${++state.traceIdCounter}`;
 }
 
 // =============================================================================
@@ -342,28 +112,28 @@ function getCacheHitStatus(
 // =============================================================================
 
 /**
- * Creates a tracing-enabled container by wrapping a base container.
+ * Creates a tracing-enabled container from a validated graph.
  *
- * The tracing container uses the Decorator pattern to intercept resolve() calls
- * and capture timing data without mutating the base container. All original
- * container functionality is preserved.
+ * The tracing container uses resolution hooks to capture timing data for
+ * ALL resolutions, including nested dependency resolutions. This enables
+ * proper parent-child hierarchy tracking in trace data.
  *
- * @param baseContainer - The container to wrap with tracing capabilities
+ * @param graph - The validated Graph from @hex-di/graph
  * @param options - Optional configuration for tracing behavior
- * @returns A new container with TRACING_ACCESS Symbol for accessing trace data
+ * @returns A container with TRACING_ACCESS Symbol for accessing trace data
  *
  * @remarks
- * - The base container is not modified
- * - Scopes created from the tracing container also trace resolutions
+ * - Uses resolution hooks for zero-overhead when tracing is paused
+ * - Captures all resolutions including nested dependencies
+ * - Parent-child relationships are properly tracked
  * - Use TRACING_ACCESS Symbol to access the TracingAPI
- * - Traces are collected by the configured collector (defaults to MemoryCollector)
  *
  * @example Basic usage
  * ```typescript
  * import { createTracingContainer } from '@hex-di/devtools/tracing';
  * import { TRACING_ACCESS } from '@hex-di/runtime';
  *
- * const tracingContainer = createTracingContainer(container);
+ * const tracingContainer = createTracingContainer(graph);
  * const logger = tracingContainer.resolve(LoggerPort);
  *
  * const tracingAPI = tracingContainer[TRACING_ACCESS];
@@ -371,14 +141,15 @@ function getCacheHitStatus(
  * console.log(`Resolved ${traces.length} services`);
  * ```
  *
- * @example With custom collector
+ * @example With custom retention policy
  * ```typescript
- * const collector = new MemoryCollector({ maxTraces: 5000 });
- * const tracingContainer = createTracingContainer(container, { collector });
+ * const tracingContainer = createTracingContainer(graph, {
+ *   retentionPolicy: { maxTraces: 5000, slowThresholdMs: 50 }
+ * });
  * ```
  */
 export function createTracingContainer<TProvides extends Port<unknown, string>>(
-  baseContainer: Container<TProvides>,
+  graph: Graph<TProvides>,
   options?: TracingContainerOptions
 ): TracingContainer<TProvides> {
   // Create or use provided collector
@@ -393,12 +164,10 @@ export function createTracingContainer<TProvides extends Port<unknown, string>>(
   const state: TracingState = {
     collector,
     isPaused: false,
-    context: {
-      traceStack: [],
-      traceIdCounter: 0,
-      orderCounter: 0,
-    },
-    childTraceMap: new Map(),
+    traceIdCounter: 0,
+    orderCounter: 0,
+    activeTraces: new Map(),
+    traceStack: [],
   };
 
   // Create the TracingAPI
@@ -421,6 +190,11 @@ export function createTracingContainer<TProvides extends Port<unknown, string>>(
 
     clear(): void {
       collector.clear();
+      // Reset counters for clean slate
+      state.traceIdCounter = 0;
+      state.orderCounter = 0;
+      state.activeTraces.clear();
+      state.traceStack.length = 0;
     },
 
     subscribe(callback: (entry: TraceEntry) => void): () => void {
@@ -432,87 +206,112 @@ export function createTracingContainer<TProvides extends Port<unknown, string>>(
     },
 
     pin(traceId: string): void {
-      // Pinning will be implemented in Task Group 4
-      // For now, this is a no-op placeholder
-      void traceId;
+      collector.pin?.(traceId);
     },
 
     unpin(traceId: string): void {
-      // Unpinning will be implemented in Task Group 4
-      // For now, this is a no-op placeholder
-      void traceId;
+      collector.unpin?.(traceId);
     },
   };
 
-  // Create tracing scope wrapper
-  function wrapScope(baseScope: Scope<TProvides>, scopeId: string): TracingScope<TProvides> {
-    const wrappedScope: TracingScope<TProvides> = {
-      resolve<P extends TProvides>(port: P): InferService<P> {
-        return traceResolve(
-          state,
-          baseContainer as Container<Port<unknown, string>>,
-          baseScope as Scope<Port<unknown, string>>,
-          port as Port<unknown, string>,
-          () => baseScope.resolve(port),
-          scopeId
-        ) as InferService<P>;
-      },
+  // Create resolution hooks
+  const hooks: ResolutionHooks = {
+    beforeResolve: (context: ResolutionHookContext): void => {
+      // Skip if paused
+      if (state.isPaused) {
+        return;
+      }
 
-      createScope(): Scope<TProvides> {
-        const newBaseScope = baseScope.createScope();
-        const newScopeId = getScopeId(newBaseScope);
-        return wrapScope(newBaseScope, newScopeId);
-      },
+      const traceId = generateTraceId(state);
 
-      dispose(): Promise<void> {
-        return baseScope.dispose();
-      },
+      // Get parent trace ID from stack
+      const parentTraceId =
+        state.traceStack.length > 0
+          ? state.traceStack[state.traceStack.length - 1] ?? null
+          : null;
 
-      // Forward isDisposed from baseScope - required for React StrictMode compatibility
-      // AutoScopeProvider checks this to detect disposed scopes and recreate them
-      get isDisposed(): boolean {
-        return baseScope.isDisposed;
-      },
-    } as TracingScope<TProvides>;
+      // Create active trace entry
+      const activeTrace: ActiveTrace = {
+        traceId,
+        parentTraceId,
+        startTime: context.isCacheHit ? Date.now() : Date.now(), // Use same timing for consistency
+        childTraceIds: [],
+      };
 
-    return Object.freeze(wrappedScope) as TracingScope<TProvides>;
-  }
+      // Store for correlation in afterResolve
+      state.activeTraces.set(context.port, activeTrace);
 
-  // Helper to get scope ID from a scope
-  function getScopeId(scope: Scope<TProvides>): string {
-    try {
-      const accessor = scope as unknown as { [key: symbol]: () => ScopeInternalAccessor };
-      const scopeState = accessor[INTERNAL_ACCESS]?.();
-      return scopeState?.id ?? `scope-${Date.now()}`;
-    } catch {
-      return `scope-${Date.now()}`;
-    }
-  }
+      // Push onto stack for child tracking
+      state.traceStack.push(traceId);
 
-  // Create the tracing container wrapper
+      // If has parent, register as child
+      if (parentTraceId !== null) {
+        // Find parent's active trace and add this as child
+        for (const [, active] of state.activeTraces) {
+          if (active.traceId === parentTraceId) {
+            active.childTraceIds.push(traceId);
+            break;
+          }
+        }
+      }
+    },
+
+    afterResolve: (context: ResolutionResultContext): void => {
+      // Skip if paused
+      if (state.isPaused) {
+        return;
+      }
+
+      // Get the active trace for this port
+      const activeTrace = state.activeTraces.get(context.port);
+      if (activeTrace === undefined) {
+        // This shouldn't happen, but handle gracefully
+        return;
+      }
+
+      // Pop from stack
+      state.traceStack.pop();
+
+      // Remove from active traces
+      state.activeTraces.delete(context.port);
+
+      // Create the trace entry
+      const entry: TraceEntry = {
+        id: activeTrace.traceId,
+        portName: context.portName,
+        lifetime: context.lifetime as Lifetime,
+        startTime: activeTrace.startTime,
+        duration: context.duration,
+        isCacheHit: context.isCacheHit,
+        parentTraceId: activeTrace.parentTraceId,
+        childTraceIds: Object.freeze([...activeTrace.childTraceIds]),
+        scopeId: context.scopeId,
+        order: ++state.orderCounter,
+        isPinned: false,
+      };
+
+      // Collect the trace (errors are still traced)
+      collector.collect(entry);
+    },
+  };
+
+  // Create the container with hooks
+  const baseContainer = createContainer(graph, { hooks });
+
+  // Create the tracing container wrapper that exposes TRACING_ACCESS
   const tracingContainer = {
     resolve<P extends TProvides>(port: P): InferService<P> {
-      return traceResolve(
-        state,
-        baseContainer as Container<Port<unknown, string>>,
-        null,
-        port as Port<unknown, string>,
-        () => baseContainer.resolve(port),
-        null
-      ) as InferService<P>;
+      return baseContainer.resolve(port);
     },
 
     createScope(): Scope<TProvides> {
-      const baseScope = baseContainer.createScope();
-      const scopeId = getScopeId(baseScope);
-      return wrapScope(baseScope, scopeId);
+      return baseContainer.createScope();
     },
 
     dispose(): Promise<void> {
       return baseContainer.dispose();
     },
 
-    // Forward isDisposed from baseContainer
     get isDisposed(): boolean {
       return baseContainer.isDisposed;
     },

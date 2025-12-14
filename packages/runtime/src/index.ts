@@ -200,6 +200,29 @@ export type {
 export { createContainer } from "./container.js";
 
 // =============================================================================
+// Resolution Hooks
+// =============================================================================
+
+/**
+ * Resolution hooks for instrumentation and tracing.
+ *
+ * Hooks are called during service resolution and enable instrumentation
+ * like tracing without modifying core resolution logic. When hooks are
+ * not provided, there is zero overhead.
+ *
+ * @see {@link ResolutionHooks} - Hook configuration object
+ * @see {@link ResolutionHookContext} - Context passed to beforeResolve
+ * @see {@link ResolutionResultContext} - Context passed to afterResolve
+ * @see {@link ContainerOptions} - Options for createContainer with hooks
+ */
+export type {
+  ResolutionHooks,
+  ResolutionHookContext,
+  ResolutionResultContext,
+  ContainerOptions,
+} from "./resolution-hooks.js";
+
+// =============================================================================
 // Captive Dependency Prevention Types
 // =============================================================================
 

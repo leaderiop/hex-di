@@ -27,6 +27,12 @@ import {
   ScopeRequiredError,
   FactoryError,
 } from "./errors.js";
+import type {
+  ContainerOptions,
+  ResolutionHooks,
+  ResolutionHookContext,
+  ResolutionResultContext,
+} from "./resolution-hooks.js";
 
 // =============================================================================
 // Internal Types
@@ -37,6 +43,29 @@ import {
  * @internal
  */
 type RuntimeAdapter = Adapter<Port<unknown, string>, Port<unknown, string> | never, Lifetime>;
+
+/**
+ * Entry in the parent stack for tracking resolution hierarchy.
+ * @internal
+ */
+interface ParentStackEntry {
+  /** The port being resolved */
+  readonly port: Port<unknown, string>;
+  /** Start time of resolution for duration calculation */
+  readonly startTime: number;
+}
+
+/**
+ * Internal state for resolution hooks.
+ * Only allocated when hooks are provided (zero overhead otherwise).
+ * @internal
+ */
+interface HooksState {
+  /** The hooks configuration */
+  readonly hooks: ResolutionHooks;
+  /** Stack of parent ports for tracking nested resolution hierarchy */
+  readonly parentStack: ParentStackEntry[];
+}
 
 // =============================================================================
 // Scope ID Generation
@@ -148,7 +177,7 @@ class ScopeImpl<TProvides extends Port<unknown, string>> {
       throw new DisposedScopeError(portName);
     }
 
-    return this.container.resolveInternal(port, this.scopedMemo);
+    return this.container.resolveInternal(port, this.scopedMemo, this.id);
   }
 
   /**
@@ -357,7 +386,13 @@ class ContainerImpl<TProvides extends Port<unknown, string>> {
    */
   private readonly childScopes: Set<ScopeImpl<TProvides>> = new Set();
 
-  constructor(graph: Graph<TProvides>) {
+  /**
+   * Optional hooks state for resolution instrumentation.
+   * Only allocated when hooks are provided (zero overhead otherwise).
+   */
+  private readonly hooksState: HooksState | undefined;
+
+  constructor(graph: Graph<TProvides>, options?: ContainerOptions) {
     this.graph = graph;
     this.singletonMemo = new MemoMap();
     this.resolutionContext = new ResolutionContext();
@@ -366,6 +401,14 @@ class ContainerImpl<TProvides extends Port<unknown, string>> {
     this.adapterMap = new Map();
     for (const adapter of graph.adapters) {
       this.adapterMap.set(adapter.provides, adapter);
+    }
+
+    // Only create hooks state if hooks are provided (zero overhead otherwise)
+    if (options?.hooks?.beforeResolve !== undefined || options?.hooks?.afterResolve !== undefined) {
+      this.hooksState = {
+        hooks: options.hooks,
+        parentStack: [],
+      };
     }
   }
 
@@ -398,16 +441,23 @@ class ContainerImpl<TProvides extends Port<unknown, string>> {
       throw new ScopeRequiredError(portName);
     }
 
-    return this.resolveWithAdapter(port, adapter, this.singletonMemo);
+    return this.resolveWithAdapter(port, adapter, this.singletonMemo, null);
   }
 
   /**
    * Internal resolve method that can use a specific MemoMap.
    * Used by ScopeImpl for scoped resolution.
    *
+   * @param port - The port to resolve
+   * @param scopedMemo - The MemoMap for scoped instances
+   * @param scopeId - The scope ID (null for container-level)
    * @internal
    */
-  resolveInternal<P extends TProvides>(port: P, scopedMemo: MemoMap): InferService<P> {
+  resolveInternal<P extends TProvides>(
+    port: P,
+    scopedMemo: MemoMap,
+    scopeId: string | null = null
+  ): InferService<P> {
     const portName = (port as Port<unknown, string>).__portName;
 
     // Lookup adapter
@@ -416,41 +466,137 @@ class ContainerImpl<TProvides extends Port<unknown, string>> {
       throw new Error(`No adapter registered for port '${portName}'`);
     }
 
-    return this.resolveWithAdapter(port, adapter, scopedMemo);
+    return this.resolveWithAdapter(port, adapter, scopedMemo, scopeId);
   }
 
   /**
    * Core resolution logic with adapter and memo context.
+   * Emits hooks if configured.
    */
   private resolveWithAdapter<P extends TProvides>(
     port: P,
     adapter: RuntimeAdapter,
-    scopedMemo: MemoMap
+    scopedMemo: MemoMap,
+    scopeId: string | null
   ): InferService<P> {
+    // Zero overhead path - no hooks configured
+    if (this.hooksState === undefined) {
+      return this.resolveWithAdapterCore(port, adapter, scopedMemo, scopeId);
+    }
+
+    // With hooks: emit beforeResolve, resolve, emit afterResolve
+    const { hooks, parentStack } = this.hooksState;
     const portName = (port as Port<unknown, string>).__portName;
 
+    // Determine parent from stack
+    const parentEntry = parentStack.length > 0 ? parentStack[parentStack.length - 1] : null;
+    const parentPort = parentEntry?.port ?? null;
+
+    // Check if this resolution will be a cache hit
+    const isCacheHit = this.checkCacheHit(port, adapter, scopedMemo);
+
+    // Build hook context
+    const context: ResolutionHookContext = {
+      port: port as Port<unknown, string>,
+      portName,
+      lifetime: adapter.lifetime,
+      scopeId,
+      parentPort,
+      isCacheHit,
+      depth: parentStack.length,
+    };
+
+    // Call beforeResolve hook
+    if (hooks.beforeResolve !== undefined) {
+      hooks.beforeResolve(context);
+    }
+
+    const startTime = Date.now();
+
+    // Push onto parent stack before resolution
+    parentStack.push({ port: port as Port<unknown, string>, startTime });
+
+    let error: Error | null = null;
+    let result: InferService<P>;
+
+    try {
+      result = this.resolveWithAdapterCore(port, adapter, scopedMemo, scopeId);
+    } catch (e) {
+      error = e instanceof Error ? e : new Error(String(e));
+      throw e;
+    } finally {
+      // Pop from parent stack
+      parentStack.pop();
+
+      const duration = Date.now() - startTime;
+
+      // Call afterResolve hook
+      if (hooks.afterResolve !== undefined) {
+        const resultContext: ResolutionResultContext = {
+          ...context,
+          duration,
+          error,
+        };
+        hooks.afterResolve(resultContext);
+      }
+    }
+
+    return result!;
+  }
+
+  /**
+   * Core resolution logic without hooks overhead.
+   * @internal
+   */
+  private resolveWithAdapterCore<P extends TProvides>(
+    port: P,
+    adapter: RuntimeAdapter,
+    scopedMemo: MemoMap,
+    scopeId: string | null
+  ): InferService<P> {
     // Handle based on lifetime
     switch (adapter.lifetime) {
       case "singleton":
         return this.singletonMemo.getOrElseMemoize(
           port as Port<unknown, string>,
-          () => this.createInstance(port, adapter, scopedMemo),
+          () => this.createInstance(port, adapter, scopedMemo, scopeId),
           adapter.finalizer as ((instance: unknown) => void | Promise<void>) | undefined
         ) as InferService<P>;
 
       case "scoped":
         return scopedMemo.getOrElseMemoize(
           port as Port<unknown, string>,
-          () => this.createInstance(port, adapter, scopedMemo),
+          () => this.createInstance(port, adapter, scopedMemo, scopeId),
           adapter.finalizer as ((instance: unknown) => void | Promise<void>) | undefined
         ) as InferService<P>;
 
       case "request":
         // Request lifetime: always create new instance
-        return this.createInstance(port, adapter, scopedMemo) as InferService<P>;
+        return this.createInstance(port, adapter, scopedMemo, scopeId) as InferService<P>;
 
       default:
         throw new Error(`Unknown lifetime: ${adapter.lifetime}`);
+    }
+  }
+
+  /**
+   * Checks if a resolution would be a cache hit.
+   * @internal
+   */
+  private checkCacheHit(
+    port: Port<unknown, string>,
+    adapter: RuntimeAdapter,
+    scopedMemo: MemoMap
+  ): boolean {
+    switch (adapter.lifetime) {
+      case "singleton":
+        return this.singletonMemo.has(port);
+      case "scoped":
+        return scopedMemo.has(port);
+      case "request":
+        return false;
+      default:
+        return false;
     }
   }
 
@@ -461,7 +607,8 @@ class ContainerImpl<TProvides extends Port<unknown, string>> {
   private createInstance<P extends TProvides>(
     port: P,
     adapter: RuntimeAdapter,
-    scopedMemo: MemoMap
+    scopedMemo: MemoMap,
+    scopeId: string | null
   ): unknown {
     const portName = (port as Port<unknown, string>).__portName;
 
@@ -470,7 +617,7 @@ class ContainerImpl<TProvides extends Port<unknown, string>> {
 
     try {
       // Resolve dependencies
-      const deps = this.resolveDependencies(adapter, scopedMemo);
+      const deps = this.resolveDependencies(adapter, scopedMemo, scopeId);
 
       // Call factory with resolved deps
       try {
@@ -490,7 +637,8 @@ class ContainerImpl<TProvides extends Port<unknown, string>> {
    */
   private resolveDependencies(
     adapter: RuntimeAdapter,
-    scopedMemo: MemoMap
+    scopedMemo: MemoMap,
+    scopeId: string | null
   ): Record<string, unknown> {
     const deps: Record<string, unknown> = {};
 
@@ -505,7 +653,8 @@ class ContainerImpl<TProvides extends Port<unknown, string>> {
       deps[requiredPortName] = this.resolveWithAdapter(
         requiredPort as TProvides,
         requiredAdapter,
-        scopedMemo
+        scopedMemo,
+        scopeId
       );
     }
 
@@ -623,15 +772,18 @@ class ContainerImpl<TProvides extends Port<unknown, string>> {
  * - Singleton, scoped, and request lifetime management
  * - Circular dependency detection at resolution time
  * - LIFO disposal ordering with finalizer support
+ * - Optional resolution hooks for instrumentation
  *
  * @typeParam TProvides - Union of Port types that the container can resolve
  * @param graph - A validated Graph from @hex-di/graph
+ * @param options - Optional configuration including resolution hooks
  * @returns A frozen Container instance
  *
  * @remarks
  * - The container is immutable (frozen) - no dynamic registration after creation
  * - Resolution is synchronous - all factory functions must be sync
  * - Scoped ports cannot be resolved from the root container - use createScope()
+ * - When hooks are not provided, there is zero overhead
  *
  * @example Basic usage
  * ```typescript
@@ -663,11 +815,22 @@ class ContainerImpl<TProvides extends Port<unknown, string>> {
  *   await scope.dispose();
  * }
  * ```
+ *
+ * @example With resolution hooks
+ * ```typescript
+ * const container = createContainer(graph, {
+ *   hooks: {
+ *     beforeResolve: (ctx) => console.log(`Resolving ${ctx.portName}`),
+ *     afterResolve: (ctx) => console.log(`Resolved in ${ctx.duration}ms`),
+ *   },
+ * });
+ * ```
  */
 export function createContainer<TProvides extends Port<unknown, string>>(
-  graph: Graph<TProvides>
+  graph: Graph<TProvides>,
+  options?: ContainerOptions
 ): Container<TProvides> {
-  const impl = new ContainerImpl(graph);
+  const impl = new ContainerImpl(graph, options);
 
   // Create the container object with the public API
   const container = {

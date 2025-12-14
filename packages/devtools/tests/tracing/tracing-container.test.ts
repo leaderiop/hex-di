@@ -15,8 +15,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createPort } from "@hex-di/ports";
 import type { Port } from "@hex-di/ports";
 import { GraphBuilder, createAdapter } from "@hex-di/graph";
-import { createContainer, TRACING_ACCESS } from "@hex-di/runtime";
-import type { Container } from "@hex-di/runtime";
+import { TRACING_ACCESS } from "@hex-di/runtime";
 import { createTracingContainer, type TracingContainer } from "../../src/tracing/tracing-container.js";
 import { MemoryCollector } from "../../src/tracing/memory-collector.js";
 import type { TracingAPI, TraceEntry } from "../../src/tracing/types.js";
@@ -98,29 +97,19 @@ function createTestGraph() {
 // =============================================================================
 
 describe("createTracingContainer", () => {
-  it("wraps a container without mutating the original container", () => {
+  it("creates a container from graph with tracing capabilities", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
 
-    // Tracing container should be a different object
-    expect(tracingContainer).not.toBe(baseContainer);
-
-    // Both should still be able to resolve services
-    const logger1 = baseContainer.resolve(LoggerPort);
-    const logger2 = tracingContainer.resolve(LoggerPort);
-
-    // Should get the same singleton instance (same underlying container)
-    expect(logger1).toBe(logger2);
+    // Container should be able to resolve services
+    const logger = tracingContainer.resolve(LoggerPort);
+    expect(logger).toBeDefined();
+    expect(typeof logger.log).toBe("function");
   });
 
-  it("provides TRACING_ACCESS Symbol on the wrapped container", () => {
+  it("provides TRACING_ACCESS Symbol on the container", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
-
-    // Base container should not have TRACING_ACCESS
-    expect(TRACING_ACCESS in baseContainer).toBe(false);
+    const tracingContainer = createTracingContainer(graph);
 
     // Tracing container should have TRACING_ACCESS
     expect(TRACING_ACCESS in tracingContainer).toBe(true);
@@ -142,10 +131,9 @@ describe("createTracingContainer", () => {
 // =============================================================================
 
 describe("resolve() interception", () => {
-  it("captures timing data via performance.now() for each resolution", () => {
+  it("captures timing data for each resolution", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     // Resolve a service
@@ -165,8 +153,7 @@ describe("resolve() interception", () => {
 
   it("detects cache hits for singleton services on subsequent resolutions", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     // First resolution - should be a cache miss
@@ -187,8 +174,7 @@ describe("resolve() interception", () => {
 
   it("assigns unique trace IDs and incremental order values", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     tracingContainer.resolve(LoggerPort);
@@ -213,8 +199,7 @@ describe("resolve() interception", () => {
 describe("trace hierarchy tracking", () => {
   it("traces single resolve call without parent", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     // Resolve a single service
@@ -235,8 +220,7 @@ describe("trace hierarchy tracking", () => {
     // within the base container and is not intercepted by the wrapper.
     // This test verifies we at least capture the top-level resolution.
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     // Create a scope and resolve UserService
@@ -256,8 +240,7 @@ describe("trace hierarchy tracking", () => {
 
   it("tracks multiple sequential resolve calls independently", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     // Resolve multiple services sequentially
@@ -283,8 +266,7 @@ describe("trace hierarchy tracking", () => {
 describe("TRACING_ACCESS API", () => {
   it("getTraces() returns frozen/readonly trace entries", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     tracingContainer.resolve(LoggerPort);
@@ -303,8 +285,7 @@ describe("TRACING_ACCESS API", () => {
 
   it("getStats() returns computed statistics", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     tracingContainer.resolve(LoggerPort);
@@ -320,8 +301,7 @@ describe("TRACING_ACCESS API", () => {
 
   it("clear() removes all traces", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     tracingContainer.resolve(LoggerPort);
@@ -333,8 +313,7 @@ describe("TRACING_ACCESS API", () => {
 
   it("subscribe() notifies on new traces and unsubscribe works", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     const callback = vi.fn();
@@ -357,8 +336,7 @@ describe("TRACING_ACCESS API", () => {
 describe("pause/resume recording", () => {
   it("pause() stops trace recording and isPaused() returns true", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     expect(tracingAPI.isPaused()).toBe(false);
@@ -376,8 +354,7 @@ describe("pause/resume recording", () => {
 
   it("resume() restarts trace recording", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     tracingAPI.pause();
@@ -394,13 +371,11 @@ describe("pause/resume recording", () => {
 
   it("has zero overhead when paused (skips interception logic)", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-
     // Create a custom collector to verify no collection happens
     const collector = new MemoryCollector();
     const collectSpy = vi.spyOn(collector, "collect");
 
-    const tracingContainer = createTracingContainer(baseContainer, { collector });
+    const tracingContainer = createTracingContainer(graph, { collector });
     const tracingAPI = getTracingAPI(tracingContainer);
 
     tracingAPI.pause();
@@ -422,8 +397,7 @@ describe("pause/resume recording", () => {
 describe("scope integration", () => {
   it("tracks scopeId for scoped service resolutions", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     const scope = tracingContainer.createScope();
@@ -439,8 +413,7 @@ describe("scope integration", () => {
 
   it("createScope() returns a scope that also traces resolutions", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
-    const tracingContainer = createTracingContainer(baseContainer);
+    const tracingContainer = createTracingContainer(graph);
     const tracingAPI = getTracingAPI(tracingContainer);
 
     // Create scope from tracing container
@@ -466,10 +439,9 @@ describe("scope integration", () => {
 describe("custom collector option", () => {
   it("uses provided collector for trace storage", () => {
     const graph = createTestGraph();
-    const baseContainer = createContainer(graph);
     const collector = new MemoryCollector();
 
-    const tracingContainer = createTracingContainer(baseContainer, { collector });
+    const tracingContainer = createTracingContainer(graph, { collector });
 
     tracingContainer.resolve(LoggerPort);
 

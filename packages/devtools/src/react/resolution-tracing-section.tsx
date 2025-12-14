@@ -13,6 +13,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   type ReactElement,
   type CSSProperties,
 } from "react";
@@ -438,6 +439,9 @@ export function ResolutionTracingSection({
   // TreeView state
   const [timeDisplayMode, setTimeDisplayMode] = useState<TimeDisplayMode>("self");
 
+  // Ref to schedule deferred updates (avoid state updates during render)
+  const rafIdRef = useRef<number | null>(null);
+
   // Subscribe to trace updates when tracingAPI is provided
   useEffect(() => {
     if (tracingAPI === undefined) {
@@ -451,12 +455,23 @@ export function ResolutionTracingSection({
 
     // Subscribe to new traces
     const unsubscribe = tracingAPI.subscribe(() => {
-      // Refresh traces and stats when new trace is recorded
-      setTraces(tracingAPI.getTraces());
-      setStats(tracingAPI.getStats());
+      // Defer state update to next frame to avoid updating during render
+      // This prevents "Cannot update a component while rendering a different component" warning
+      if (rafIdRef.current === null) {
+        rafIdRef.current = requestAnimationFrame(() => {
+          rafIdRef.current = null;
+          setTraces(tracingAPI.getTraces());
+          setStats(tracingAPI.getStats());
+        });
+      }
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+    };
   }, [tracingAPI]);
 
   // Compute filtered and sorted traces
