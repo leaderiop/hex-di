@@ -213,7 +213,7 @@ function GraphView({ exportedGraph }: GraphViewProps): ReactElement {
   }));
 
   return (
-    <div style={{ height: "400px" }}>
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
       <DependencyGraph
         nodes={graphNodes}
         edges={exportedGraph.edges}
@@ -507,6 +507,7 @@ export function DevToolsPanel({
             id="tabpanel-graph"
             role="tabpanel"
             aria-labelledby="tab-graph"
+            style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
           >
             <GraphView exportedGraph={exportedGraph} />
           </div>
@@ -518,6 +519,7 @@ export function DevToolsPanel({
             id="tabpanel-services"
             role="tabpanel"
             aria-labelledby="tab-services"
+            style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
           >
             <ContainerBrowser exportedGraph={exportedGraph} />
           </div>
@@ -529,6 +531,7 @@ export function DevToolsPanel({
             id="tabpanel-tracing"
             role="tabpanel"
             aria-labelledby="tab-tracing"
+            style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
           >
             <ResolutionTracingSection
               {...(tracingAPI !== undefined ? { tracingAPI } : {})}
@@ -542,6 +545,7 @@ export function DevToolsPanel({
             id="tabpanel-inspector"
             role="tabpanel"
             aria-labelledby="tab-inspector"
+            style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
           >
             <ContainerInspector container={container} exportedGraph={exportedGraph} />
           </div>

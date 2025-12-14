@@ -268,6 +268,9 @@ export const panelStyles: PanelStyleDef = {
     border: "1px solid var(--hex-devtools-border, #45475a)",
     borderRadius: "8px",
     overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
   },
   header: {
     padding: "12px 16px",
@@ -278,6 +281,10 @@ export const panelStyles: PanelStyleDef = {
   },
   content: {
     padding: "12px 16px",
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    overflow: "auto",
   },
 };
 
