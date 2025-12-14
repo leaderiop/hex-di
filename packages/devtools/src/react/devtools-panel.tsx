@@ -19,13 +19,11 @@ import type { Container } from "@hex-di/runtime";
 import { TRACING_ACCESS } from "@hex-di/runtime";
 import { toJSON } from "../to-json.js";
 import type { TracingAPI } from "../tracing/types.js";
-import type { ExportedGraph, ExportedNode, ExportedEdge } from "../types.js";
+import type { ExportedGraph, ExportedNode } from "../types.js";
 import {
   panelStyles,
   sectionStyles,
-  nodeStyles,
   adapterStyles,
-  edgeStyles,
   emptyStyles,
   getLifetimeBadgeStyle,
   getLifetimeClassName,
@@ -33,6 +31,7 @@ import {
 import { ContainerInspector } from "./container-inspector.js";
 import { TabNavigation, type TabId } from "./tab-navigation.js";
 import { ResolutionTracingSection } from "./resolution-tracing-section.js";
+import { DependencyGraph } from "./graph-visualization/index.js";
 
 // =============================================================================
 // Types
@@ -191,40 +190,7 @@ function LifetimeBadge({ lifetime, portName }: LifetimeBadgeProps): ReactElement
 }
 
 /**
- * Graph node item component.
- */
-interface GraphNodeProps {
-  readonly node: ExportedNode;
-}
-
-function GraphNode({ node }: GraphNodeProps): ReactElement {
-  return (
-    <div data-testid="graph-node" style={nodeStyles.item}>
-      <span style={nodeStyles.name}>{node.label}</span>
-      <LifetimeBadge lifetime={node.lifetime} portName={node.id} />
-    </div>
-  );
-}
-
-/**
- * Graph edge item component.
- */
-interface GraphEdgeProps {
-  readonly edge: ExportedEdge;
-}
-
-function GraphEdge({ edge }: GraphEdgeProps): ReactElement {
-  return (
-    <div data-testid={`edge-${edge.from}-${edge.to}`} style={edgeStyles.item}>
-      <span style={edgeStyles.fromNode}>{edge.from}</span>
-      <span style={edgeStyles.arrow}>{"->"}</span>
-      <span style={edgeStyles.toNode}>{edge.to}</span>
-    </div>
-  );
-}
-
-/**
- * Graph view section showing nodes and edges.
+ * Graph view section showing visual dependency graph.
  */
 interface GraphViewProps {
   readonly exportedGraph: ExportedGraph;
@@ -239,30 +205,21 @@ function GraphView({ exportedGraph }: GraphViewProps): ReactElement {
     );
   }
 
+  // Transform nodes to include lifetime property required by DependencyGraph
+  const graphNodes = exportedGraph.nodes.map((node) => ({
+    id: node.id,
+    label: node.label,
+    lifetime: node.lifetime as "singleton" | "scoped" | "request",
+  }));
+
   return (
-    <div>
-      <div>
-        {exportedGraph.nodes.map((node) => (
-          <GraphNode key={node.id} node={node} />
-        ))}
-      </div>
-      {exportedGraph.edges.length > 0 && (
-        <div style={edgeStyles.container}>
-          <div
-            style={{
-              fontSize: "11px",
-              color: "var(--hex-devtools-text-muted, #a6adc8)",
-              marginBottom: "8px",
-              fontWeight: 600,
-            }}
-          >
-            Dependencies
-          </div>
-          {exportedGraph.edges.map((edge) => (
-            <GraphEdge key={`${edge.from}-${edge.to}`} edge={edge} />
-          ))}
-        </div>
-      )}
+    <div style={{ height: "400px" }}>
+      <DependencyGraph
+        nodes={graphNodes}
+        edges={exportedGraph.edges}
+        direction="TB"
+        showControls={true}
+      />
     </div>
   );
 }

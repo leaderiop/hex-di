@@ -350,3 +350,93 @@ export type { TreeViewProps, TimeDisplayMode } from "./tree-view.js";
  */
 export { SummaryStatsView } from "./summary-stats-view.js";
 export type { SummaryStatsViewProps } from "./summary-stats-view.js";
+
+// =============================================================================
+// Graph Visualization Components
+// =============================================================================
+
+/**
+ * DependencyGraph component for interactive visual dependency graph.
+ *
+ * Renders a visual node-based dependency graph with:
+ * - Hierarchical layout using Dagre algorithm
+ * - Interactive zoom and pan with D3
+ * - Hover highlighting of connected dependencies
+ * - Click selection with focus
+ * - Tooltips showing node details
+ * - Lifetime-based color coding (singleton=green, scoped=blue, request=orange)
+ *
+ * @see {@link DependencyGraphProps} - Component props interface
+ *
+ * @example Basic usage
+ * ```typescript
+ * import { DependencyGraph } from '@hex-di/devtools/react';
+ *
+ * <DependencyGraph
+ *   nodes={[
+ *     { id: 'Logger', label: 'Logger', lifetime: 'singleton' },
+ *     { id: 'UserService', label: 'UserService', lifetime: 'scoped' },
+ *   ]}
+ *   edges={[
+ *     { from: 'UserService', to: 'Logger' },
+ *   ]}
+ *   direction="TB"
+ *   onNodeClick={(nodeId) => console.log('Clicked:', nodeId)}
+ * />
+ * ```
+ */
+export { DependencyGraph } from "./graph-visualization/index.js";
+export type { DependencyGraphProps } from "./graph-visualization/index.js";
+
+/**
+ * GraphRenderer component for low-level SVG rendering with D3 zoom.
+ *
+ * Used internally by DependencyGraph but exported for advanced customization.
+ */
+export { GraphRenderer } from "./graph-visualization/index.js";
+
+/**
+ * Layout utilities for computing graph positions.
+ *
+ * - computeLayout: Computes node positions using Dagre
+ * - generateEdgePath: Creates SVG path strings for edges
+ * - findConnectedNodes/findConnectedEdges: For highlighting
+ */
+export {
+  computeLayout,
+  generateEdgePath,
+  findConnectedNodes,
+  findConnectedEdges,
+} from "./graph-visualization/index.js";
+export type {
+  LayoutConfig,
+  InputNode,
+  InputEdge,
+} from "./graph-visualization/index.js";
+
+/**
+ * Graph visualization types.
+ */
+export type {
+  Point,
+  PositionedNode,
+  PositionedEdge,
+  LayoutResult,
+  GraphDirection,
+  GraphInteractionState,
+  TransformState,
+} from "./graph-visualization/index.js";
+export { createEdgeKey, DEFAULT_TRANSFORM } from "./graph-visualization/index.js";
+
+/**
+ * Graph styling utilities.
+ */
+export {
+  graphContainerStyles,
+  graphNodeStyles,
+  graphEdgeStyles,
+  graphControlsStyles,
+  tooltipStyles,
+  getLifetimeStrokeVar,
+  LIFETIME_COLORS,
+} from "./graph-visualization/index.js";

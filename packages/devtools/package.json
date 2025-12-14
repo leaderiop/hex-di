@@ -75,7 +75,11 @@
   "dependencies": {
     "@hex-di/ports": "workspace:*",
     "@hex-di/graph": "workspace:*",
-    "@hex-di/runtime": "workspace:*"
+    "@hex-di/runtime": "workspace:*",
+    "dagre": "^0.8.5",
+    "d3-selection": "^3.0.0",
+    "d3-transition": "^3.0.0",
+    "d3-zoom": "^3.0.0"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
@@ -91,6 +95,10 @@
   },
   "devDependencies": {
     "@testing-library/react": "^14.0.0",
+    "@types/d3-selection": "^3.0.0",
+    "@types/d3-transition": "^3.0.0",
+    "@types/d3-zoom": "^3.0.0",
+    "@types/dagre": "^0.7.52",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "jsdom": "^24.0.0",
