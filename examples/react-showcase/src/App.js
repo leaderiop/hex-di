@@ -7,7 +7,6 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  *
  * @packageDocumentation
  */
-import { createContainer } from "@hex-di/runtime";
 import { DevToolsFloating, createTracingContainer } from "@hex-di/devtools";
 import { ContainerProvider } from "./di/hooks.js";
 import { appGraph } from "./di/graph.js";
@@ -25,8 +24,7 @@ import { ChatRoom } from "./components/ChatRoom.js";
  * The container is wrapped with tracing to enable resolution tracking
  * in the DevTools panel.
  */
-const baseContainer = createContainer(appGraph);
-const container = createTracingContainer(baseContainer);
+const container = createTracingContainer(appGraph);
 // =============================================================================
 // App Component
 // =============================================================================

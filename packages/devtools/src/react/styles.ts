@@ -171,8 +171,11 @@ interface FloatingStyleDef {
   toggleIcon: CSSProperties;
   panelWrapper: CSSProperties;
   panelHeader: CSSProperties;
+  headerControls: CSSProperties;
+  controlButton: CSSProperties;
   closeButton: CSSProperties;
   panelContent: CSSProperties;
+  resizeHandle: CSSProperties;
 }
 
 // =============================================================================
@@ -496,8 +499,9 @@ export const floatingStyles: FloatingStyleDef = {
    * Panel wrapper - contains the header and content when expanded.
    */
   panelWrapper: {
+    position: "relative",
     width: "400px",
-    maxHeight: "500px",
+    height: "500px",
     backgroundColor: "var(--hex-devtools-bg, #1e1e2e)",
     border: "1px solid var(--hex-devtools-border, #45475a)",
     borderRadius: "8px",
@@ -513,9 +517,39 @@ export const floatingStyles: FloatingStyleDef = {
   panelHeader: {
     display: "flex",
     justifyContent: "flex-end",
+    alignItems: "center",
     padding: "4px 8px",
     backgroundColor: "var(--hex-devtools-bg-secondary, #2a2a3e)",
     borderBottom: "1px solid var(--hex-devtools-border, #45475a)",
+    gap: "4px",
+  },
+
+  /**
+   * Header controls container (reset, fullscreen buttons).
+   */
+  headerControls: {
+    display: "flex",
+    alignItems: "center",
+    gap: "2px",
+  },
+
+  /**
+   * Control button (reset, fullscreen).
+   */
+  controlButton: {
+    width: "24px",
+    height: "24px",
+    borderRadius: "4px",
+    border: "none",
+    backgroundColor: "transparent",
+    color: "var(--hex-devtools-text-muted, #a6adc8)",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "12px",
+    fontWeight: 600,
+    transition: "background-color 0.15s ease, color 0.15s ease",
   },
 
   /**
@@ -542,7 +576,21 @@ export const floatingStyles: FloatingStyleDef = {
    */
   panelContent: {
     overflow: "auto",
-    maxHeight: "456px", // 500 - header height
+    flex: 1,
+  },
+
+  /**
+   * Resize handle at corner.
+   */
+  resizeHandle: {
+    position: "absolute",
+    width: "16px",
+    height: "16px",
+    cursor: "nwse-resize",
+    zIndex: 10,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
 };
 
