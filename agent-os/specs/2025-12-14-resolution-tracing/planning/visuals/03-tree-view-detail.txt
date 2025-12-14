@@ -1,0 +1,313 @@
+================================================================================
+                    RESOLUTION TRACING - TREE VIEW DETAIL
+================================================================================
+
+The Tree View shows dependency resolution chains hierarchically. When resolving
+a service, its dependencies are resolved first - this view shows that nesting.
+
+TREE VIEW STRUCTURE:
+--------------------------------------------------------------------------------
+
++==============================================================================+
+|  TREE VIEW                                                                   |
++------------------------------------------------------------------------------+
+|                                                                              |
+|  Resolution Chains (grouped by root resolution)                              |
+|                                                                              |
+|  [-] UserService                          23.4ms total    REQUEST            |
+|      |                                                                       |
+|      +--[-] AuthService                    8.2ms          SCOPED             |
+|      |      |                                                                |
+|      |      +--[+] ConfigPort              0.3ms [*]      SINGLETON          |
+|      |      |                                                                |
+|      |      +--[-] TokenService            5.1ms          SCOPED             |
+|      |             |                                                         |
+|      |             +--[+] CryptoPort       2.8ms          SINGLETON          |
+|      |             |                                                         |
+|      |             +--[+] ConfigPort       0.0ms [*]      SINGLETON (cached) |
+|      |                                                                       |
+|      +--[-] UserRepository                 12.4ms         SCOPED             |
+|             |                                                                |
+|             +--[+] DatabasePort            8.9ms [!]      SINGLETON (slow)   |
+|             |                                                                |
+|             +--[+] LoggerPort              0.2ms [*]      SINGLETON (cached) |
+|                                                                              |
+|  [-] PaymentService                       15.2ms total    REQUEST            |
+|      |                                                                       |
+|      +--[-] PaymentGateway                 9.8ms          SINGLETON          |
+|      |      |                                                                |
+|      |      +--[+] ConfigPort              0.0ms [*]      SINGLETON (cached) |
+|      |      |                                                                |
+|      |      +--[+] HttpClient              6.2ms          SINGLETON          |
+|      |                                                                       |
+|      +--[+] LoggerPort                     0.0ms [*]      SINGLETON (cached) |
+|                                                                              |
++------------------------------------------------------------------------------+
+|  2 root resolutions | 8 unique services | 4 cache hits | Total: 38.6ms       |
++==============================================================================+
+
+
+SINGLE TREE NODE - EXPANDED STATES:
+--------------------------------------------------------------------------------
+
+Collapsed Node (with children):
++------------------------------------------------------------------------------+
+|                                                                              |
+|  [+] AuthService                           8.2ms          SCOPED             |
+|   ^   ^                                     ^               ^                |
+|   |   |                                     |               |                |
+|   |   Port name (accent color)              Duration        Lifetime badge   |
+|   |                                                                          |
+|   Expand/collapse toggle                                                     |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+Expanded Node (with children):
++------------------------------------------------------------------------------+
+|                                                                              |
+|  [-] AuthService                           8.2ms          SCOPED             |
+|      |                                                                       |
+|      +-- [child nodes indented here]                                         |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+Leaf Node (no children):
++------------------------------------------------------------------------------+
+|                                                                              |
+|      ConfigPort                            0.3ms [*]      SINGLETON          |
+|      ^                                           ^                           |
+|      |                                           |                           |
+|      No toggle (leaf)                            Cache hit indicator         |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+TREE NODE COMPONENT STRUCTURE:
+--------------------------------------------------------------------------------
+
+TreeNode (recursive)
+  +-- ExpandToggle ([-] or [+], only if hasChildren)
+  +-- TreeConnector (vertical and horizontal lines)
+  +-- NodeContent
+  |     +-- PortNameLabel
+  |     +-- DurationDisplay
+  |           +-- SelfDuration (time for this node only)
+  |           +-- TotalDuration (including children, for root nodes)
+  |     +-- StatusIndicators
+  |           +-- CacheHitIndicator [*]
+  |           +-- SlowIndicator [!]
+  |     +-- LifetimeBadge
+  +-- ChildrenContainer (if expanded)
+        +-- TreeNode (recursive for each child)
+
+
+TREE CONNECTORS ASCII ART:
+--------------------------------------------------------------------------------
+
+Standard tree lines using Unicode box-drawing characters:
+
+      Parent
+      |
+      +-- Child 1
+      |
+      +-- Child 2
+      |      |
+      |      +-- Grandchild 1
+      |      |
+      |      +-- Grandchild 2
+      |
+      +-- Child 3 (last)
+
+CSS implementation:
+  - Vertical line:   border-left: 1px solid var(--hex-devtools-border)
+  - Horizontal arm:  border-top: 1px solid var(--hex-devtools-border)
+  - Corner:          Pseudo-element for L-shaped connector
+
+
+DETAILED NODE LAYOUT:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  [-] DatabasePort            8.9ms (self)    [!] SLOW    SINGLETON           |
+|   |   |                       |               |           |                  |
+|   |   |                       |               |           +-- Lifetime badge |
+|   |   |                       |               |               (green bg)     |
+|   |   |                       |               |                              |
+|   |   |                       |               +-- Slow indicator             |
+|   |   |                       |                   (red [!] icon)             |
+|   |   |                       |                                              |
+|   |   |                       +-- Duration (bold for slow items)             |
+|   |   |                                                                      |
+|   |   +-- Port name in accent color (#89b4fa)                                |
+|   |                                                                          |
+|   +-- Expand/collapse button                                                 |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+EXPANDED NODE WITH DETAILS PANEL:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  [-] DatabasePort            8.9ms    [!] SLOW    SINGLETON          [v]     |
+|      |                                                                ^      |
+|      |  +----------------------------------------------------------+  |      |
+|      |  |  Trace Details                                           |  |      |
+|      |  |  ..........................................................  |      |
+|      |  |                                                          |  |      |
+|      |  |  Resolution Order:  #5                                   |  |      |
+|      |  |  Start Time:        12.4ms (from session start)          |  |      |
+|      |  |  End Time:          21.3ms                               |  |      |
+|      |  |  Self Duration:     8.9ms                                |  |      |
+|      |  |  Total Duration:    8.9ms (no children)                  |  |      |
+|      |  |  Cache Status:      Fresh resolution                     |  |      |
+|      |  |  Scope Context:     root                                 |  |      |
+|      |  |                                                          |  |      |
+|      |  |  Performance:                                            |  |      |
+|      |  |  [===================                    ]               |  |      |
+|      |  |   8.9ms / 50ms threshold (178% of threshold)             |  |      |
+|      |  |                                                          |  |      |
+|      |  |  [View in Timeline]   [Copy Trace]                       |  |      |
+|      |  +----------------------------------------------------------+  |      |
+|      |                                                                       |
+|      +-- [child nodes...]                                                    |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+TREE VIEW HEADER:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|  TREE VIEW HEADER                                                            |
+|  +------------------------------------------------------------------------+  |
+|  |                                                                        |  |
+|  |  [Expand All]  [Collapse All]  |  Group by: [Root Resolution v]        |  |
+|  |                                                                        |  |
+|  |  Show: [x] Self time  [ ] Total time  [ ] Cumulative                   |  |
+|  |                                                                        |  |
+|  +------------------------------------------------------------------------+  |
++------------------------------------------------------------------------------+
+
+
+VISUAL INDICATORS IN TREE:
+--------------------------------------------------------------------------------
+
+Duration Display Modes:
+
+  Self Time (default):
+    - Shows only this node's direct execution time
+    - Excludes time spent in children
+
+  Total Time:
+    - Shows node time + all descendant times
+    - Useful for understanding cascading impact
+
+  Example:
+    AuthService (self: 2.4ms, total: 8.2ms)
+      +-- ConfigPort (self: 0.3ms, total: 0.3ms)
+      +-- TokenService (self: 2.7ms, total: 5.5ms)
+           +-- CryptoPort (self: 2.8ms)
+
+
+Cache Hit Indicator:
++------------------------------------------------------------------------------+
+|                                                                              |
+|  [*] = Cache hit (cyan color: #89dceb)                                       |
+|                                                                              |
+|  Cached nodes show:                                                          |
+|  - Duration: 0.0ms or very small                                             |
+|  - [*] icon after duration                                                   |
+|  - "(cached)" text label                                                     |
+|  - Cyan tint on the node row                                                 |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+Slow Indicator:
++------------------------------------------------------------------------------+
+|                                                                              |
+|  [!] = Slow resolution (red color: #f38ba8)                                  |
+|                                                                              |
+|  Slow nodes show:                                                            |
+|  - Duration in bold                                                          |
+|  - [!] icon after duration                                                   |
+|  - "(slow)" text label                                                       |
+|  - Red/pink tint on the node row                                             |
+|  - Red left border (3px solid)                                               |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+TREE NODE STATES:
+--------------------------------------------------------------------------------
+
+Normal (collapsed, no children):
+  - Background: transparent
+  - Text: var(--hex-devtools-text)
+  - No left border
+
+Normal (expanded):
+  - Background: transparent
+  - Vertical tree line visible on left
+  - Children indented
+
+Hovered:
+  - Background: var(--hex-devtools-bg-hover)
+  - Cursor: pointer
+
+Selected (details shown):
+  - Background: var(--hex-devtools-bg-secondary)
+  - Left border: 3px solid var(--hex-devtools-accent)
+  - Details panel visible below
+
+Cached:
+  - Background: rgba(137, 220, 235, 0.1)
+  - [*] icon in cyan
+  - Duration in cyan
+
+Slow:
+  - Background: rgba(243, 139, 168, 0.1)
+  - [!] icon in red
+  - Duration in red/bold
+  - Left border: 3px solid #f38ba8
+
+
+INDENTATION AND SPACING:
+--------------------------------------------------------------------------------
+
+  Level 0 (root):     padding-left: 12px
+  Level 1:            padding-left: 36px  (+24px per level)
+  Level 2:            padding-left: 60px
+  Level 3:            padding-left: 84px
+  ...
+
+  Tree connector offset: 20px from left edge of content
+  Expand button width:   16px
+  Gap between elements:  8px
+
+
+EMPTY STATE:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|                    No dependency chains recorded.                            |
+|                                                                              |
+|         Resolution chains show when services with dependencies               |
+|         are resolved. The tree displays the order of resolution.             |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+KEYBOARD NAVIGATION:
+--------------------------------------------------------------------------------
+
+  Up/Down Arrow:      Move between visible nodes
+  Left Arrow:         Collapse current node (or move to parent if leaf)
+  Right Arrow:        Expand current node (or move to first child if expanded)
+  Enter/Space:        Toggle expand/collapse
+  Home:               Jump to first root node
+  End:                Jump to last visible node
+

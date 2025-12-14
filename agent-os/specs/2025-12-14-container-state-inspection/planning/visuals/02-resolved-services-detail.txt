@@ -1,0 +1,204 @@
+================================================================================
+RESOLVED SERVICES - DETAILED WIREFRAME
+================================================================================
+File: 02-resolved-services-detail.txt
+Version: 1.0
+Date: 2025-12-14
+
+This wireframe details the "Resolved Services" section showing which services
+have been instantiated vs registered-only.
+
+================================================================================
+RESOLVED SERVICES SECTION - COLLAPSED STATE (List View)
+================================================================================
+
++-----------------------------------------------------------------------+
+|  RESOLVED SERVICES                                     [3/8 resolved] |
++-----------------------------------------------------------------------+
+|                                                                       |
+|  Search: [_________________________________________________]          |
+|                                                                       |
+|  Filter: [All] [Singleton] [Scoped] [Request] [Resolved] [Pending]    |
+|          ^^^^^ (active filter highlighted)                            |
+|                                                                       |
++-----------------------------------------------------------------------+
+|                                                                       |
+|  +-------------------------------------------------------------------+|
+|  | (*) Logger                                                        ||
+|  |     SINGLETON                                                     ||
+|  +-------------------------------------------------------------------+|
+|                                                                       |
+|  +-------------------------------------------------------------------+|
+|  | (*) DatabasePool                                                  ||
+|  |     SINGLETON                                                     ||
+|  +-------------------------------------------------------------------+|
+|                                                                       |
+|  +-------------------------------------------------------------------+|
+|  | ( ) UserRepository                                                ||
+|  |     SCOPED                                                        ||
+|  +-------------------------------------------------------------------+|
+|                                                                       |
+|  +-------------------------------------------------------------------+|
+|  | (*) AuthService                                                   ||
+|  |     SINGLETON                                                     ||
+|  +-------------------------------------------------------------------+|
+|                                                                       |
+|  +-------------------------------------------------------------------+|
+|  | ( ) RequestValidator                                              ||
+|  |     REQUEST                                                       ||
+|  +-------------------------------------------------------------------+|
+|                                                                       |
++-----------------------------------------------------------------------+
+
+LEGEND:
+  (*)  = Resolved (filled green circle)
+  ( )  = Not resolved (empty outline circle)
+
+================================================================================
+RESOLVED SERVICES - SINGLE ITEM EXPANDED
+================================================================================
+
++-----------------------------------------------------------------------+
+|  +-------------------------------------------------------------------+|
+|  | v (*) Logger                                              SINGLETON|
+|  |--------------------------------------------------------------------||
+|  |                                                                    ||
+|  |   Status:         RESOLVED (cached)                                ||
+|  |   Lifetime:       singleton                                        ||
+|  |   Scope:          Root Container                                   ||
+|  |   Created At:     12:34:56.789                                     ||
+|  |   Resolution #:   1 (first resolved service)                       ||
+|  |                                                                    ||
+|  |   Dependencies:   None                                             ||
+|  |                                                                    ||
+|  |   Instance Info:                                                   ||
+|  |   +--------------------------------------------------------------+ ||
+|  |   |  type: ConsoleLogger                                         | ||
+|  |   |  keys: ["log", "warn", "error", "debug"]                     | ||
+|  |   +--------------------------------------------------------------+ ||
+|  |                                                                    ||
+|  +-------------------------------------------------------------------+|
++-----------------------------------------------------------------------+
+
+================================================================================
+RESOLVED SERVICES - ITEM WITH DEPENDENCIES EXPANDED
+================================================================================
+
++-----------------------------------------------------------------------+
+|  +-------------------------------------------------------------------+|
+|  | v (*) AuthService                                         SINGLETON|
+|  |--------------------------------------------------------------------||
+|  |                                                                    ||
+|  |   Status:         RESOLVED (cached)                                ||
+|  |   Lifetime:       singleton                                        ||
+|  |   Scope:          Root Container                                   ||
+|  |   Created At:     12:34:57.123                                     ||
+|  |   Resolution #:   3                                                ||
+|  |                                                                    ||
+|  |   Dependencies:                                                    ||
+|  |   +--------------------------------------------------------------+ ||
+|  |   |  Logger          SINGLETON   (*) resolved                    | ||
+|  |   +--------------------------------------------------------------+ ||
+|  |   |  DatabasePool    SINGLETON   (*) resolved                    | ||
+|  |   +--------------------------------------------------------------+ ||
+|  |                                                                    ||
+|  |   Instance Info:                                                   ||
+|  |   +--------------------------------------------------------------+ ||
+|  |   |  type: JwtAuthService                                        | ||
+|  |   |  keys: ["login", "logout", "verify", "refresh"]              | ||
+|  |   +--------------------------------------------------------------+ ||
+|  |                                                                    ||
+|  +-------------------------------------------------------------------+|
++-----------------------------------------------------------------------+
+
+================================================================================
+RESOLVED SERVICES - NOT-YET-RESOLVED ITEM EXPANDED
+================================================================================
+
++-----------------------------------------------------------------------+
+|  +-------------------------------------------------------------------+|
+|  | v ( ) UserRepository                                        SCOPED |
+|  |--------------------------------------------------------------------||
+|  |                                                                    ||
+|  |   Status:         NOT RESOLVED                                     ||
+|  |                   (requires scope - cannot resolve from root)      ||
+|  |   Lifetime:       scoped                                           ||
+|  |   Available In:   Scope instances only                             ||
+|  |                                                                    ||
+|  |   Dependencies:                                                    ||
+|  |   +--------------------------------------------------------------+ ||
+|  |   |  DatabasePool    SINGLETON   (*) resolved                    | ||
+|  |   +--------------------------------------------------------------+ ||
+|  |   |  Logger          SINGLETON   (*) resolved                    | ||
+|  |   +--------------------------------------------------------------+ ||
+|  |                                                                    ||
+|  |   [!] This service is scoped and must be resolved from a scope.   ||
+|  |       It will be instantiated once per scope and cached.          ||
+|  |                                                                    ||
+|  +-------------------------------------------------------------------+|
++-----------------------------------------------------------------------+
+
+================================================================================
+FILTER STATES
+================================================================================
+
+All Filters (toggle buttons):
+
+  +-----------------------------------------------------------------------+
+  |  [All] [Singleton] [Scoped] [Request] | [Resolved] [Pending]          |
+  +-----------------------------------------------------------------------+
+
+  - First group: Lifetime filters (mutually exclusive with "All")
+  - Second group: Status filters (can combine with lifetime)
+
+Active filter styling:
+  - Background: var(--hex-devtools-accent) #89b4fa
+  - Color: #1e1e2e (dark text on light bg)
+
+Inactive filter styling:
+  - Background: transparent
+  - Border: 1px solid var(--hex-devtools-border)
+  - Color: var(--hex-devtools-text-muted)
+
+================================================================================
+VISUAL STATES FOR RESOLUTION STATUS
+================================================================================
+
+RESOLVED (Cached):
++-------------------+
+| (*) ServiceName   |   - Filled green circle: #a6e3a1
+|     SINGLETON     |   - Badge has full opacity
++-------------------+   - Row background: slightly elevated
+
+NOT RESOLVED (Pending):
++-------------------+
+| ( ) ServiceName   |   - Empty circle outline: var(--hex-devtools-text-muted)
+|     SCOPED        |   - Badge has 70% opacity
++-------------------+   - Row background: normal
+
+SCOPED (Root Container Warning):
++-------------------+
+| (!) ServiceName   |   - Warning icon: #fab387 (orange)
+|     SCOPED        |   - Tooltip: "Requires scope to resolve"
++-------------------+   - Subtle orange left border
+
+================================================================================
+ACCESSIBILITY CONSIDERATIONS
+================================================================================
+
+1. Resolution status uses both color AND shape:
+   - Resolved: Filled circle (shape indicates "full/complete")
+   - Not resolved: Empty circle (shape indicates "empty/waiting")
+
+2. All interactive elements have:
+   - role="button" for headers
+   - aria-expanded for collapsible sections
+   - tabIndex={0} for keyboard navigation
+
+3. Filter buttons are toggle buttons with aria-pressed state
+
+4. Status text accompanies visual indicators for screen readers:
+   - "Logger - Singleton - Resolved"
+   - "UserRepository - Scoped - Not Resolved"
+
+================================================================================

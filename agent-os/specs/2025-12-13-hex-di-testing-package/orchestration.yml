@@ -1,0 +1,21 @@
+task_groups:
+  - name: Package Infrastructure
+    claude_code_subagent: implementer
+  - name: TestGraphBuilder
+    claude_code_subagent: composition-test-architect
+  - name: Mock Adapter Utilities
+    claude_code_subagent: composition-test-architect
+  - name: Spied Mock Adapters (Vitest)
+    claude_code_subagent: composition-test-architect
+  - name: Test Container Utilities (Vitest)
+    claude_code_subagent: composition-test-architect
+  - name: Adapter Test Harness
+    claude_code_subagent: composition-test-architect
+  - name: Graph Assertions
+    claude_code_subagent: architecture-guardian
+  - name: Graph Snapshots
+    claude_code_subagent: implementer
+  - name: React Testing Library Integration
+    claude_code_subagent: react-ports-integrator
+  - name: Type Tests and Quality Assurance
+    claude_code_subagent: typescript-type-system-architect

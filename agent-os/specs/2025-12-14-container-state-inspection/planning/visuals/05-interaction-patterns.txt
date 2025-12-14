@@ -1,0 +1,360 @@
+================================================================================
+INTERACTION PATTERNS - DETAILED WIREFRAME
+================================================================================
+File: 05-interaction-patterns.txt
+Version: 1.0
+Date: 2025-12-14
+
+This wireframe details the interaction patterns, default states, and
+user workflows for the Container State Inspection feature.
+
+================================================================================
+DEFAULT STATES ON LOAD
+================================================================================
+
+CONTAINER INSPECTOR SECTION:
+  - Collapsed by default (consistent with Container Browser)
+  - When expanded, shows:
+    - Scope Hierarchy: Expanded with root container visible
+    - Resolved Services: Collapsed to list view
+
+SCOPE HIERARCHY:
+  - Root container: Always visible, expanded to show summary
+  - Child scopes: Collapsed by default
+  - Nested scopes: Collapsed, visible only when parent expanded
+
+RESOLVED SERVICES:
+  - All items: Collapsed to single row
+  - Filter: "All" selected by default
+  - Sort: By resolution order (most recent first)
+
+================================================================================
+EXPANSION/COLLAPSE BEHAVIOR
+================================================================================
+
+Section Header Click:
++-----------------------------------------------------------------------+
+|  > Container Inspector            [click]                             |
++-----------------------------------------------------------------------+
+                                      |
+                                      v
++-----------------------------------------------------------------------+
+|  v Container Inspector                                                |
++-----------------------------------------------------------------------+
+|  [Content appears below]                                              |
++-----------------------------------------------------------------------+
+
+Service Row Expansion:
++-----------------------------------------------------------------------+
+|  > (*)  Logger                                              SINGLETON |
++-----------------------------------------------------------------------+
+                          [click anywhere on row]
+                                      |
+                                      v
++-----------------------------------------------------------------------+
+|  v (*)  Logger                                              SINGLETON |
+|----------------------------------------------------------------------|
+|      Status: Resolved (cached)                                        |
+|      Created: 12:34:56.789                                            |
+|      Dependencies: None                                               |
++-----------------------------------------------------------------------+
+
+Scope Node Expansion:
++-----------------------------------------------------------------------+
+|  [+] [C] Root Container                                       Active  |
++-----------------------------------------------------------------------+
+                          [click on [+] or row]
+                                      |
+                                      v
++-----------------------------------------------------------------------+
+|  [-] [C] Root Container                                       Active  |
+|      Singletons: 3/5 resolved                                         |
+|                                                                       |
+|      +-- [+] [S] Scope #1 (request-abc123)                    Active  |
+|      +-- [+] [S] Scope #2 (request-def456)                    Active  |
++-----------------------------------------------------------------------+
+
+================================================================================
+KEYBOARD NAVIGATION
+================================================================================
+
+Tab Order:
+1. Section header (Container Inspector)
+2. Scope Hierarchy items (in tree order)
+3. Resolved Services search input
+4. Filter buttons (left to right)
+5. Service list items (top to bottom)
+
+Key Bindings:
+
++-------------+----------------------------------------------------------+
+| Key         | Action                                                   |
++-------------+----------------------------------------------------------+
+| Tab         | Move to next focusable element                           |
+| Shift+Tab   | Move to previous focusable element                       |
+| Enter/Space | Toggle expand/collapse on focused item                   |
+| ArrowDown   | Move focus to next item in list                          |
+| ArrowUp     | Move focus to previous item in list                      |
+| ArrowRight  | Expand collapsed item OR move to first child             |
+| ArrowLeft   | Collapse expanded item OR move to parent                 |
+| Home        | Move focus to first item in current section              |
+| End         | Move focus to last item in current section               |
+| /           | Focus search input (when in Resolved Services)           |
+| Escape      | Clear search / deselect / close expanded panel           |
++-------------+----------------------------------------------------------+
+
+================================================================================
+SEARCH FUNCTIONALITY
+================================================================================
+
+Search Input:
++-----------------------------------------------------------------------+
+|  Search: [Logger___________________________________________]  [x]     |
+|                                                                       |
+|  Showing 2 of 8 services matching "Logger"                            |
++-----------------------------------------------------------------------+
+
+Search Behavior:
+  - Debounced input (300ms delay)
+  - Matches against service name (case-insensitive)
+  - Partial match supported (e.g., "Log" matches "Logger")
+  - Clear button [x] appears when text present
+  - Results update in real-time
+
+No Results State:
++-----------------------------------------------------------------------+
+|  Search: [NonExistentService_______________________________]  [x]     |
+|                                                                       |
+|  No services match "NonExistentService"                               |
+|  Try a different search term or clear filters                         |
++-----------------------------------------------------------------------+
+
+================================================================================
+FILTER INTERACTIONS
+================================================================================
+
+Filter Button States:
+
+Inactive:
++------------+
+|  Singleton |   Background: transparent
++------------+   Border: 1px solid var(--hex-devtools-border)
+                 Color: var(--hex-devtools-text-muted)
+
+Active:
++------------+
+|  Singleton |   Background: var(--hex-devtools-singleton) (20% opacity)
++------------+   Border: 1px solid var(--hex-devtools-singleton)
+                 Color: var(--hex-devtools-singleton)
+
+Hover (inactive):
++------------+
+|  Singleton |   Background: var(--hex-devtools-bg-hover)
++------------+   Border: 1px solid var(--hex-devtools-border)
+                 Color: var(--hex-devtools-text)
+
+Filter Combinations:
++-----------------------------------------------------------------------+
+|  [All] [Singleton] [Scoped] [Request]  |  [Resolved] [Pending]        |
++-----------------------------------------------------------------------+
+
+Rules:
+  - "All" is mutually exclusive with Singleton/Scoped/Request
+  - Clicking Singleton/Scoped/Request deselects "All"
+  - Clicking "All" deselects any active lifetime filter
+  - Resolved/Pending can combine with any lifetime filter
+  - Clicking active filter deselects it
+
+Example Combinations:
+  - [All] + [Resolved] = Show all resolved services
+  - [Singleton] + [Pending] = Show singletons not yet resolved
+  - [Scoped] + [Resolved] = Show resolved scoped services
+
+================================================================================
+SCOPE SELECTION & CONTEXT
+================================================================================
+
+When user selects a scope in the hierarchy, the Resolved Services updates:
+
+Before Selection (showing root container):
++-----------------------------------------------------------------------+
+|  [-] [C] Root Container  [SELECTED]                           Active  |
+|      +-- [S] Scope #1 (request-abc123)                        Active  |
++-----------------------------------------------------------------------+
+|  RESOLVED SERVICES (Root Container)                    [3/5 resolved] |
+|  ... shows singleton instances ...                                    |
++-----------------------------------------------------------------------+
+
+After Selecting Scope #1:
++-----------------------------------------------------------------------+
+|  [-] [C] Root Container                                       Active  |
+|      +-- [S] Scope #1 (request-abc123)  [SELECTED]            Active  |
++-----------------------------------------------------------------------+
+|  RESOLVED SERVICES (Scope #1)                          [2/4 resolved] |
+|  ... shows scoped instances for Scope #1 ...                          |
+|  ... plus inherited singletons from root ...                          |
++-----------------------------------------------------------------------+
+
+Selection Indicator:
+  - Selected row has left border: 3px solid var(--hex-devtools-accent)
+  - Background: var(--hex-devtools-bg-hover)
+  - Breadcrumb shows current context: "Root > Scope #1"
+
+================================================================================
+REAL-TIME UPDATES
+================================================================================
+
+Auto-Refresh Behavior:
+
++-----------------------------------------------------------------------+
+|  RESOLVED SERVICES                [Auto-refresh: ON]  [Refresh]       |
++-----------------------------------------------------------------------+
+
+Toggle States:
+  - Auto-refresh ON: Updates every 1 second
+  - Auto-refresh OFF: Manual refresh only (click button)
+  - Default: OFF (to avoid performance impact)
+
+New Resolution Indicator:
+When a service is resolved while viewing:
+
++-----------------------------------------------------------------------+
+|  +-------------------------------------------------------------------+|
+|  | (*) NewlyResolvedService                             SINGLETON    ||
+|  |     [NEW] Just resolved                                           ||
+|  +-------------------------------------------------------------------+|
++-----------------------------------------------------------------------+
+
+Animation:
+  - Fade-in animation (0.3s)
+  - "NEW" badge with green background, fades out after 3s
+  - Pulse effect on the resolution status indicator
+
+================================================================================
+RESPONSIVE BEHAVIOR
+================================================================================
+
+Width Breakpoints:
+
+Full Width (>= 400px):
++-----------------------------------------------------------------------+
+| (*)  Logger                                                 SINGLETON |
++-----------------------------------------------------------------------+
+
+Narrow Width (< 400px):
++--------------------------------------+
+| (*)  Logger                          |
+|      SINGLETON                       |
++--------------------------------------+
+
+Badge moves to second line, status indicator stays with name.
+
+Panel Minimum Width: 320px
+Panel Maximum Width: 600px (for floating panel)
+
+================================================================================
+ERROR STATES
+================================================================================
+
+Container Not Provided:
++-----------------------------------------------------------------------+
+|  CONTAINER INSPECTOR                                                  |
++-----------------------------------------------------------------------+
+|                                                                       |
+|  +-------------------------------------------------------------------+|
+|  |  [!] Container not provided                                       ||
+|  |                                                                   ||
+|  |  To enable state inspection, pass the container prop:             ||
+|  |                                                                   ||
+|  |  <DevToolsPanel graph={graph} container={container} />            ||
+|  +-------------------------------------------------------------------+|
+|                                                                       |
++-----------------------------------------------------------------------+
+
+Container Disposed:
++-----------------------------------------------------------------------+
+|  CONTAINER INSPECTOR                                                  |
++-----------------------------------------------------------------------+
+|                                                                       |
+|  +-------------------------------------------------------------------+|
+|  |  [!] Container has been disposed                                  ||
+|  |                                                                   ||
+|  |  The container is no longer active. Create a new container        ||
+|  |  to continue inspecting state.                                    ||
+|  |                                                                   ||
+|  |  Last known state:                                                ||
+|  |  - Singletons resolved: 5                                         ||
+|  |  - Total scopes created: 12                                       ||
+|  |  - Disposed at: 12:45:00.123                                      ||
+|  +-------------------------------------------------------------------+|
+|                                                                       |
++-----------------------------------------------------------------------+
+
+================================================================================
+TOOLTIP CONTENT
+================================================================================
+
+Hover on Lifetime Badge:
++------------------------------------------+
+|  SINGLETON                               |
+|  ----------------------------------------|
+|  Created once, shared globally.          |
+|  Cached in root container.               |
+|  Lives until container is disposed.      |
++------------------------------------------+
+
+Hover on Resolution Status (Resolved):
++------------------------------------------+
+|  RESOLVED                                |
+|  ----------------------------------------|
+|  Instance exists in cache.               |
+|  Created at: 12:34:56.789                |
+|  Resolution order: #3                    |
++------------------------------------------+
+
+Hover on Resolution Status (Not Resolved):
++------------------------------------------+
+|  NOT RESOLVED                            |
+|  ----------------------------------------|
+|  Service registered but not instantiated.|
+|  Will be created on first resolution.    |
++------------------------------------------+
+
+Hover on Scope Badge:
++------------------------------------------+
+|  Scope #1 (request-abc123)               |
+|  ----------------------------------------|
+|  Parent: Root Container                  |
+|  Children: 1 nested scope                |
+|  Scoped instances: 2                     |
+|  Age: 1m 48s                             |
++------------------------------------------+
+
+================================================================================
+COPY TO CLIPBOARD
+================================================================================
+
+Right-click context menu or copy button:
+
++-----------------------------------------------------------------------+
+| (*)  Logger                                          [Copy]  SINGLETON|
++-----------------------------------------------------------------------+
+
+Copied Content (JSON):
+{
+  "portName": "Logger",
+  "lifetime": "singleton",
+  "resolved": true,
+  "scope": "root",
+  "createdAt": "2025-12-14T12:34:56.789Z",
+  "resolutionOrder": 1,
+  "dependencies": []
+}
+
+Toast Notification:
++------------------------------------------+
+|  [check] Copied to clipboard             |
++------------------------------------------+
+  Appears for 2 seconds, bottom-right corner
+
+================================================================================

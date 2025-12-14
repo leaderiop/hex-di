@@ -1,0 +1,164 @@
+================================================================================
+                    RESOLUTION TRACING - OVERALL SECTION LAYOUT
+================================================================================
+
+The Resolution Tracing section integrates into the existing DevToolsPanel as a
+new CollapsibleSection, following the established pattern with sectionStyles.
+
+LOCATION IN DEVTOOLS PANEL:
+--------------------------------------------------------------------------------
+
++==============================================================================+
+|  HexDI DevTools                                                [panelHeader] |
++==============================================================================+
+|                                                                              |
+|  [>] Graph View                                    [sectionStyles.header]    |
+|  ....................................................................        |
+|                                                                              |
+|  [>] Container Browser                             [sectionStyles.header]    |
+|  ....................................................................        |
+|                                                                              |
+|  [>] Container Inspector                           [sectionStyles.header]    |
+|  ....................................................................        |
+|                                                                              |
+|  [v] Resolution Tracing   (3 traces)               [sectionStyles.header]    |
+|  +--------------------------------------------------------------------------+|
+|  |                                                                          ||
+|  |  +-- CONTROLS BAR -----------------------------------------------------+ ||
+|  |  |  [Search: _________________ x]   [Slowest First v]   Threshold: 50ms| ||
+|  |  |  [All] [SINGLETON] [SCOPED] [REQUEST]     [Cache Hits] [Fresh Only] | ||
+|  |  +---------------------------------------------------------------------+ ||
+|  |                                                                          ||
+|  |  +-- VIEW TOGGLE TABS ------------------------------------------------+ ||
+|  |  |  [ Timeline View ]  |  [ Tree View ]  |  [ Summary Stats ]         | ||
+|  |  +---------------------------------------------------------------------+ ||
+|  |                                                                          ||
+|  |  +-- ACTIVE VIEW AREA ------------------------------------------------+ ||
+|  |  |                                                                     | ||
+|  |  |           (Timeline / Tree / Summary content here)                  | ||
+|  |  |                                                                     | ||
+|  |  +---------------------------------------------------------------------+ ||
+|  |                                                                          ||
+|  +--------------------------------------------------------------------------+|
+|                                                                              |
++==============================================================================+
+
+
+COMPONENT HIERARCHY:
+--------------------------------------------------------------------------------
+
+DevToolsPanel
+  +-- CollapsibleSection (title="Resolution Tracing")
+        +-- ResolutionTracingSection
+              +-- TracingControlsBar
+              |     +-- SearchInput (reuse pattern from ResolvedServices)
+              |     +-- SortDropdown
+              |     +-- ThresholdSlider
+              |     +-- LifetimeFilterButtons
+              |     +-- CacheFilterButtons
+              |
+              +-- ViewToggleTabs
+              |     +-- TimelineTab (active/inactive)
+              |     +-- TreeTab (active/inactive)
+              |     +-- SummaryTab (active/inactive)
+              |
+              +-- ViewContainer (conditional render based on active tab)
+                    +-- TimelineView (when timeline selected)
+                    +-- TreeView (when tree selected)
+                    +-- SummaryView (when summary selected)
+
+
+DESIGN TOKENS (from existing styles.ts):
+--------------------------------------------------------------------------------
+
+Colors (dark theme - CSS variables):
+  - Background:        var(--hex-devtools-bg)           #1e1e2e
+  - Background Alt:    var(--hex-devtools-bg-secondary) #2a2a3e
+  - Background Hover:  var(--hex-devtools-bg-hover)     #3a3a4e
+  - Text:              var(--hex-devtools-text)         #cdd6f4
+  - Text Muted:        var(--hex-devtools-text-muted)   #a6adc8
+  - Border:            var(--hex-devtools-border)       #45475a
+  - Accent:            var(--hex-devtools-accent)       #89b4fa
+  - Singleton (green): var(--hex-devtools-singleton)    #a6e3a1
+  - Scoped (blue):     var(--hex-devtools-scoped)       #89b4fa
+  - Request (orange):  var(--hex-devtools-request)      #fab387
+
+NEW colors for performance indicators:
+  - Fast (green):      #a6e3a1 (reuse singleton)
+  - Medium (yellow):   #f9e2af (catppuccin yellow)
+  - Slow (red):        #f38ba8 (catppuccin red/pink)
+  - Cache Hit:         #89dceb (catppuccin cyan)
+
+Typography:
+  - Font Family:       var(--hex-devtools-font-mono)
+  - Font Size:         13px (base), 12px (details), 11px (labels), 10px (badges)
+  - Line Height:       1.5
+
+Spacing:
+  - Section padding:   12px 16px
+  - Item padding:      8px 12px
+  - Gap (small):       4px
+  - Gap (medium):      8px
+  - Gap (large):       12px
+  - Border Radius:     4px (small), 6px (medium), 8px (large)
+
+
+EMPTY STATE:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|                    No resolution traces recorded.                            |
+|                                                                              |
+|         Traces are captured when services are resolved from the container.   |
+|         Try resolving some services to see timing data here.                 |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+LOADING STATE:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|                         Recording traces...                                  |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+DATA MODEL (TraceEvent):
+--------------------------------------------------------------------------------
+
+interface TraceEvent {
+  id: string;                    // Unique trace ID
+  portName: string;              // Service/port being resolved
+  lifetime: Lifetime;            // singleton | scoped | request
+  startTime: number;             // High-resolution timestamp (performance.now())
+  duration: number;              // Time in milliseconds
+  isCacheHit: boolean;           // Was this served from cache?
+  parentTraceId: string | null;  // Parent resolution (for dependency chains)
+  childTraceIds: string[];       // Child resolutions triggered
+  scopeId: string | null;        // Which scope context
+  order: number;                 // Global resolution order (1, 2, 3...)
+}
+
+interface TraceSession {
+  traces: TraceEvent[];
+  sessionStart: number;
+  totalDuration: number;
+  cacheHitRate: number;
+  averageDuration: number;
+  slowestTrace: TraceEvent | null;
+}
+
+
+ACCESSIBILITY CONSIDERATIONS:
+--------------------------------------------------------------------------------
+
+- All interactive elements use role="button" with tabIndex={0}
+- Keyboard navigation: Tab to navigate, Enter/Space to activate
+- Timeline bars have aria-label with timing info
+- Color coding supplemented with icons/text for color-blind users
+- Filter buttons use aria-pressed for toggle state
+- Tree view uses aria-expanded for collapse state
+

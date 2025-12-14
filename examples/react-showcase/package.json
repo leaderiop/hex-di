@@ -1,0 +1,42 @@
+{
+  "name": "@hex-di/react-showcase",
+  "version": "0.0.0",
+  "private": true,
+  "description": "React showcase app demonstrating all hex-di library features",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hex-di/ports": "workspace:*",
+    "@hex-di/graph": "workspace:*",
+    "@hex-di/runtime": "workspace:*",
+    "@hex-di/react": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@hex-di/testing": "workspace:*",
+    "@hex-di/devtools": "workspace:*",
+    "@testing-library/react": "^14.3.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "jsdom": "^24.1.3",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.16",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.3",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

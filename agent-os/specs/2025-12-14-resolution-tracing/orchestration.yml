@@ -1,0 +1,36 @@
+task_groups:
+  - name: Trace Types & Interfaces
+    claude_code_subagent: typescript-type-system-architect
+    status: complete
+  - name: TraceCollector Strategy Pattern
+    claude_code_subagent: di-container-architect
+    status: complete
+  - name: TracingContainer Wrapper
+    claude_code_subagent: di-container-architect
+    status: complete
+  - name: Trace Limits & Eviction
+    claude_code_subagent: di-container-architect
+    status: complete
+  - name: DevTools Styles Extension
+    claude_code_subagent: react-ports-integrator
+    status: complete
+  - name: DevTools Tabbed Interface
+    claude_code_subagent: react-ports-integrator
+    status: complete
+  - name: Controls Bar Component
+    claude_code_subagent: react-ports-integrator
+    status: complete
+  - name: Timeline View Component
+    claude_code_subagent: react-ports-integrator
+    status: complete
+  - name: Tree View Component
+    claude_code_subagent: react-ports-integrator
+    status: complete
+  - name: Summary Stats View & Integration
+    claude_code_subagent: react-ports-integrator
+    status: complete
+  - name: Test Review & Gap Analysis
+    claude_code_subagent: implementation-verifier
+    status: complete
+
+orchestration_complete: true

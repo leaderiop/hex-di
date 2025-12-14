@@ -1,0 +1,35 @@
+task_groups:
+  - name: Package Infrastructure
+    claude_code_subagent: implementer
+  - name: Error Hierarchy
+    claude_code_subagent: implementer
+  - name: Container and Scope Branded Types
+    claude_code_subagent: typescript-type-system-architect
+  - name: Type Utility Functions
+    claude_code_subagent: typescript-type-system-architect
+  - name: MemoMap Internal Class
+    claude_code_subagent: di-container-architect
+  - name: Resolution Path Tracking
+    claude_code_subagent: di-container-architect
+  - name: createContainer Function
+    claude_code_subagent: di-container-architect
+  - name: Scope Hierarchy
+    claude_code_subagent: di-container-architect
+  - name: Lifetime Behaviors
+    claude_code_subagent: di-container-architect
+  - name: Captive Dependency Prevention Types
+    claude_code_subagent: typescript-type-system-architect
+  - name: Resolution Type Safety
+    claude_code_subagent: typescript-type-system-architect
+  - name: Disposal Implementation
+    claude_code_subagent: di-container-architect
+  - name: Integration Tests
+    claude_code_subagent: composition-test-architect
+  - name: Final Exports and Documentation
+    claude_code_subagent: library-docs-writer
+  - name: Test Review and Gap Analysis
+    claude_code_subagent: composition-test-architect
+  - name: Build and Final Verification
+    claude_code_subagent: architecture-guardian
+
+orchestration_complete: true

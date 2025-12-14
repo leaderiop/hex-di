@@ -1,0 +1,357 @@
+================================================================================
+                    RESOLUTION TRACING - SUMMARY STATS VIEW
+================================================================================
+
+The Summary Stats view provides aggregate performance metrics and insights.
+This is the third tab alongside Timeline and Tree views.
+
+SUMMARY VIEW STRUCTURE:
+--------------------------------------------------------------------------------
+
++==============================================================================+
+|  SUMMARY STATS VIEW                                                          |
++------------------------------------------------------------------------------+
+|                                                                              |
+|  +-- OVERVIEW CARDS ---------------------------------------------------+    |
+|  |                                                                      |    |
+|  |  +-------------+  +-------------+  +-------------+  +-------------+  |    |
+|  |  | TOTAL       |  | AVG TIME    |  | CACHE HIT   |  | SLOW COUNT  |  |    |
+|  |  | RESOLUTIONS |  |             |  | RATE        |  |             |  |    |
+|  |  |             |  |             |  |             |  |             |  |    |
+|  |  |     15      |  |   3.2ms     |  |    40%      |  |     3       |  |    |
+|  |  |             |  |             |  |   (6/15)    |  |   (> 50ms)  |  |    |
+|  |  +-------------+  +-------------+  +-------------+  +-------------+  |    |
+|  |                                                                      |    |
+|  +----------------------------------------------------------------------+    |
+|                                                                              |
+|  +-- DURATION DISTRIBUTION -------------------------------------------+     |
+|  |                                                                     |     |
+|  |  Duration Distribution                                              |     |
+|  |  .................................................................  |     |
+|  |                                                                     |     |
+|  |  0-10ms    [==================]  8   (53%)    Fast                  |     |
+|  |  10-25ms   [========]            4   (27%)    Medium                |     |
+|  |  25-50ms   [===]                 2   (13%)    Medium                |     |
+|  |  50-100ms  [=]                   1   (7%)     Slow                  |     |
+|  |  >100ms    []                    0   (0%)     Slow                  |     |
+|  |                                                                     |     |
+|  +---------------------------------------------------------------------+     |
+|                                                                              |
+|  +-- SLOWEST SERVICES ------------------------------------------------+     |
+|  |                                                                     |     |
+|  |  Slowest Services (Top 5)                                           |     |
+|  |  .................................................................  |     |
+|  |                                                                     |     |
+|  |  1. DatabasePort          62.3ms  [=================]  SINGLETON    |     |
+|  |  2. PaymentGateway        45.2ms  [============]       SINGLETON    |     |
+|  |  3. HttpClient            38.9ms  [==========]         SINGLETON    |     |
+|  |  4. UserRepository        22.4ms  [======]             SCOPED       |     |
+|  |  5. AuthService           15.1ms  [====]               SCOPED       |     |
+|  |                                                                     |     |
+|  +---------------------------------------------------------------------+     |
+|                                                                              |
+|  +-- LIFETIME BREAKDOWN ---------------------------------------------+      |
+|  |                                                                    |      |
+|  |  By Lifetime                                                       |      |
+|  |  ................................................................  |      |
+|  |                                                                    |      |
+|  |  SINGLETON    8 services    Avg: 12.3ms    Total: 98.4ms          |      |
+|  |               [====================================]               |      |
+|  |                                                                    |      |
+|  |  SCOPED       5 services    Avg: 4.2ms     Total: 21.0ms          |      |
+|  |               [===========]                                        |      |
+|  |                                                                    |      |
+|  |  REQUEST      2 services    Avg: 1.1ms     Total: 2.2ms           |      |
+|  |               [===]                                                |      |
+|  |                                                                    |      |
+|  +--------------------------------------------------------------------+      |
+|                                                                              |
+|  +-- CACHE EFFICIENCY ------------------------------------------------+     |
+|  |                                                                     |     |
+|  |  Cache Efficiency                                                   |     |
+|  |  .................................................................  |     |
+|  |                                                                     |     |
+|  |  Fresh Resolutions:    9    Time Spent: 115.6ms                     |     |
+|  |  Cache Hits:           6    Time Saved: ~48.2ms (estimated)         |     |
+|  |                                                                     |     |
+|  |  [Fresh: 60%        |  Cached: 40%       ]                          |     |
+|  |                                                                     |     |
+|  +---------------------------------------------------------------------+     |
+|                                                                              |
++==============================================================================+
+
+
+OVERVIEW CARDS DETAIL:
+--------------------------------------------------------------------------------
+
+Single Card Structure:
+
++-------------------+
+|  LABEL            |  <-- Text muted, uppercase, 10px
+|                   |
+|      VALUE        |  <-- Large text, accent color, 24px
+|                   |
+|    (subtext)      |  <-- Text muted, 11px
++-------------------+
+
+Card Styles:
+  - background: var(--hex-devtools-bg-secondary)
+  - border: 1px solid var(--hex-devtools-border)
+  - border-radius: 6px
+  - padding: 16px
+  - min-width: 100px
+  - text-align: center
+
+Cards Grid:
+  - display: grid
+  - grid-template-columns: repeat(auto-fit, minmax(100px, 1fr))
+  - gap: 12px
+
+Conditional Styling:
+  - SLOW COUNT card turns red background when count > 0
+  - CACHE HIT RATE shows green when > 50%, yellow when 25-50%, red when < 25%
+
+
+DURATION DISTRIBUTION BAR CHART:
+--------------------------------------------------------------------------------
+
+Horizontal bar chart showing count distribution by duration buckets:
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  Duration Distribution                                                       |
+|  ......................................................................      |
+|                                                                              |
+|  0-10ms    [==========================================]  8   (53%)   Fast    |
+|             ^                                           ^    ^        ^      |
+|             |                                           |    |        |      |
+|             Bar (proportional width)                   Count Percent Category|
+|                                                                              |
+|  Bar colors by category:                                                     |
+|  - Fast (0-10ms):     #a6e3a1 (green)                                        |
+|  - Medium (10-50ms):  #f9e2af (yellow)                                       |
+|  - Slow (>50ms):      #f38ba8 (red)                                          |
+|                                                                              |
+|  Bar styles:                                                                 |
+|  - height: 20px                                                              |
+|  - border-radius: 4px                                                        |
+|  - max-width: 200px (for largest bar)                                        |
+|  - transition: width 0.3s ease                                               |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+SLOWEST SERVICES LIST:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  Slowest Services (Top 5)                                                    |
+|  ......................................................................      |
+|                                                                              |
+|  +------------------------------------------------------------------------+  |
+|  |  1.  DatabasePort                   62.3ms              SINGLETON      |  |
+|  |      [================================================]                |  |
+|  |                                                                        |  |
+|  |  2.  PaymentGateway                 45.2ms              SINGLETON      |  |
+|  |      [====================================]                            |  |
+|  |                                                                        |  |
+|  |  3.  HttpClient                     38.9ms              SINGLETON      |  |
+|  |      [================================]                                |  |
+|  |                                                                        |  |
+|  +------------------------------------------------------------------------+  |
+|                                                                              |
+|  Each row is clickable - navigates to that trace in Timeline/Tree view       |
+|                                                                              |
+|  Row styles:                                                                 |
+|  - padding: 8px 12px                                                         |
+|  - hover: var(--hex-devtools-bg-hover)                                       |
+|  - cursor: pointer                                                           |
+|                                                                              |
+|  Bar represents relative duration (longest = 100% width)                     |
+|  Bar color: gradient from yellow to red based on severity                    |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+LIFETIME BREAKDOWN SECTION:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  By Lifetime                                                                 |
+|  ......................................................................      |
+|                                                                              |
+|  +------------------------------------------------------------------------+  |
+|  |  SINGLETON                                                             |  |
+|  |  +------------------------------------------------------------------+  |  |
+|  |  |  8 services    |    Avg: 12.3ms    |    Total: 98.4ms            |  |  |
+|  |  +------------------------------------------------------------------+  |  |
+|  |  [=====================================================]               |  |
+|  |   ^                                                                    |  |
+|  |   Bar showing proportion of total time (green)                         |  |
+|  +------------------------------------------------------------------------+  |
+|                                                                              |
+|  +------------------------------------------------------------------------+  |
+|  |  SCOPED                                                                |  |
+|  |  +------------------------------------------------------------------+  |  |
+|  |  |  5 services    |    Avg: 4.2ms     |    Total: 21.0ms            |  |  |
+|  |  +------------------------------------------------------------------+  |  |
+|  |  [===============]                                                     |  |
+|  |   ^                                                                    |  |
+|  |   Bar (blue)                                                           |  |
+|  +------------------------------------------------------------------------+  |
+|                                                                              |
+|  +------------------------------------------------------------------------+  |
+|  |  REQUEST                                                               |  |
+|  |  +------------------------------------------------------------------+  |  |
+|  |  |  2 services    |    Avg: 1.1ms     |    Total: 2.2ms             |  |  |
+|  |  +------------------------------------------------------------------+  |  |
+|  |  [====]                                                                |  |
+|  |   ^                                                                    |  |
+|  |   Bar (orange)                                                         |  |
+|  +------------------------------------------------------------------------+  |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+CACHE EFFICIENCY SECTION:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  Cache Efficiency                                                            |
+|  ......................................................................      |
+|                                                                              |
+|  +------------------------------------------------------------------------+  |
+|  |                                                                        |  |
+|  |  Fresh Resolutions                                                     |  |
+|  |  [===========================================================]         |  |
+|  |  9 resolutions | 115.6ms total                                         |  |
+|  |                                                                        |  |
+|  |  Cache Hits                                                            |  |
+|  |  [=======================================]                             |  |
+|  |  6 hits | ~48.2ms saved (estimated from avg singleton time)            |  |
+|  |                                                                        |  |
+|  +------------------------------------------------------------------------+  |
+|                                                                              |
+|  Stacked bar visualization:                                                  |
+|                                                                              |
+|  [    Fresh (60%)      |     Cached (40%)    ]                               |
+|        (default)              (cyan)                                         |
+|                                                                              |
+|  Estimated savings calculation:                                              |
+|  - For each cache hit, estimate saved time as the original resolution time   |
+|  - Show "estimated" since we don't know exact would-be time                  |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+INSIGHTS PANEL (Optional - AI/Heuristic suggestions):
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  Performance Insights                                                        |
+|  ......................................................................      |
+|                                                                              |
+|  [!] DatabasePort takes 62.3ms - consider lazy initialization or caching     |
+|      strategy optimization.                                                  |
+|                                                                              |
+|  [i] 40% cache hit rate is good. Consider making frequently-resolved         |
+|      request-scoped services into scoped for better caching.                 |
+|                                                                              |
+|  [*] AuthService resolved 12 times with 8 cache hits (67% efficiency).       |
+|                                                                              |
+|  Icon legend:                                                                |
+|  [!] = Warning (red/orange)                                                  |
+|  [i] = Info/Suggestion (blue)                                                |
+|  [*] = Positive/Achievement (green)                                          |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+REAL-TIME UPDATING:
+--------------------------------------------------------------------------------
+
+Stats update in real-time as new traces are recorded:
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  Live mode indicator:                                                        |
+|  [LIVE] Stats updating in real-time                 [Pause] [Reset Stats]    |
+|                                                                              |
+|  When paused:                                                                |
+|  [PAUSED] Stats frozen at 15 traces                 [Resume] [Reset Stats]   |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+EXPORT OPTIONS:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  [Export Stats]                                                              |
+|  +-- Dropdown -----------+                                                   |
+|  |                       |                                                   |
+|  |  Export as JSON       |  --> Full stats object                            |
+|  |  Export as CSV        |  --> Flattened table format                       |
+|  |  Export as Markdown   |  --> Human-readable report                        |
+|  |  -------------------- |                                                   |
+|  |  Copy Summary         |  --> Clipboard text summary                       |
+|  |                       |                                                   |
+|  +-----------------------+                                                   |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+RESPONSIVE LAYOUT:
+--------------------------------------------------------------------------------
+
+Wide (> 600px):
+  - Cards in 4-column grid
+  - Charts side by side where possible
+
+Medium (400-600px):
+  - Cards in 2-column grid
+  - Charts stacked vertically
+
+Narrow (< 400px):
+  - Cards in single column
+  - All content stacked
+  - Simplified bar charts
+
+
+COMPONENT STRUCTURE:
+--------------------------------------------------------------------------------
+
+SummaryStatsView
+  +-- OverviewCardsGrid
+  |     +-- StatCard (Total Resolutions)
+  |     +-- StatCard (Avg Time)
+  |     +-- StatCard (Cache Hit Rate)
+  |     +-- StatCard (Slow Count)
+  |
+  +-- DurationDistributionChart
+  |     +-- ChartHeader
+  |     +-- DistributionBar (for each bucket)
+  |
+  +-- SlowestServicesSection
+  |     +-- SectionHeader
+  |     +-- SlowestServiceRow (top 5)
+  |
+  +-- LifetimeBreakdownSection
+  |     +-- SectionHeader
+  |     +-- LifetimeCard (Singleton)
+  |     +-- LifetimeCard (Scoped)
+  |     +-- LifetimeCard (Request)
+  |
+  +-- CacheEfficiencySection
+  |     +-- SectionHeader
+  |     +-- FreshVsCachedBar
+  |     +-- SavingsEstimate
+  |
+  +-- InsightsPanel (optional)
+        +-- InsightItem (for each insight)
+

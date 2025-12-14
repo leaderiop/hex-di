@@ -1,0 +1,357 @@
+================================================================================
+COMPONENT STRUCTURE - IMPLEMENTATION REFERENCE
+================================================================================
+File: 06-component-structure.txt
+Version: 1.0
+Date: 2025-12-14
+
+This document provides the proposed React component structure for implementing
+the Container State Inspection feature, following existing patterns.
+
+================================================================================
+COMPONENT HIERARCHY
+================================================================================
+
+DevToolsPanel (existing)
+|
++-- CollapsibleSection (existing) - "Graph View"
+|   +-- GraphView (existing)
+|
++-- CollapsibleSection (existing) - "Container Browser"
+|   +-- ContainerBrowser (existing)
+|
++-- CollapsibleSection (existing) - "Container Inspector" [NEW]
+    |
+    +-- ContainerInspector [NEW]
+        |
+        +-- ScopeHierarchy [NEW]
+        |   +-- ScopeTreeNode [NEW] (recursive)
+        |   +-- ScopeDetails [NEW]
+        |
+        +-- ResolvedServices [NEW]
+            +-- ServiceSearch [NEW]
+            +-- ServiceFilters [NEW]
+            +-- ServiceList [NEW]
+            +-- ServiceItem [NEW]
+            +-- ServiceDetails [NEW]
+
+================================================================================
+PROPOSED COMPONENT INTERFACES
+================================================================================
+
+/**
+ * Props for ContainerInspector component.
+ */
+interface ContainerInspectorProps {
+  /** The runtime container to inspect */
+  readonly container: Container<Port<unknown, string>>;
+  /** The dependency graph for service metadata */
+  readonly graph: ExportedGraph;
+}
+
+/**
+ * Props for ScopeHierarchy component.
+ */
+interface ScopeHierarchyProps {
+  /** The root container */
+  readonly container: Container<Port<unknown, string>>;
+  /** Callback when a scope is selected */
+  readonly onScopeSelect: (scopeId: string | null) => void;
+  /** Currently selected scope ID (null = root container) */
+  readonly selectedScopeId: string | null;
+}
+
+/**
+ * Props for ScopeTreeNode component (recursive).
+ */
+interface ScopeTreeNodeProps {
+  /** Scope or container info */
+  readonly node: ScopeNodeInfo;
+  /** Depth level for indentation */
+  readonly depth: number;
+  /** Whether this node is selected */
+  readonly isSelected: boolean;
+  /** Selection handler */
+  readonly onSelect: () => void;
+  /** Child nodes */
+  readonly children: readonly ScopeNodeInfo[];
+}
+
+/**
+ * Scope/Container node information.
+ */
+interface ScopeNodeInfo {
+  /** Unique identifier */
+  readonly id: string;
+  /** Display name */
+  readonly name: string;
+  /** Type of node */
+  readonly type: 'container' | 'scope';
+  /** Current status */
+  readonly status: 'active' | 'disposing' | 'disposed';
+  /** Number of resolved instances in this scope */
+  readonly resolvedCount: number;
+  /** Total number of registered services */
+  readonly totalCount: number;
+  /** Creation timestamp */
+  readonly createdAt: number;
+  /** Parent scope ID (null for root) */
+  readonly parentId: string | null;
+}
+
+/**
+ * Props for ResolvedServices component.
+ */
+interface ResolvedServicesProps {
+  /** Services to display */
+  readonly services: readonly ServiceInfo[];
+  /** Current filter state */
+  readonly filters: ServiceFilters;
+  /** Filter change handler */
+  readonly onFiltersChange: (filters: ServiceFilters) => void;
+  /** Search query */
+  readonly searchQuery: string;
+  /** Search handler */
+  readonly onSearchChange: (query: string) => void;
+}
+
+/**
+ * Service filter state.
+ */
+interface ServiceFilters {
+  /** Lifetime filter (null = all) */
+  readonly lifetime: 'singleton' | 'scoped' | 'request' | null;
+  /** Resolution status filter (null = all) */
+  readonly resolved: boolean | null;
+}
+
+/**
+ * Service information for display.
+ */
+interface ServiceInfo {
+  /** Port name / service ID */
+  readonly portName: string;
+  /** Display label */
+  readonly label: string;
+  /** Service lifetime */
+  readonly lifetime: 'singleton' | 'scoped' | 'request';
+  /** Whether the service has been resolved */
+  readonly isResolved: boolean;
+  /** Scope where instance is cached (null if not resolved) */
+  readonly cachedIn: string | null;
+  /** Resolution timestamp (null if not resolved) */
+  readonly resolvedAt: number | null;
+  /** Resolution order within scope */
+  readonly resolutionOrder: number | null;
+  /** Dependency port names */
+  readonly dependencies: readonly string[];
+}
+
+/**
+ * Props for ServiceItem component.
+ */
+interface ServiceItemProps {
+  /** Service information */
+  readonly service: ServiceInfo;
+  /** Whether expanded */
+  readonly isExpanded: boolean;
+  /** Expansion toggle handler */
+  readonly onToggle: () => void;
+}
+
+================================================================================
+STYLE EXTENSIONS
+================================================================================
+
+Add to styles.ts:
+
+/** Container inspector style properties */
+interface ContainerInspectorStyleDef {
+  container: CSSProperties;
+  scopeHierarchy: CSSProperties;
+  resolvedServices: CSSProperties;
+}
+
+/** Scope hierarchy tree styles */
+interface ScopeTreeStyleDef {
+  container: CSSProperties;
+  node: CSSProperties;
+  nodeSelected: CSSProperties;
+  nodeContent: CSSProperties;
+  nodeIcon: CSSProperties;
+  nodeIconContainer: CSSProperties;
+  nodeIconScope: CSSProperties;
+  nodeName: CSSProperties;
+  nodeStatus: CSSProperties;
+  nodeStatusActive: CSSProperties;
+  nodeStatusDisposed: CSSProperties;
+  treeLine: CSSProperties;
+  treeConnector: CSSProperties;
+  childrenContainer: CSSProperties;
+}
+
+/** Service list styles */
+interface ServiceListStyleDef {
+  container: CSSProperties;
+  searchInput: CSSProperties;
+  filterContainer: CSSProperties;
+  filterButton: CSSProperties;
+  filterButtonActive: CSSProperties;
+  listContainer: CSSProperties;
+}
+
+/** Service item styles */
+interface ServiceItemStyleDef {
+  container: CSSProperties;
+  header: CSSProperties;
+  headerExpanded: CSSProperties;
+  statusIndicator: CSSProperties;
+  statusResolved: CSSProperties;
+  statusPending: CSSProperties;
+  statusWarning: CSSProperties;
+  serviceName: CSSProperties;
+  details: CSSProperties;
+  detailRow: CSSProperties;
+  detailLabel: CSSProperties;
+  detailValue: CSSProperties;
+}
+
+================================================================================
+CSS VARIABLE ADDITIONS
+================================================================================
+
+Add to cssVariables:
+
+  /* Container Inspector specific */
+  --hex-devtools-status-active: #a6e3a1;
+  --hex-devtools-status-disposed: #f38ba8;
+  --hex-devtools-status-disposing: #fab387;
+  --hex-devtools-tree-line: #45475a;
+  --hex-devtools-resolved: #a6e3a1;
+  --hex-devtools-pending: #6c7086;
+  --hex-devtools-warning: #fab387;
+
+================================================================================
+DATA FLOW
+================================================================================
+
+Container Inspection Port (future consideration):
+
+To inspect container state, the runtime package would need to expose
+inspection capabilities. This could be done via:
+
+Option A: DevTools-specific inspection methods on Container
+  container.__devtools_getState() // Returns internal state for inspection
+
+Option B: Separate inspection port/adapter
+  const inspectionPort = createPort<'DevToolsInspection', InspectionService>(...);
+  // Register alongside application adapters
+
+Option C: Event-based observation
+  container.on('resolved', (event) => { ... });
+  container.on('scopeCreated', (event) => { ... });
+
+For the wireframes, we assume Option A with the following interface:
+
+interface ContainerDevToolsState {
+  /** Whether container is disposed */
+  readonly isDisposed: boolean;
+  /** Singleton instances */
+  readonly singletons: Map<string, InstanceInfo>;
+  /** Active child scopes */
+  readonly scopes: Map<string, ScopeDevToolsState>;
+}
+
+interface ScopeDevToolsState {
+  /** Unique scope identifier */
+  readonly id: string;
+  /** Parent scope ID (null for direct children of container) */
+  readonly parentId: string | null;
+  /** Whether scope is disposed */
+  readonly isDisposed: boolean;
+  /** Scoped instances */
+  readonly instances: Map<string, InstanceInfo>;
+  /** Child scopes */
+  readonly children: readonly string[];
+}
+
+interface InstanceInfo {
+  /** Port name */
+  readonly portName: string;
+  /** Resolution timestamp */
+  readonly resolvedAt: number;
+  /** Resolution order */
+  readonly order: number;
+}
+
+================================================================================
+INTEGRATION POINTS
+================================================================================
+
+1. DevToolsPanel receives optional `container` prop (already defined)
+2. When container is provided, show Container Inspector section
+3. Container Inspector polls/subscribes to container state
+4. State changes trigger re-render of affected components
+
+DevToolsPanel integration:
+
+export function DevToolsPanel({ graph, container }: DevToolsPanelProps) {
+  const exportedGraph = useMemo(() => toJSON(graph), [graph]);
+
+  return (
+    <div data-testid="devtools-panel" style={panelStyles.container}>
+      <div style={panelStyles.header}>HexDI DevTools</div>
+
+      {/* Graph View Section */}
+      <CollapsibleSection ...>
+        <GraphView ... />
+      </CollapsibleSection>
+
+      {/* Container Browser Section */}
+      <CollapsibleSection ...>
+        <ContainerBrowser ... />
+      </CollapsibleSection>
+
+      {/* Container Inspector Section - NEW */}
+      {container !== undefined && (
+        <CollapsibleSection
+          title="Container Inspector"
+          testIdPrefix="container-inspector"
+          defaultExpanded={false}
+        >
+          <ContainerInspector
+            container={container}
+            graph={exportedGraph}
+          />
+        </CollapsibleSection>
+      )}
+    </div>
+  );
+}
+
+================================================================================
+TEST IDS
+================================================================================
+
+For testing, use consistent test ID patterns:
+
+Section:
+  - data-testid="container-inspector-header"
+  - data-testid="container-inspector-content"
+
+Scope Hierarchy:
+  - data-testid="scope-hierarchy"
+  - data-testid="scope-node-{id}"
+  - data-testid="scope-node-{id}-expand"
+  - data-testid="scope-node-{id}-status"
+
+Resolved Services:
+  - data-testid="resolved-services"
+  - data-testid="service-search"
+  - data-testid="service-filter-{type}"
+  - data-testid="service-list"
+  - data-testid="service-item-{portName}"
+  - data-testid="service-item-{portName}-status"
+  - data-testid="service-item-{portName}-details"
+
+================================================================================

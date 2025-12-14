@@ -1,0 +1,394 @@
+================================================================================
+                    RESOLUTION TRACING - FILTER/CONTROLS BAR
+================================================================================
+
+The controls bar provides filtering, sorting, and threshold controls for
+the Resolution Tracing section. It follows existing patterns from the
+ResolvedServices component (search, filter buttons).
+
+FULL CONTROLS BAR LAYOUT:
+--------------------------------------------------------------------------------
+
++==============================================================================+
+|  CONTROLS BAR                                                                |
++------------------------------------------------------------------------------+
+|                                                                              |
+|  ROW 1: Search and Primary Actions                                           |
+|  +------------------------------------------------------------------------+  |
+|  |                                                                        |  |
+|  |  [Search: ______________________________ x]     [Clear All]  [Export]  |  |
+|  |                                                                        |  |
+|  +------------------------------------------------------------------------+  |
+|                                                                              |
+|  ROW 2: Filters                                                              |
+|  +------------------------------------------------------------------------+  |
+|  |                                                                        |  |
+|  |  Lifetime:  [All] [SINGLETON] [SCOPED] [REQUEST]                       |  |
+|  |                                                                        |  |
+|  |  Status:    [All] [Fresh] [Cached]    Resolution: [All] [Slow Only]    |  |
+|  |                                                                        |  |
+|  +------------------------------------------------------------------------+  |
+|                                                                              |
+|  ROW 3: Sorting and Threshold                                                |
+|  +------------------------------------------------------------------------+  |
+|  |                                                                        |  |
+|  |  Sort: [Chronological v]    Threshold: [----o---------] 50ms           |  |
+|  |                                                                        |  |
+|  +------------------------------------------------------------------------+  |
+|                                                                              |
++==============================================================================+
+
+
+COMPACT MODE (for narrow panels):
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  [Search: ___________________ x]  [Filters v]  [Sort v]  [...]               |
+|                                      ^           ^         ^                 |
+|                                      |           |         |                 |
+|                                Dropdown      Dropdown   More actions         |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+Expanded Filter Dropdown:
++------------------------------------------------------------------------------+
+|  +-- Filters Dropdown ----+                                                  |
+|  |                        |                                                  |
+|  |  LIFETIME              |                                                  |
+|  |  [x] All               |                                                  |
+|  |  [ ] Singleton         |                                                  |
+|  |  [ ] Scoped            |                                                  |
+|  |  [ ] Request           |                                                  |
+|  |  ------------------    |                                                  |
+|  |  STATUS                |                                                  |
+|  |  [x] All               |                                                  |
+|  |  [ ] Fresh only        |                                                  |
+|  |  [ ] Cached only       |                                                  |
+|  |  ------------------    |                                                  |
+|  |  PERFORMANCE           |                                                  |
+|  |  [x] All               |                                                  |
+|  |  [ ] Slow only         |                                                  |
+|  |  ------------------    |                                                  |
+|  |  Threshold: 50ms       |                                                  |
+|  |  [----o---------]      |                                                  |
+|  |                        |                                                  |
+|  +------------------------+                                                  |
++------------------------------------------------------------------------------+
+
+
+SEARCH INPUT DETAIL:
+--------------------------------------------------------------------------------
+
+Following existing pattern from serviceListStyles.searchContainer:
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  +----------------------------------------------------------------------+   |
+|  |  [Q] Search traces...                                             [x]|   |
+|  +----------------------------------------------------------------------+   |
+|   ^   ^                                                               ^      |
+|   |   |                                                               |      |
+|   |   Placeholder text (muted color)                                  |      |
+|   |                                                            Clear btn     |
+|   Search icon (optional, muted color)                          (on input)    |
+|                                                                              |
+|  Styles:                                                                     |
+|  - width: 100% (flex: 1)                                                     |
+|  - padding: 8px 32px 8px 12px                                                |
+|  - font-size: 12px                                                           |
+|  - background: var(--hex-devtools-bg)                                        |
+|  - border: 1px solid var(--hex-devtools-border)                              |
+|  - border-radius: 4px                                                        |
+|  - color: var(--hex-devtools-text)                                           |
+|  - font-family: var(--hex-devtools-font-mono)                                |
+|                                                                              |
+|  Focus state:                                                                |
+|  - border-color: var(--hex-devtools-accent)                                  |
+|  - outline: none                                                             |
+|                                                                              |
+|  Search behavior:                                                            |
+|  - Debounced (300ms delay)                                                   |
+|  - Searches port names                                                       |
+|  - Case-insensitive partial match                                            |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+LIFETIME FILTER BUTTONS:
+--------------------------------------------------------------------------------
+
+Following existing pattern from serviceListStyles.filterButton:
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  Lifetime:  [All] [SINGLETON] [SCOPED] [REQUEST]                             |
+|              ^        ^          ^         ^                                 |
+|              |        |          |         |                                 |
+|              |   Green accent    |    Orange accent                          |
+|              |   when active     |    when active                            |
+|              |                   |                                           |
+|         Blue accent         Blue accent                                      |
+|         when active         when active                                      |
+|                                                                              |
+|  Inactive button:                                                            |
+|  - background: transparent                                                   |
+|  - border: 1px solid var(--hex-devtools-border)                              |
+|  - color: var(--hex-devtools-text-muted)                                     |
+|                                                                              |
+|  Active button (example: SINGLETON):                                         |
+|  - background: var(--hex-devtools-singleton) (#a6e3a1)                       |
+|  - border: 1px solid var(--hex-devtools-singleton)                           |
+|  - color: #1e1e2e (dark text on light bg)                                    |
+|                                                                              |
+|  Button styles:                                                              |
+|  - padding: 4px 8px                                                          |
+|  - font-size: 10px                                                           |
+|  - font-weight: 600                                                          |
+|  - text-transform: uppercase                                                 |
+|  - letter-spacing: 0.5px                                                     |
+|  - border-radius: 4px                                                        |
+|  - cursor: pointer                                                           |
+|  - transition: 0.15s ease                                                    |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+STATUS FILTER BUTTONS:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  Status:    [All]  [Fresh]  [Cached]                                         |
+|              ^       ^         ^                                             |
+|              |       |         |                                             |
+|              |       |         Cyan accent when active (#89dceb)             |
+|              |       |                                                       |
+|              |       Default text/accent when active                         |
+|              |                                                               |
+|         Default accent when active                                           |
+|                                                                              |
+|  Fresh = not from cache (new resolution)                                     |
+|  Cached = served from singleton/scoped cache                                 |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+PERFORMANCE FILTER (Slow Only Toggle):
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  Resolution:  [All]  [Slow Only]                                             |
+|                ^         ^                                                   |
+|                |         |                                                   |
+|                |         Red accent when active (#f38ba8)                    |
+|                |                                                             |
+|           Default accent when active                                         |
+|                                                                              |
+|  When "Slow Only" is active:                                                 |
+|  - Only traces exceeding threshold are shown                                 |
+|  - Filter indicator shows count: "Slow Only (3)"                             |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+SORT DROPDOWN:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  Sort: [Chronological         v]                                             |
+|        +----------------------+                                              |
+|        | Chronological       |   <-- Default: by start time                  |
+|        | Slowest First       |   <-- Duration desc                           |
+|        | Fastest First       |   <-- Duration asc                            |
+|        | Alphabetical (A-Z)  |   <-- Port name asc                           |
+|        | Alphabetical (Z-A)  |   <-- Port name desc                          |
+|        | Resolution Order    |   <-- By resolution sequence number           |
+|        +----------------------+                                              |
+|                                                                              |
+|  Dropdown styles:                                                            |
+|  - background: var(--hex-devtools-bg-secondary)                              |
+|  - border: 1px solid var(--hex-devtools-border)                              |
+|  - border-radius: 4px                                                        |
+|  - padding: 4px 24px 4px 8px                                                 |
+|  - font-size: 12px                                                           |
+|  - color: var(--hex-devtools-text)                                           |
+|                                                                              |
+|  Option hover:                                                               |
+|  - background: var(--hex-devtools-bg-hover)                                  |
+|                                                                              |
+|  Selected option:                                                            |
+|  - background: var(--hex-devtools-accent) with opacity                       |
+|  - or checkmark indicator                                                    |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+THRESHOLD SLIDER:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  Threshold:  [-------|o|-----------------]  50ms                              |
+|               ^       ^                      ^                               |
+|               |       |                      |                               |
+|               |       Thumb (draggable)      Current value label             |
+|               |                                                              |
+|               Track (gradient from green to red)                             |
+|                                                                              |
+|  Slider details:                                                             |
+|  - Min value: 5ms                                                            |
+|  - Max value: 500ms                                                          |
+|  - Default: 50ms                                                             |
+|  - Step: 5ms                                                                 |
+|                                                                              |
+|  Track gradient (left to right):                                             |
+|  - 5ms:   #a6e3a1 (green)                                                    |
+|  - 50ms:  #f9e2af (yellow)                                                   |
+|  - 500ms: #f38ba8 (red)                                                      |
+|                                                                              |
+|  Thumb styles:                                                               |
+|  - width: 14px, height: 14px                                                 |
+|  - background: var(--hex-devtools-text)                                      |
+|  - border-radius: 50%                                                        |
+|  - border: 2px solid var(--hex-devtools-bg)                                  |
+|  - box-shadow: 0 2px 4px rgba(0,0,0,0.3)                                     |
+|                                                                              |
+|  Value label updates in real-time as slider moves                            |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+ACTION BUTTONS:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  [Clear All]                                                                 |
+|  - Clears all recorded traces                                                |
+|  - Requires confirmation: "Clear 15 traces?"                                 |
+|  - Style: destructive (red text when hovered)                                |
+|                                                                              |
+|  [Export]                                                                    |
+|  - Exports traces as JSON                                                    |
+|  - Dropdown options:                                                         |
+|    +-- Export as JSON                                                        |
+|    +-- Export as CSV                                                         |
+|    +-- Copy to Clipboard                                                     |
+|  - Style: accent color                                                       |
+|                                                                              |
+|  Button base style (reuse containerInspectorStyles.refreshButton):           |
+|  - padding: 4px 8px                                                          |
+|  - font-size: 11px                                                           |
+|  - font-weight: 500                                                          |
+|  - background: transparent                                                   |
+|  - border: 1px solid var(--hex-devtools-border)                              |
+|  - border-radius: 4px                                                        |
+|  - color: var(--hex-devtools-text-muted)                                     |
+|  - cursor: pointer                                                           |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+FILTER SUMMARY / ACTIVE FILTERS INDICATOR:
+--------------------------------------------------------------------------------
+
+When filters are active, show summary below controls:
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  Active filters: Lifetime: SINGLETON | Status: Slow Only | Threshold: 50ms  |
+|                  ^                                                           |
+|                  |                                                           |
+|                  Clickable tags that remove the filter when clicked          |
+|                                                                              |
+|  [x SINGLETON]  [x Slow Only]  [x 50ms threshold]    [Clear filters]         |
+|                                                                              |
+|  Tag style:                                                                  |
+|  - background: var(--hex-devtools-bg-secondary)                              |
+|  - border: 1px solid var(--hex-devtools-border)                              |
+|  - border-radius: 12px (pill shape)                                          |
+|  - padding: 2px 8px                                                          |
+|  - font-size: 10px                                                           |
+|  - [x] icon on left, hoverable                                               |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+RECORDING INDICATOR:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|                                                                              |
+|  [REC] Recording traces...    |    15 traces captured    |    23.4ms total   |
+|   ^                                ^                           ^             |
+|   |                                |                           |             |
+|   Red dot animation                Live count                  Running total |
+|   (pulsing)                                                                  |
+|                                                                              |
+|  When paused:                                                                |
+|  [||] Recording paused    |    15 traces    |    [Resume]                    |
+|                                                                              |
++------------------------------------------------------------------------------+
+
+
+COMPLETE CONTROLS BAR - ASSEMBLED VIEW:
+--------------------------------------------------------------------------------
+
++==============================================================================+
+|                                                                              |
+|  [Search: ______________________________ x]           [Clear All]  [Export v]|
+|                                                                              |
+|  Lifetime:  [All] [SINGLETON] [SCOPED] [REQUEST]                             |
+|  Status:    [All] [Fresh] [Cached]        Performance: [All] [Slow Only]     |
+|                                                                              |
+|  Sort: [Chronological v]      Threshold: [----o---------] 50ms               |
+|                                                                              |
+|  [REC] Recording...  |  15 traces  |  23.4ms total  |  3 slow  |  4 cached   |
+|                                                                              |
+|  Active: [x SINGLETON] [x 50ms threshold]                    [Clear filters] |
+|                                                                              |
++==============================================================================+
+
+
+COMPONENT STRUCTURE:
+--------------------------------------------------------------------------------
+
+TracingControlsBar
+  +-- SearchRow
+  |     +-- SearchInput (reuse pattern)
+  |     +-- ActionButtons
+  |           +-- ClearAllButton
+  |           +-- ExportDropdown
+  |
+  +-- FilterRow
+  |     +-- LifetimeFilterGroup
+  |     |     +-- FilterButton (All)
+  |     |     +-- FilterButton (Singleton)
+  |     |     +-- FilterButton (Scoped)
+  |     |     +-- FilterButton (Request)
+  |     +-- StatusFilterGroup
+  |     |     +-- FilterButton (All)
+  |     |     +-- FilterButton (Fresh)
+  |     |     +-- FilterButton (Cached)
+  |     +-- PerformanceFilterGroup
+  |           +-- FilterButton (All)
+  |           +-- FilterButton (Slow Only)
+  |
+  +-- SortAndThresholdRow
+  |     +-- SortDropdown
+  |     +-- ThresholdSlider
+  |           +-- SliderTrack
+  |           +-- SliderThumb
+  |           +-- ValueLabel
+  |
+  +-- StatusBar
+  |     +-- RecordingIndicator
+  |     +-- TraceSummary
+  |
+  +-- ActiveFiltersBar (conditional)
+        +-- FilterTag (for each active filter)
+        +-- ClearFiltersButton
+

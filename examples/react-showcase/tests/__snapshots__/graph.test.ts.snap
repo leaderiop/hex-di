@@ -1,0 +1,47 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`DI Graph > Graph Serialization > should produce expected structure with serializeGraph() 1`] = `
+{
+  "adapters": [
+    {
+      "lifetime": "scoped",
+      "port": "ChatService",
+      "requires": [
+        "Logger",
+        "MessageStore",
+        "UserSession",
+      ],
+    },
+    {
+      "lifetime": "singleton",
+      "port": "Config",
+      "requires": [],
+    },
+    {
+      "lifetime": "singleton",
+      "port": "Logger",
+      "requires": [],
+    },
+    {
+      "lifetime": "singleton",
+      "port": "MessageStore",
+      "requires": [
+        "Logger",
+      ],
+    },
+    {
+      "lifetime": "request",
+      "port": "NotificationService",
+      "requires": [
+        "Config",
+        "Logger",
+      ],
+    },
+    {
+      "lifetime": "scoped",
+      "port": "UserSession",
+      "requires": [],
+    },
+  ],
+}
+`;

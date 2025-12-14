@@ -1,0 +1,297 @@
+================================================================================
+INSTANCE LIFETIME VISUAL INDICATORS - DETAILED WIREFRAME
+================================================================================
+File: 04-lifetime-indicators.txt
+Version: 1.0
+Date: 2025-12-14
+
+This wireframe details the visual indicators for service instance lifetimes
+and their resolved/cached status.
+
+================================================================================
+LIFETIME BADGE DESIGNS
+================================================================================
+
+SINGLETON (Green):
++-------------+
+| SINGLETON   |   Background: #a6e3a1 (var(--hex-devtools-singleton))
++-------------+   Text Color: #1e1e2e (dark)
+                  Font: 10px, fontWeight 600, uppercase
+                  Padding: 2px 6px
+                  Border-radius: 4px
+
+SCOPED (Blue):
++--------+
+| SCOPED |       Background: #89b4fa (var(--hex-devtools-scoped))
++--------+       Text Color: #1e1e2e (dark)
+                 Font: 10px, fontWeight 600, uppercase
+                 Padding: 2px 6px
+                 Border-radius: 4px
+
+REQUEST (Orange):
++-----------+
+| REQUEST   |    Background: #fab387 (var(--hex-devtools-request))
++-----------+    Text Color: #1e1e2e (dark)
+                 Font: 10px, fontWeight 600, uppercase
+                 Padding: 2px 6px
+                 Border-radius: 4px
+
+================================================================================
+RESOLUTION STATUS INDICATORS
+================================================================================
+
+RESOLVED - Service instance exists in cache:
+
+  +---+
+  |(*)| Filled Circle
+  +---+
+
+  Style:
+    - Size: 10px diameter
+    - Fill: #a6e3a1 (green)
+    - No border
+    - Inner shadow for depth (optional)
+
+NOT RESOLVED - Registered but not yet instantiated:
+
+  +---+
+  |( )| Empty Circle
+  +---+
+
+  Style:
+    - Size: 10px diameter
+    - Fill: transparent
+    - Border: 2px solid var(--hex-devtools-text-muted)
+    - Opacity: 0.7
+
+SCOPE REQUIRED - Scoped service viewed from root container:
+
+  +---+
+  |(!)| Warning Circle
+  +---+
+
+  Style:
+    - Size: 10px diameter
+    - Fill: transparent
+    - Border: 2px solid #fab387 (orange)
+    - Exclamation mark inside (optional)
+
+================================================================================
+COMBINED LIFETIME + STATUS DISPLAY
+================================================================================
+
+Row Layout (Compact):
+
++-----------------------------------------------------------------------+
+| (*)  ServiceName                                            SINGLETON |
++-----------------------------------------------------------------------+
+  ^                                                               ^
+  |                                                               |
+  Resolution Status                                        Lifetime Badge
+  (left side)                                              (right side)
+
+Row Layout (Expanded with details):
+
++-----------------------------------------------------------------------+
+| (*)  Logger                                                 SINGLETON |
+|----------------------------------------------------------------------|
+|      Status: Resolved (cached in root container)                      |
+|      Created: 12:34:56.789                                            |
+|      Resolution Order: #1                                             |
++-----------------------------------------------------------------------+
+
+================================================================================
+CACHE LOCATION INDICATORS
+================================================================================
+
+For resolved services, show WHERE the instance is cached:
+
+ROOT CONTAINER (for singletons):
++-----------------------------------------------------------------------+
+| (*)  Logger                                                 SINGLETON |
+|      Cached in: Root Container                                        |
++-----------------------------------------------------------------------+
+
+SPECIFIC SCOPE (for scoped services):
++-----------------------------------------------------------------------+
+| (*)  UserRepository                                           SCOPED  |
+|      Cached in: Scope #1 (request-abc123)                             |
++-----------------------------------------------------------------------+
+
+NO CACHE (for request lifetime):
++-----------------------------------------------------------------------+
+| (-)  RequestValidator                                        REQUEST  |
+|      Not cached (new instance per resolution)                         |
++-----------------------------------------------------------------------+
+
+Note: Request lifetime uses (-) dash instead of circle to indicate
+"always fresh, never cached"
+
+================================================================================
+CREATION ORDER VISUALIZATION
+================================================================================
+
+Show resolution order to help understand instantiation sequence:
+
++-----------------------------------------------------------------------+
+|  RESOLUTION ORDER                                                     |
++-----------------------------------------------------------------------+
+|                                                                       |
+|  #1  (*)  Logger              12:34:51.456              SINGLETON     |
+|           |                                                           |
+|           v                                                           |
+|  #2  (*)  DatabasePool        12:34:51.789              SINGLETON     |
+|           |                                                           |
+|           v                                                           |
+|  #3  (*)  AuthService         12:34:52.012              SINGLETON     |
+|           |   depends on: Logger, DatabasePool                        |
+|           v                                                           |
+|  --  ( )  ConfigService       -- not resolved --        SINGLETON     |
+|                                                                       |
++-----------------------------------------------------------------------+
+
+Timeline representation showing dependency chain:
+
+  Time -->
+
+  |-------|-------|-------|-------|-------|
+  t0      t1      t2      t3      t4      t5
+
+  [Logger]
+          [DatabasePool]
+                  [AuthService]
+                          [UserRepo - in scope]
+
+================================================================================
+INSTANCE SHARING VISUALIZATION
+================================================================================
+
+Show how instances are shared across scopes:
+
++-----------------------------------------------------------------------+
+|  INSTANCE SHARING MAP                                                 |
++-----------------------------------------------------------------------+
+|                                                                       |
+|  Logger (singleton)                                                   |
+|  +----------------------------------------------------------------+  |
+|  | Shared by: Root, Scope #1, Scope #2, Scope #3                  |  |
+|  | Instance: ConsoleLogger@0x1234                                  |  |
+|  +----------------------------------------------------------------+  |
+|                                                                       |
+|  UserRepository (scoped)                                              |
+|  +----------------------------------------------------------------+  |
+|  | Scope #1: PostgresUserRepo@0x5678                              |  |
+|  | Scope #2: PostgresUserRepo@0x9abc                              |  |
+|  | Scope #3: -- inherits from Scope #1 --                          |  |
+|  +----------------------------------------------------------------+  |
+|                                                                       |
++-----------------------------------------------------------------------+
+
+================================================================================
+DISPOSAL STATUS
+================================================================================
+
+When a scope is being disposed or has been disposed:
+
+DISPOSING (in progress):
++-----------------------------------------------------------------------+
+| (~)  UserRepository                                           SCOPED  |
+|      Status: Disposing...  (finalizer running)                        |
+|      [==========>          ] 60%                                      |
++-----------------------------------------------------------------------+
+
+Style:
+  - Circle: Orange, pulsing animation
+  - Progress bar for multiple finalizers
+  - Disabled interaction
+
+DISPOSED:
++-----------------------------------------------------------------------+
+| (x)  UserRepository                                           SCOPED  |
+|      Status: Disposed at 12:35:01.234                                 |
+|      Finalizer: Completed successfully                                |
++-----------------------------------------------------------------------+
+
+Style:
+  - Circle: Gray with X mark
+  - Strikethrough on service name
+  - Muted colors throughout
+
+================================================================================
+COMPACT VS DETAILED VIEW TOGGLE
+================================================================================
+
+Compact View (default for long lists):
++-----------------------------------------------------------------------+
+|  (*)  Logger          SINGLETON  |  (*)  Database    SINGLETON       |
+|  (*)  AuthService     SINGLETON  |  ( )  Config      SINGLETON       |
+|  ( )  UserRepo        SCOPED     |  ( )  Validator   REQUEST         |
++-----------------------------------------------------------------------+
+
+Detailed View (toggle button in header):
++-----------------------------------------------------------------------+
+|  [Compact] [Detailed]                                                 |
++-----------------------------------------------------------------------+
+|                                                                       |
+|  +-------------------------------------------------------------------+|
+|  | (*)  Logger                                              SINGLETON||
+|  |      ConsoleLogger | Root Container | Created: 12:34:51           ||
+|  +-------------------------------------------------------------------+|
+|                                                                       |
+|  +-------------------------------------------------------------------+|
+|  | (*)  DatabasePool                                        SINGLETON||
+|  |      PgPool | Root Container | Created: 12:34:51                  ||
+|  +-------------------------------------------------------------------+|
+|                                                                       |
++-----------------------------------------------------------------------+
+
+================================================================================
+COLOR-BLIND ACCESSIBLE ALTERNATIVES
+================================================================================
+
+For users who cannot distinguish colors, add shape variations:
+
+SINGLETON (Green + Square badge):
++---+  +-------------+
+|[*]|  |[] SINGLETON |
++---+  +-------------+
+
+SCOPED (Blue + Circle badge):
++---+  +----------+
+|(o)|  |() SCOPED |
++---+  +----------+
+
+REQUEST (Orange + Diamond badge):
++---+  +-----------+
+|<>|   |<> REQUEST |
++---+  +-----------+
+
+Resolution status also uses shape:
+  - Resolved: Filled shape (same as lifetime shape)
+  - Not resolved: Outline only
+  - Warning: Shape with ! inside
+
+================================================================================
+HOVER/FOCUS STATES
+================================================================================
+
+Hover on service row:
++-----------------------------------------------------------------------+
+| (*)  Logger                                                 SINGLETON |
++-----------------------------------------------------------------------+
+  ^
+  |
+  +-- Background: var(--hex-devtools-bg-hover) #3a3a4e
+      Cursor: pointer
+      Subtle left border accent: 2px solid var(--hex-devtools-accent)
+
+Focus (keyboard navigation):
++-----------------------------------------------------------------------+
+| (*)  Logger                                                 SINGLETON |
++-----------------------------------------------------------------------+
+  ^
+  |
+  +-- Outline: 2px solid var(--hex-devtools-accent)
+      Outline-offset: 2px
+
+================================================================================

@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`serializeGraph > works with toMatchSnapshot() 1`] = `
+{
+  "adapters": [
+    {
+      "lifetime": "scoped",
+      "port": "Database",
+      "requires": [
+        "Logger",
+      ],
+    },
+    {
+      "lifetime": "singleton",
+      "port": "Logger",
+      "requires": [],
+    },
+    {
+      "lifetime": "request",
+      "port": "UserService",
+      "requires": [
+        "Database",
+        "Logger",
+      ],
+    },
+  ],
+}
+`;

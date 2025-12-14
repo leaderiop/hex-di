@@ -1,0 +1,13 @@
+task_groups:
+  - name: Package Setup and Error System
+    claude_code_subagent: implementer
+  - name: React Context and Provider Components
+    claude_code_subagent: react-ports-integrator
+  - name: React Hooks for Service Resolution
+    claude_code_subagent: react-ports-integrator
+  - name: createTypedHooks Factory and Type Exports
+    claude_code_subagent: typescript-type-system-architect
+  - name: Type Tests and Test Gap Analysis
+    claude_code_subagent: composition-test-architect
+
+orchestration_complete: true

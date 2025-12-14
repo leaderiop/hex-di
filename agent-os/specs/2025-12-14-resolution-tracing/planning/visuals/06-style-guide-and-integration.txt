@@ -1,0 +1,671 @@
+================================================================================
+                    RESOLUTION TRACING - STYLE GUIDE & INTEGRATION
+================================================================================
+
+This document defines the style extensions needed for Resolution Tracing
+and how they integrate with existing DevTools styles.
+
+EXISTING STYLES TO REUSE (from styles.ts):
+--------------------------------------------------------------------------------
+
+From panelStyles:
+  - container: Main panel wrapper
+  - header: Panel title header
+  - content: Content area padding
+
+From sectionStyles:
+  - header: Collapsible section header
+  - headerHover: Hover state
+  - title: Section title text
+  - chevron / chevronExpanded: Expand indicator
+  - content: Section content padding
+
+From nodeStyles:
+  - item: Node row container
+  - name: Port name text
+  - badge, badgeSingleton, badgeScoped, badgeRequest: Lifetime badges
+
+From serviceListStyles:
+  - searchContainer, searchInput, searchClearButton: Search UI
+  - filterContainer, filterGroup, filterButton, filterButtonActive: Filters
+
+From adapterStyles:
+  - detailRow, detailLabel, detailValue: Detail rows
+
+From emptyStyles:
+  - container: Empty state message
+
+
+NEW STYLE DEFINITIONS NEEDED:
+--------------------------------------------------------------------------------
+
+/** Resolution tracing main container styles */
+interface TracingStyleDef {
+  container: CSSProperties;
+  viewToggleContainer: CSSProperties;
+  viewToggleTab: CSSProperties;
+  viewToggleTabActive: CSSProperties;
+  viewContent: CSSProperties;
+}
+
+/** Timeline view specific styles */
+interface TimelineStyleDef {
+  container: CSSProperties;
+  ruler: CSSProperties;
+  rulerTick: CSSProperties;
+  rulerLabel: CSSProperties;
+  thresholdLine: CSSProperties;
+  row: CSSProperties;
+  rowHover: CSSProperties;
+  rowExpanded: CSSProperties;
+  rowSlow: CSSProperties;
+  rowCached: CSSProperties;
+  orderBadge: CSSProperties;
+  portName: CSSProperties;
+  barContainer: CSSProperties;
+  bar: CSSProperties;
+  barFast: CSSProperties;
+  barMedium: CSSProperties;
+  barSlow: CSSProperties;
+  barCached: CSSProperties;
+  durationLabel: CSSProperties;
+  statusIndicator: CSSProperties;
+  slowIndicator: CSSProperties;
+  cacheIndicator: CSSProperties;
+  detailsPanel: CSSProperties;
+  footer: CSSProperties;
+}
+
+/** Tree view specific styles */
+interface TreeViewStyleDef {
+  container: CSSProperties;
+  header: CSSProperties;
+  expandAllButton: CSSProperties;
+  node: CSSProperties;
+  nodeHover: CSSProperties;
+  nodeSelected: CSSProperties;
+  nodeSlow: CSSProperties;
+  nodeCached: CSSProperties;
+  expandToggle: CSSProperties;
+  connectorVertical: CSSProperties;
+  connectorHorizontal: CSSProperties;
+  nodeContent: CSSProperties;
+  durationSelf: CSSProperties;
+  durationTotal: CSSProperties;
+  childrenContainer: CSSProperties;
+}
+
+/** Summary stats styles */
+interface SummaryStyleDef {
+  container: CSSProperties;
+  cardsGrid: CSSProperties;
+  card: CSSProperties;
+  cardLabel: CSSProperties;
+  cardValue: CSSProperties;
+  cardSubtext: CSSProperties;
+  cardWarning: CSSProperties;
+  sectionHeader: CSSProperties;
+  barChart: CSSProperties;
+  barRow: CSSProperties;
+  barLabel: CSSProperties;
+  bar: CSSProperties;
+  barFast: CSSProperties;
+  barMedium: CSSProperties;
+  barSlow: CSSProperties;
+  barValue: CSSProperties;
+}
+
+/** Controls bar styles */
+interface ControlsStyleDef {
+  container: CSSProperties;
+  row: CSSProperties;
+  filterGroup: CSSProperties;
+  sortDropdown: CSSProperties;
+  thresholdContainer: CSSProperties;
+  thresholdSlider: CSSProperties;
+  thresholdTrack: CSSProperties;
+  thresholdThumb: CSSProperties;
+  thresholdLabel: CSSProperties;
+  statusBar: CSSProperties;
+  recordingIndicator: CSSProperties;
+  recordingDot: CSSProperties;
+  activeFiltersBar: CSSProperties;
+  filterTag: CSSProperties;
+  filterTagRemove: CSSProperties;
+}
+
+
+NEW CSS VARIABLES:
+--------------------------------------------------------------------------------
+
+Add to cssVariables (dark theme):
+
+  /* Performance colors */
+  --hex-devtools-fast: #a6e3a1;        /* Green - reuse singleton */
+  --hex-devtools-medium: #f9e2af;      /* Yellow - catppuccin yellow */
+  --hex-devtools-slow: #f38ba8;        /* Red - catppuccin red */
+  --hex-devtools-cached: #89dceb;      /* Cyan - catppuccin cyan */
+
+  /* Performance backgrounds (with transparency) */
+  --hex-devtools-slow-bg: rgba(243, 139, 168, 0.1);
+  --hex-devtools-cached-bg: rgba(137, 220, 235, 0.1);
+  --hex-devtools-medium-bg: rgba(249, 226, 175, 0.1);
+
+  /* Timeline specific */
+  --hex-devtools-ruler: #585b70;       /* Catppuccin surface2 */
+  --hex-devtools-threshold: #f38ba8;   /* Same as slow */
+
+Add to cssVariablesLight (light theme):
+
+  /* Performance colors - light theme */
+  --hex-devtools-fast: #40a02b;        /* Green */
+  --hex-devtools-medium: #df8e1d;      /* Yellow */
+  --hex-devtools-slow: #d20f39;        /* Red */
+  --hex-devtools-cached: #04a5e5;      /* Cyan */
+
+  /* Performance backgrounds (with transparency) */
+  --hex-devtools-slow-bg: rgba(210, 15, 57, 0.1);
+  --hex-devtools-cached-bg: rgba(4, 165, 229, 0.1);
+  --hex-devtools-medium-bg: rgba(223, 142, 29, 0.1);
+
+
+STYLE OBJECTS - TRACING CONTAINER:
+--------------------------------------------------------------------------------
+
+export const tracingStyles: TracingStyleDef = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+  },
+  viewToggleContainer: {
+    display: "flex",
+    borderBottom: "1px solid var(--hex-devtools-border, #45475a)",
+    marginBottom: "12px",
+  },
+  viewToggleTab: {
+    padding: "8px 16px",
+    fontSize: "12px",
+    fontWeight: 500,
+    color: "var(--hex-devtools-text-muted, #a6adc8)",
+    backgroundColor: "transparent",
+    border: "none",
+    borderBottom: "2px solid transparent",
+    cursor: "pointer",
+    transition: "color 0.15s ease, border-color 0.15s ease",
+  },
+  viewToggleTabActive: {
+    color: "var(--hex-devtools-accent, #89b4fa)",
+    borderBottomColor: "var(--hex-devtools-accent, #89b4fa)",
+  },
+  viewContent: {
+    minHeight: "200px",
+  },
+};
+
+
+STYLE OBJECTS - TIMELINE VIEW:
+--------------------------------------------------------------------------------
+
+export const timelineStyles: TimelineStyleDef = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px",
+  },
+  ruler: {
+    position: "relative",
+    height: "24px",
+    borderBottom: "1px solid var(--hex-devtools-ruler, #585b70)",
+    marginBottom: "8px",
+    fontSize: "10px",
+    color: "var(--hex-devtools-text-muted, #a6adc8)",
+  },
+  rulerTick: {
+    position: "absolute",
+    top: "16px",
+    width: "1px",
+    height: "8px",
+    backgroundColor: "var(--hex-devtools-ruler, #585b70)",
+  },
+  rulerLabel: {
+    position: "absolute",
+    top: "2px",
+    fontSize: "9px",
+    transform: "translateX(-50%)",
+  },
+  thresholdLine: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    width: "1px",
+    backgroundColor: "var(--hex-devtools-threshold, #f38ba8)",
+    borderStyle: "dashed",
+  },
+  row: {
+    display: "flex",
+    alignItems: "center",
+    padding: "6px 12px",
+    gap: "8px",
+    backgroundColor: "transparent",
+    borderRadius: "4px",
+    cursor: "pointer",
+    transition: "background-color 0.15s ease",
+  },
+  rowHover: {
+    backgroundColor: "var(--hex-devtools-bg-hover, #3a3a4e)",
+  },
+  rowExpanded: {
+    backgroundColor: "var(--hex-devtools-bg-secondary, #2a2a3e)",
+    borderLeft: "3px solid var(--hex-devtools-accent, #89b4fa)",
+  },
+  rowSlow: {
+    backgroundColor: "var(--hex-devtools-slow-bg)",
+    borderLeft: "3px solid var(--hex-devtools-slow, #f38ba8)",
+  },
+  rowCached: {
+    backgroundColor: "var(--hex-devtools-cached-bg)",
+  },
+  orderBadge: {
+    fontSize: "10px",
+    fontWeight: 600,
+    color: "var(--hex-devtools-text-muted, #a6adc8)",
+    minWidth: "24px",
+  },
+  portName: {
+    fontWeight: 600,
+    color: "var(--hex-devtools-accent, #89b4fa)",
+    flex: "0 0 140px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  barContainer: {
+    flex: 1,
+    position: "relative",
+    height: "16px",
+    backgroundColor: "var(--hex-devtools-bg, #1e1e2e)",
+    borderRadius: "2px",
+  },
+  bar: {
+    position: "absolute",
+    top: "2px",
+    height: "12px",
+    borderRadius: "2px",
+    minWidth: "4px",
+    transition: "width 0.3s ease, left 0.3s ease",
+  },
+  barFast: {
+    backgroundColor: "var(--hex-devtools-fast, #a6e3a1)",
+  },
+  barMedium: {
+    backgroundColor: "var(--hex-devtools-medium, #f9e2af)",
+  },
+  barSlow: {
+    backgroundColor: "var(--hex-devtools-slow, #f38ba8)",
+  },
+  barCached: {
+    backgroundColor: "var(--hex-devtools-cached, #89dceb)",
+  },
+  durationLabel: {
+    fontSize: "11px",
+    fontWeight: 500,
+    color: "var(--hex-devtools-text, #cdd6f4)",
+    minWidth: "50px",
+    textAlign: "right",
+  },
+  statusIndicator: {
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+    fontSize: "10px",
+  },
+  slowIndicator: {
+    color: "var(--hex-devtools-slow, #f38ba8)",
+    fontWeight: 600,
+  },
+  cacheIndicator: {
+    color: "var(--hex-devtools-cached, #89dceb)",
+    fontWeight: 600,
+  },
+  detailsPanel: {
+    marginTop: "8px",
+    marginLeft: "32px",
+    padding: "12px",
+    backgroundColor: "var(--hex-devtools-bg, #1e1e2e)",
+    borderRadius: "4px",
+    border: "1px solid var(--hex-devtools-border, #45475a)",
+    fontSize: "12px",
+  },
+  footer: {
+    display: "flex",
+    gap: "16px",
+    padding: "12px",
+    marginTop: "8px",
+    borderTop: "1px solid var(--hex-devtools-border, #45475a)",
+    fontSize: "11px",
+    color: "var(--hex-devtools-text-muted, #a6adc8)",
+  },
+};
+
+
+STYLE OBJECTS - TREE VIEW:
+--------------------------------------------------------------------------------
+
+export const treeViewStyles: TreeViewStyleDef = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  header: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    marginBottom: "12px",
+  },
+  expandAllButton: {
+    padding: "4px 8px",
+    fontSize: "10px",
+    fontWeight: 500,
+    backgroundColor: "transparent",
+    border: "1px solid var(--hex-devtools-border, #45475a)",
+    borderRadius: "4px",
+    color: "var(--hex-devtools-text-muted, #a6adc8)",
+    cursor: "pointer",
+  },
+  node: {
+    display: "flex",
+    flexDirection: "column",
+    position: "relative",
+  },
+  nodeHover: {
+    backgroundColor: "var(--hex-devtools-bg-hover, #3a3a4e)",
+  },
+  nodeSelected: {
+    backgroundColor: "var(--hex-devtools-bg-secondary, #2a2a3e)",
+    borderLeft: "3px solid var(--hex-devtools-accent, #89b4fa)",
+  },
+  nodeSlow: {
+    backgroundColor: "var(--hex-devtools-slow-bg)",
+    borderLeft: "3px solid var(--hex-devtools-slow, #f38ba8)",
+  },
+  nodeCached: {
+    backgroundColor: "var(--hex-devtools-cached-bg)",
+  },
+  expandToggle: {
+    width: "16px",
+    height: "16px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "10px",
+    color: "var(--hex-devtools-text-muted, #a6adc8)",
+    backgroundColor: "transparent",
+    border: "none",
+    cursor: "pointer",
+    padding: 0,
+    marginRight: "4px",
+  },
+  connectorVertical: {
+    position: "absolute",
+    left: "7px",
+    top: "24px",
+    bottom: 0,
+    width: "1px",
+    backgroundColor: "var(--hex-devtools-border, #45475a)",
+  },
+  connectorHorizontal: {
+    position: "absolute",
+    left: "7px",
+    top: "12px",
+    width: "12px",
+    height: "1px",
+    backgroundColor: "var(--hex-devtools-border, #45475a)",
+  },
+  nodeContent: {
+    display: "flex",
+    alignItems: "center",
+    padding: "6px 8px",
+    gap: "8px",
+    cursor: "pointer",
+    borderRadius: "4px",
+    transition: "background-color 0.15s ease",
+  },
+  durationSelf: {
+    fontSize: "11px",
+    fontWeight: 500,
+    color: "var(--hex-devtools-text, #cdd6f4)",
+  },
+  durationTotal: {
+    fontSize: "10px",
+    color: "var(--hex-devtools-text-muted, #a6adc8)",
+  },
+  childrenContainer: {
+    marginLeft: "24px",
+    borderLeft: "1px solid var(--hex-devtools-border, #45475a)",
+    paddingLeft: "8px",
+  },
+};
+
+
+STYLE OBJECTS - CONTROLS BAR:
+--------------------------------------------------------------------------------
+
+export const controlsStyles: ControlsStyleDef = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    padding: "8px 0",
+    borderBottom: "1px solid var(--hex-devtools-border, #45475a)",
+    marginBottom: "12px",
+  },
+  row: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    flexWrap: "wrap",
+  },
+  filterGroup: {
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+  },
+  sortDropdown: {
+    padding: "4px 24px 4px 8px",
+    fontSize: "12px",
+    backgroundColor: "var(--hex-devtools-bg-secondary, #2a2a3e)",
+    border: "1px solid var(--hex-devtools-border, #45475a)",
+    borderRadius: "4px",
+    color: "var(--hex-devtools-text, #cdd6f4)",
+    cursor: "pointer",
+    appearance: "none",
+    backgroundImage: "url(\"data:image/svg+xml,...\")", /* dropdown arrow */
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "right 8px center",
+  },
+  thresholdContainer: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  thresholdSlider: {
+    width: "120px",
+    height: "4px",
+    borderRadius: "2px",
+    appearance: "none",
+    background: "linear-gradient(to right, var(--hex-devtools-fast), var(--hex-devtools-medium), var(--hex-devtools-slow))",
+    cursor: "pointer",
+  },
+  thresholdTrack: {
+    height: "4px",
+    borderRadius: "2px",
+  },
+  thresholdThumb: {
+    width: "14px",
+    height: "14px",
+    borderRadius: "50%",
+    backgroundColor: "var(--hex-devtools-text, #cdd6f4)",
+    border: "2px solid var(--hex-devtools-bg, #1e1e2e)",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
+    cursor: "pointer",
+  },
+  thresholdLabel: {
+    fontSize: "11px",
+    fontWeight: 600,
+    color: "var(--hex-devtools-text, #cdd6f4)",
+    minWidth: "45px",
+  },
+  statusBar: {
+    display: "flex",
+    alignItems: "center",
+    gap: "16px",
+    padding: "8px 12px",
+    backgroundColor: "var(--hex-devtools-bg-secondary, #2a2a3e)",
+    borderRadius: "4px",
+    fontSize: "11px",
+  },
+  recordingIndicator: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    fontWeight: 600,
+    color: "var(--hex-devtools-slow, #f38ba8)",
+  },
+  recordingDot: {
+    width: "8px",
+    height: "8px",
+    borderRadius: "50%",
+    backgroundColor: "var(--hex-devtools-slow, #f38ba8)",
+    animation: "pulse 1.5s ease-in-out infinite",
+  },
+  activeFiltersBar: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "6px 0",
+    flexWrap: "wrap",
+  },
+  filterTag: {
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+    padding: "2px 8px",
+    backgroundColor: "var(--hex-devtools-bg-secondary, #2a2a3e)",
+    border: "1px solid var(--hex-devtools-border, #45475a)",
+    borderRadius: "12px",
+    fontSize: "10px",
+    color: "var(--hex-devtools-text, #cdd6f4)",
+  },
+  filterTagRemove: {
+    fontSize: "10px",
+    color: "var(--hex-devtools-text-muted, #a6adc8)",
+    cursor: "pointer",
+    padding: "0 2px",
+  },
+};
+
+
+UTILITY FUNCTIONS:
+--------------------------------------------------------------------------------
+
+/**
+ * Get bar color style based on duration and threshold.
+ */
+export function getPerformanceBarStyle(
+  durationMs: number,
+  thresholdMs: number,
+  isCacheHit: boolean
+): CSSProperties {
+  if (isCacheHit) {
+    return timelineStyles.barCached;
+  }
+  if (durationMs >= thresholdMs) {
+    return timelineStyles.barSlow;
+  }
+  if (durationMs >= thresholdMs * 0.5) {
+    return timelineStyles.barMedium;
+  }
+  return timelineStyles.barFast;
+}
+
+/**
+ * Get row style based on trace state.
+ */
+export function getTraceRowStyle(
+  isExpanded: boolean,
+  isSlow: boolean,
+  isCacheHit: boolean
+): CSSProperties {
+  let style = { ...timelineStyles.row };
+
+  if (isSlow) {
+    style = { ...style, ...timelineStyles.rowSlow };
+  } else if (isCacheHit) {
+    style = { ...style, ...timelineStyles.rowCached };
+  }
+
+  if (isExpanded) {
+    style = { ...style, ...timelineStyles.rowExpanded };
+  }
+
+  return style;
+}
+
+/**
+ * Format duration for display.
+ */
+export function formatDuration(ms: number): string {
+  if (ms < 0.1) {
+    return "<0.1ms";
+  }
+  if (ms < 10) {
+    return `${ms.toFixed(1)}ms`;
+  }
+  if (ms < 1000) {
+    return `${Math.round(ms)}ms`;
+  }
+  return `${(ms / 1000).toFixed(2)}s`;
+}
+
+
+KEYFRAME ANIMATIONS:
+--------------------------------------------------------------------------------
+
+Add to a global CSS or inject via style tag:
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+INTEGRATION CHECKLIST:
+--------------------------------------------------------------------------------
+
+[ ] Add new CSS variables to cssVariables and cssVariablesLight
+[ ] Export new style objects from styles.ts
+[ ] Add utility functions for performance styling
+[ ] Create ResolutionTracingSection component using tracingStyles
+[ ] Create TimelineView component using timelineStyles
+[ ] Create TreeView component using treeViewStyles
+[ ] Create SummaryStatsView component using summaryStyles
+[ ] Create TracingControlsBar component using controlsStyles
+[ ] Add CollapsibleSection wrapper in DevToolsPanel
+[ ] Wire up data flow from container inspector
+

@@ -1,0 +1,225 @@
+================================================================================
+                    RESOLUTION TRACING - TIMELINE VIEW DETAIL
+================================================================================
+
+The Timeline View shows resolution events as horizontal bars on a time axis.
+Each bar represents one service resolution, with length proportional to duration.
+
+TIMELINE VIEW STRUCTURE:
+--------------------------------------------------------------------------------
+
++==============================================================================+
+|  TIMELINE VIEW                                                               |
++------------------------------------------------------------------------------+
+|                                                                              |
+|  TIME RULER (relative to first resolution)                                   |
+|  |----+----+----+----+----+----+----+----+----+----|                         |
+|  0ms  10   20   30   40   50   60   70   80   90  100ms                       |
+|                                                                              |
++------------------------------------------------------------------------------+
+|                                                                              |
+|  #1  ConfigPort          [=====]                           2.3ms   SINGLETON |
+|      |                   |     |                                             |
+|      start: 0ms          |     end: 2.3ms                                    |
+|                          |                                                   |
+|  #2  LoggerPort               [========]                   4.1ms   SINGLETON |
+|                               |        |                                     |
+|                          start: 2.3ms  end: 6.4ms                            |
+|                                                                              |
+|  #3  DatabasePort                      [================]  12.5ms  SINGLETON |
+|                                        |                |                    |
+|                                   start: 6.4ms     end: 18.9ms   <-- SLOW!   |
+|                                                                              |
+|  #4  UserRepository                                   [===]  1.8ms  SCOPED   |
+|                                                       |   |                  |
+|                                                  start: 18.9ms               |
+|                                                                              |
+|  #5  AuthService                                         [==]  0.8ms REQUEST |
+|                                                          |  |   CACHE HIT    |
+|                                                                              |
++------------------------------------------------------------------------------+
+|  Total: 23.4ms | 5 resolutions | 1 cache hit (20%) | Slowest: DatabasePort   |
++==============================================================================+
+
+
+DETAILED WIREFRAME - SINGLE TIMELINE ROW:
+--------------------------------------------------------------------------------
+
+Normal Resolution (fast):
++------------------------------------------------------------------------------+
+|  #1  ConfigPort                                                              |
+|      +-- Order badge    +-- Port name (accent color)                         |
+|                                                                              |
+|  |   [=====]             2.3ms    SINGLETON                                  |
+|  |   ^     ^             ^        ^                                          |
+|  |   |     |             |        +-- Lifetime badge (green/blue/orange)     |
+|  |   |     |             +-- Duration label                                  |
+|  |   |     +-- Bar end (proportional to duration)                            |
+|  |   +-- Bar start (positioned at start time)                                |
+|                                                                              |
+|  Bar color: #a6e3a1 (green) for fast (< 10ms)                                |
++------------------------------------------------------------------------------+
+
+Slow Resolution (above threshold):
++------------------------------------------------------------------------------+
+|  #3  DatabasePort                                                            |
+|                                                                              |
+|  |        [================================]  12.5ms  SINGLETON    [!] SLOW  |
+|           ^                                ^                       ^         |
+|           |                                |                       |         |
+|           Start position                   Long bar                Warning   |
+|                                                                    icon      |
+|  Bar color: #f38ba8 (red) for slow (>= threshold)                            |
+|  Background: subtle red glow/highlight on entire row                         |
++------------------------------------------------------------------------------+
+
+Cache Hit:
++------------------------------------------------------------------------------+
+|  #5  AuthService                                                             |
+|                                                                              |
+|  |                         [==]  0.8ms  REQUEST    [*] CACHED                |
+|                            ^                        ^                        |
+|                            |                        |                        |
+|                            Shorter bar              Cache icon               |
+|                                                                              |
+|  Bar color: #89dceb (cyan) for cache hits                                    |
+|  Icon: filled circle or checkmark to indicate cache                          |
++------------------------------------------------------------------------------+
+
+
+TIMELINE ROW COMPONENT STRUCTURE:
+--------------------------------------------------------------------------------
+
+TimelineRow
+  +-- OrderBadge (#1, #2, etc.)
+  +-- PortNameLabel (clickable - expands to show details)
+  +-- TimelineBarContainer
+  |     +-- TimelineBar (styled div with dynamic width and position)
+  |     +-- DurationLabel
+  +-- LifetimeBadge (reuse from existing nodeStyles)
+  +-- StatusIndicators
+        +-- SlowIndicator (conditional)
+        +-- CacheIndicator (conditional)
+
+
+EXPANDED ROW (on click):
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|  #3  DatabasePort           [v]                                              |
+|                                                                              |
+|  |        [================================]  12.5ms  SINGLETON    [!] SLOW  |
+|                                                                              |
+|  +------------------------------------------------------------------------+  |
+|  |  Details                                                               |  |
+|  |  ......................................................................|  |
+|  |  Start Time:      6.4ms                                                |  |
+|  |  End Time:        18.9ms                                               |  |
+|  |  Duration:        12.5ms                                               |  |
+|  |  Lifetime:        singleton                                            |  |
+|  |  Cache Hit:       No (fresh resolution)                                |  |
+|  |  Scope:           root                                                 |  |
+|  |  Dependencies:    ConfigPort, LoggerPort                               |  |
+|  |                                                                        |  |
+|  |  [View in Tree]   [Copy Trace JSON]                                    |  |
+|  +------------------------------------------------------------------------+  |
++------------------------------------------------------------------------------+
+
+
+TIME RULER DETAIL:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|  TIME RULER                                                                  |
+|  +------------------------------------------------------------------------+  |
+|  |                                                                        |  |
+|  |  0ms       25ms       50ms       75ms      100ms      125ms     150ms  |  |
+|  |  |----+----|----+----|----+----|----+----|----+----|----+----|----+   |  |
+|  |  ^         ^                              ^                            |  |
+|  |  |         |                              |                            |  |
+|  |  Major     Minor tick                     Threshold marker             |  |
+|  |  tick      (every 5ms)                    (red dashed line)            |  |
+|  |  (every 25ms)                                                          |  |
+|  |                                                                        |  |
+|  +------------------------------------------------------------------------+  |
+|                                                                              |
+|  - Ruler auto-scales based on total session duration                         |
+|  - Red vertical dashed line shows "slow" threshold                           |
+|  - Zoom controls: [+] [-] [Fit All]                                          |
++------------------------------------------------------------------------------+
+
+
+VISUAL STATES:
+--------------------------------------------------------------------------------
+
+Bar Colors (using existing palette + new additions):
+
+  Fast Resolution (< 10ms):
+    - Bar:        #a6e3a1 (green, --hex-devtools-singleton)
+    - Background: transparent
+
+  Medium Resolution (10ms - threshold):
+    - Bar:        #f9e2af (yellow, catppuccin yellow)
+    - Background: transparent
+
+  Slow Resolution (>= threshold):
+    - Bar:        #f38ba8 (red, catppuccin red)
+    - Background: rgba(243, 139, 168, 0.1) (subtle red glow)
+    - Border:     1px solid #f38ba8 (on row container)
+
+  Cache Hit (any duration):
+    - Bar:        #89dceb (cyan, catppuccin cyan)
+    - Icon:       [*] or filled circle
+    - Background: transparent
+
+Hover State:
+  - Row background: var(--hex-devtools-bg-hover)
+  - Bar:            slightly brighter (10% lighter)
+  - Cursor:         pointer
+
+Selected/Expanded State:
+  - Row background: var(--hex-devtools-bg-secondary)
+  - Left border:    3px solid var(--hex-devtools-accent)
+  - Details panel:  slides down below bar
+
+
+ZOOM AND SCROLL:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|  ZOOM CONTROLS                                                               |
+|  +------------------------------------------------------------------------+  |
+|  |  [+] [100%] [-]     |     [Fit All]     |     [Focus Slow]             |  |
+|  +------------------------------------------------------------------------+  |
+|                                                                              |
+|  Horizontal scroll for long timelines:                                       |
+|  <---------------------------------------------------------------------->    |
+|                                                                              |
+|  Virtual scrolling for many traces (only render visible rows)                |
++------------------------------------------------------------------------------+
+
+
+LEGEND:
+--------------------------------------------------------------------------------
+
++------------------------------------------------------------------------------+
+|  LEGEND (collapsible, below timeline)                                        |
+|  +------------------------------------------------------------------------+  |
+|  |  [===] Fast (<10ms)   [===] Medium   [===] Slow (>=50ms)   [===] Cache |  |
+|  |   green                yellow          red                   cyan       |  |
+|  +------------------------------------------------------------------------+  |
++------------------------------------------------------------------------------+
+
+
+RESPONSIVE BEHAVIOR:
+--------------------------------------------------------------------------------
+
+Narrow width (< 400px):
+  - Hide duration labels on bars
+  - Show duration in tooltip on hover
+  - Reduce time ruler ticks
+
+Wide width (> 600px):
+  - Show full details inline
+  - More time ruler granularity
+

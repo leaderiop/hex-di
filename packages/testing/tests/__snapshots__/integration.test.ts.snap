@@ -1,0 +1,44 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`snapshot testing with graph modifications > serializes overridden graph for comparison 1`] = `
+{
+  "adapters": [
+    {
+      "lifetime": "singleton",
+      "port": "Database",
+      "requires": [
+        "Logger",
+      ],
+    },
+    {
+      "lifetime": "request",
+      "port": "EmailService",
+      "requires": [
+        "Logger",
+      ],
+    },
+    {
+      "lifetime": "request",
+      "port": "Logger",
+      "requires": [],
+    },
+    {
+      "lifetime": "request",
+      "port": "UserRepository",
+      "requires": [
+        "Database",
+        "Logger",
+      ],
+    },
+    {
+      "lifetime": "request",
+      "port": "UserService",
+      "requires": [
+        "EmailService",
+        "Logger",
+        "UserRepository",
+      ],
+    },
+  ],
+}
+`;

@@ -1,0 +1,31 @@
+task_groups:
+  - name: Package Infrastructure
+    subagent: implementer
+    status: complete
+  - name: Core Types and ExportedGraph Structure
+    subagent: implementer
+    status: complete
+  - name: toJSON Export Function
+    subagent: implementer
+    status: complete
+  - name: toDOT Export Function
+    subagent: implementer
+    status: complete
+  - name: toMermaid Export Function
+    subagent: implementer
+    status: complete
+  - name: Transform Utilities
+    subagent: implementer
+    status: complete
+  - name: React DevToolsPanel Component
+    subagent: implementer
+    status: complete
+  - name: React DevToolsFloating Component
+    subagent: implementer
+    status: complete
+  - name: Integration and Composability
+    subagent: implementer
+    status: complete
+  - name: Type Tests and Quality Assurance
+    subagent: implementation-verifier
+    status: complete

@@ -1,0 +1,104 @@
+{
+  "name": "@hex-di/devtools",
+  "version": "0.1.0",
+  "description": "Graph visualization export utilities and React DevTools components for HexDI - export to JSON, DOT, Mermaid formats and visualize dependency graphs",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.js"
+      },
+      "require": {
+        "types": "./dist/react/index.d.cts",
+        "default": "./dist/react/index.cjs"
+      }
+    },
+    "./tracing": {
+      "import": {
+        "types": "./dist/tracing/index.d.ts",
+        "default": "./dist/tracing/index.js"
+      },
+      "require": {
+        "types": "./dist/tracing/index.d.cts",
+        "default": "./dist/tracing/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:types": "vitest run --typecheck",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "dependency-injection",
+    "di",
+    "hexagonal-architecture",
+    "devtools",
+    "visualization",
+    "graphviz",
+    "mermaid",
+    "react",
+    "typescript",
+    "type-safe"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hex-di/hex-di.git",
+    "directory": "packages/devtools"
+  },
+  "bugs": {
+    "url": "https://github.com/hex-di/hex-di/issues"
+  },
+  "homepage": "https://github.com/hex-di/hex-di/tree/main/packages/devtools#readme",
+  "dependencies": {
+    "@hex-di/ports": "workspace:*",
+    "@hex-di/graph": "workspace:*",
+    "@hex-di/runtime": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "typescript": ">=5.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@testing-library/react": "^14.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "jsdom": "^24.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "sideEffects": false
+}

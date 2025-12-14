@@ -1,0 +1,104 @@
+{
+  "name": "@hex-di/testing",
+  "version": "0.1.0",
+  "description": "Testing utilities for HexDI - override adapters, create type-safe mocks, and manage test container lifecycles",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./vitest": {
+      "import": {
+        "types": "./dist/vitest/index.d.ts",
+        "default": "./dist/vitest/index.js"
+      },
+      "require": {
+        "types": "./dist/vitest/index.d.cts",
+        "default": "./dist/vitest/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:types": "vitest run --typecheck",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "dependency-injection",
+    "di",
+    "hexagonal-architecture",
+    "testing",
+    "mock",
+    "typescript",
+    "type-safe",
+    "vitest"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hex-di/hex-di.git",
+    "directory": "packages/testing"
+  },
+  "bugs": {
+    "url": "https://github.com/hex-di/hex-di/issues"
+  },
+  "homepage": "https://github.com/hex-di/hex-di/tree/main/packages/testing#readme",
+  "dependencies": {
+    "@hex-di/ports": "workspace:*",
+    "@hex-di/graph": "workspace:*",
+    "@hex-di/runtime": "workspace:*"
+  },
+  "peerDependencies": {
+    "vitest": ">=1.0.0",
+    "@testing-library/react": ">=14.0.0",
+    "@hex-di/react": "workspace:*",
+    "react": ">=18.0.0",
+    "typescript": ">=5.0"
+  },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    },
+    "@testing-library/react": {
+      "optional": true
+    },
+    "@hex-di/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@testing-library/react": "^14.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "jsdom": "^24.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "sideEffects": false
+}
