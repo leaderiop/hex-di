@@ -176,6 +176,10 @@ interface FloatingStyleDef {
   closeButton: CSSProperties;
   panelContent: CSSProperties;
   resizeHandle: CSSProperties;
+  resizeEdgeTop: CSSProperties;
+  resizeEdgeBottom: CSSProperties;
+  resizeEdgeLeft: CSSProperties;
+  resizeEdgeRight: CSSProperties;
 }
 
 // =============================================================================
@@ -591,6 +595,58 @@ export const floatingStyles: FloatingStyleDef = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  /**
+   * Top edge resize zone.
+   */
+  resizeEdgeTop: {
+    position: "absolute",
+    top: 0,
+    left: "16px",
+    right: "16px",
+    height: "6px",
+    cursor: "ns-resize",
+    zIndex: 9,
+  },
+
+  /**
+   * Bottom edge resize zone.
+   */
+  resizeEdgeBottom: {
+    position: "absolute",
+    bottom: 0,
+    left: "16px",
+    right: "16px",
+    height: "6px",
+    cursor: "ns-resize",
+    zIndex: 9,
+  },
+
+  /**
+   * Left edge resize zone.
+   */
+  resizeEdgeLeft: {
+    position: "absolute",
+    left: 0,
+    top: "16px",
+    bottom: "16px",
+    width: "6px",
+    cursor: "ew-resize",
+    zIndex: 9,
+  },
+
+  /**
+   * Right edge resize zone.
+   */
+  resizeEdgeRight: {
+    position: "absolute",
+    right: 0,
+    top: "16px",
+    bottom: "16px",
+    width: "6px",
+    cursor: "ew-resize",
+    zIndex: 9,
   },
 };
 

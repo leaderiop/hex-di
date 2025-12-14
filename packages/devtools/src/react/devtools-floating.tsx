@@ -59,6 +59,9 @@ const MIN_SIZE: PanelSize = { width: 300, height: 300 };
 /** Maximum panel dimensions */
 const MAX_SIZE: PanelSize = { width: 1200, height: 900 };
 
+/** Resize edge types */
+type ResizeEdge = "top" | "bottom" | "left" | "right" | "corner";
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -319,6 +322,7 @@ export function DevToolsFloating({
   const isResizing = useRef(false);
   const resizeStartPos = useRef({ x: 0, y: 0 });
   const resizeStartSize = useRef({ width: 0, height: 0 });
+  const activeEdge = useRef<ResizeEdge>("corner");
 
   // Persist state changes to localStorage
   useEffect(() => {
@@ -356,9 +360,10 @@ export function DevToolsFloating({
 
   // Resize handlers
   const handleResizeStart = useCallback(
-    (e: React.MouseEvent | React.TouchEvent) => {
+    (e: React.MouseEvent | React.TouchEvent, edge: ResizeEdge = "corner") => {
       e.preventDefault();
       isResizing.current = true;
+      activeEdge.current = edge;
 
       const clientX = "touches" in e ? e.touches[0]?.clientX ?? 0 : e.clientX;
       const clientY = "touches" in e ? e.touches[0]?.clientY ?? 0 : e.clientY;
@@ -385,31 +390,74 @@ export function DevToolsFloating({
       const deltaX = clientX - resizeStartPos.current.x;
       const deltaY = clientY - resizeStartPos.current.y;
 
-      // Calculate resize direction based on position
+      // Calculate resize based on edge type and position
       let newWidth = resizeStartSize.current.width;
       let newHeight = resizeStartSize.current.height;
 
-      switch (position) {
-        case "bottom-right":
-          // Resize from top-left corner (opposite of position)
-          newWidth = resizeStartSize.current.width - deltaX;
-          newHeight = resizeStartSize.current.height - deltaY;
-          break;
-        case "bottom-left":
-          // Resize from top-right corner
-          newWidth = resizeStartSize.current.width + deltaX;
-          newHeight = resizeStartSize.current.height - deltaY;
-          break;
-        case "top-right":
-          // Resize from bottom-left corner
-          newWidth = resizeStartSize.current.width - deltaX;
-          newHeight = resizeStartSize.current.height + deltaY;
-          break;
-        case "top-left":
-          // Resize from bottom-right corner
-          newWidth = resizeStartSize.current.width + deltaX;
-          newHeight = resizeStartSize.current.height + deltaY;
-          break;
+      const edge = activeEdge.current;
+
+      // Horizontal resizing (left/right edges or corner)
+      if (edge === "left" || edge === "right" || edge === "corner") {
+        // Determine direction based on edge and panel position
+        if (edge === "left") {
+          // Left edge: grows left for right-anchored, grows right for left-anchored
+          newWidth = position === "bottom-right" || position === "top-right"
+            ? resizeStartSize.current.width - deltaX
+            : resizeStartSize.current.width + deltaX;
+        } else if (edge === "right") {
+          // Right edge: grows right for left-anchored, grows left for right-anchored
+          newWidth = position === "bottom-left" || position === "top-left"
+            ? resizeStartSize.current.width + deltaX
+            : resizeStartSize.current.width - deltaX;
+        } else {
+          // Corner: use original corner logic
+          switch (position) {
+            case "bottom-right":
+              newWidth = resizeStartSize.current.width - deltaX;
+              break;
+            case "bottom-left":
+              newWidth = resizeStartSize.current.width + deltaX;
+              break;
+            case "top-right":
+              newWidth = resizeStartSize.current.width - deltaX;
+              break;
+            case "top-left":
+              newWidth = resizeStartSize.current.width + deltaX;
+              break;
+          }
+        }
+      }
+
+      // Vertical resizing (top/bottom edges or corner)
+      if (edge === "top" || edge === "bottom" || edge === "corner") {
+        // Determine direction based on edge and panel position
+        if (edge === "top") {
+          // Top edge: grows up for bottom-anchored, grows down for top-anchored
+          newHeight = position === "bottom-right" || position === "bottom-left"
+            ? resizeStartSize.current.height - deltaY
+            : resizeStartSize.current.height + deltaY;
+        } else if (edge === "bottom") {
+          // Bottom edge: grows down for top-anchored, grows up for bottom-anchored
+          newHeight = position === "top-right" || position === "top-left"
+            ? resizeStartSize.current.height + deltaY
+            : resizeStartSize.current.height - deltaY;
+        } else {
+          // Corner: use original corner logic
+          switch (position) {
+            case "bottom-right":
+              newHeight = resizeStartSize.current.height - deltaY;
+              break;
+            case "bottom-left":
+              newHeight = resizeStartSize.current.height - deltaY;
+              break;
+            case "top-right":
+              newHeight = resizeStartSize.current.height + deltaY;
+              break;
+            case "top-left":
+              newHeight = resizeStartSize.current.height + deltaY;
+              break;
+          }
+        }
       }
 
       // Clamp to min/max bounds
@@ -518,25 +566,57 @@ export function DevToolsFloating({
           <div style={floatingStyles.panelContent}>
             <DevToolsPanel graph={graph} {...(container ? { container } : {})} />
           </div>
-          {/* Resize handle - only show when not fullscreen */}
+          {/* Resize handles - only show when not fullscreen */}
           {!isFullscreen && (
-            <div
-              data-testid="devtools-resize-handle"
-              style={resizeHandleStyle}
-              onMouseDown={handleResizeStart}
-              onTouchStart={handleResizeStart}
-              aria-label="Resize panel"
-            >
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 10 10"
-                fill="currentColor"
-                style={{ opacity: 0.5 }}
+            <>
+              {/* Edge resize zones */}
+              <div
+                data-testid="devtools-resize-edge-top"
+                style={floatingStyles.resizeEdgeTop}
+                onMouseDown={(e) => handleResizeStart(e, "top")}
+                onTouchStart={(e) => handleResizeStart(e, "top")}
+                aria-label="Resize panel vertically"
+              />
+              <div
+                data-testid="devtools-resize-edge-bottom"
+                style={floatingStyles.resizeEdgeBottom}
+                onMouseDown={(e) => handleResizeStart(e, "bottom")}
+                onTouchStart={(e) => handleResizeStart(e, "bottom")}
+                aria-label="Resize panel vertically"
+              />
+              <div
+                data-testid="devtools-resize-edge-left"
+                style={floatingStyles.resizeEdgeLeft}
+                onMouseDown={(e) => handleResizeStart(e, "left")}
+                onTouchStart={(e) => handleResizeStart(e, "left")}
+                aria-label="Resize panel horizontally"
+              />
+              <div
+                data-testid="devtools-resize-edge-right"
+                style={floatingStyles.resizeEdgeRight}
+                onMouseDown={(e) => handleResizeStart(e, "right")}
+                onTouchStart={(e) => handleResizeStart(e, "right")}
+                aria-label="Resize panel horizontally"
+              />
+              {/* Corner resize handle */}
+              <div
+                data-testid="devtools-resize-handle"
+                style={resizeHandleStyle}
+                onMouseDown={(e) => handleResizeStart(e, "corner")}
+                onTouchStart={(e) => handleResizeStart(e, "corner")}
+                aria-label="Resize panel"
               >
-                <path d="M 0 10 L 10 0 L 10 10 Z" />
-              </svg>
-            </div>
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 10 10"
+                  fill="currentColor"
+                  style={{ opacity: 0.5 }}
+                >
+                  <path d="M 0 10 L 10 0 L 10 10 Z" />
+                </svg>
+              </div>
+            </>
           )}
         </div>
       ) : (
