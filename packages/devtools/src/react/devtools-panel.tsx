@@ -37,6 +37,8 @@ import { ContainerInspector } from "./container-inspector.js";
 import { TabNavigation, type TabId } from "./tab-navigation.js";
 import { ResolutionTracingSection } from "./resolution-tracing-section.js";
 import { DependencyGraph } from "./graph-visualization/index.js";
+import { EnhancedServicesView } from "./enhanced-services-view.js";
+import type { ServiceInfo } from "./resolved-services.js";
 
 // =============================================================================
 // Types
@@ -316,6 +318,35 @@ function AdapterItem({ node, dependencies }: AdapterItemProps): ReactElement {
 }
 
 /**
+ * Build ServiceInfo list from exported graph (without container).
+ *
+ * Creates basic service info with dependencies but without resolution
+ * status (since no container is available to query).
+ */
+function buildServicesFromGraph(exportedGraph: ExportedGraph): readonly ServiceInfo[] {
+  // Build a map of port name to dependencies
+  const dependencyMap = new Map<string, readonly string[]>();
+  for (const edge of exportedGraph.edges) {
+    const deps = dependencyMap.get(edge.from);
+    if (deps !== undefined) {
+      dependencyMap.set(edge.from, [...deps, edge.to]);
+    } else {
+      dependencyMap.set(edge.from, [edge.to]);
+    }
+  }
+
+  return exportedGraph.nodes.map((node) => ({
+    portName: node.id,
+    lifetime: node.lifetime,
+    isResolved: false,
+    isScopeRequired: node.lifetime !== "singleton",
+    resolvedAt: undefined,
+    resolutionOrder: undefined,
+    dependencies: dependencyMap.get(node.id) ?? [],
+  }));
+}
+
+/**
  * Container browser section showing adapter details.
  */
 interface ContainerBrowserProps {
@@ -461,6 +492,12 @@ export function DevToolsPanel({
     return containerWithTracing[TRACING_ACCESS];
   }, [container]);
 
+  // Build services list from graph for enhanced services view
+  const services = useMemo(
+    () => buildServicesFromGraph(exportedGraph),
+    [exportedGraph]
+  );
+
   // Render sections mode (legacy layout)
   if (mode === "sections") {
     return (
@@ -476,13 +513,17 @@ export function DevToolsPanel({
           <GraphView exportedGraph={exportedGraph} />
         </CollapsibleSection>
 
-        {/* Container Browser Section */}
+        {/* Services Section */}
         <CollapsibleSection
-          title="Container Browser"
-          testIdPrefix="container-browser"
+          title="Services"
+          testIdPrefix="services"
           defaultExpanded={false}
         >
-          <ContainerBrowser exportedGraph={exportedGraph} />
+          <EnhancedServicesView
+            services={services}
+            exportedGraph={exportedGraph}
+            tracingAPI={tracingAPI}
+          />
         </CollapsibleSection>
 
         {/* Container Inspector Section - Only shown when container is provided */}
@@ -555,9 +596,14 @@ export function DevToolsPanel({
               display: "flex",
               flexDirection: "column",
               minHeight: 0,
+              overflow: "auto",
             }}
           >
-            <ContainerBrowser exportedGraph={exportedGraph} />
+            <EnhancedServicesView
+              services={services}
+              exportedGraph={exportedGraph}
+              tracingAPI={tracingAPI}
+            />
           </div>
         )}
 

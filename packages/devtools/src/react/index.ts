@@ -221,6 +221,80 @@ export type {
   ServiceFilters,
 } from "./resolved-services.js";
 
+/**
+ * EnhancedServicesView component for comprehensive service exploration.
+ *
+ * Combines list and tree views with search, filters, and view mode toggle.
+ * Provides dependency relationships and performance data.
+ *
+ * @see {@link EnhancedServicesViewProps} - Component props interface
+ * @see {@link ServicesViewMode} - View mode type
+ */
+export { EnhancedServicesView } from "./enhanced-services-view.js";
+export type {
+  EnhancedServicesViewProps,
+  ServicesViewMode,
+} from "./enhanced-services-view.js";
+
+/**
+ * ServiceDependencyTree component for hierarchical dependency visualization.
+ *
+ * Displays services in a tree structure based on their dependency relationships.
+ *
+ * @see {@link ServiceDependencyTreeProps} - Component props interface
+ */
+export { ServiceDependencyTree } from "./service-dependency-tree.js";
+export type { ServiceDependencyTreeProps } from "./service-dependency-tree.js";
+
+/**
+ * EnhancedServiceItem component for rich service display.
+ *
+ * Expandable row showing status, lifetime, dependency counts, and details.
+ *
+ * @see {@link EnhancedServiceItemProps} - Component props interface
+ */
+export { EnhancedServiceItem } from "./enhanced-service-item.js";
+export type { EnhancedServiceItemProps } from "./enhanced-service-item.js";
+
+/**
+ * ServicePerformance components for per-service metrics display.
+ *
+ * @see {@link ServicePerformanceInfoProps} - Component props interface
+ * @see {@link ServicePerformance} - Performance metrics structure
+ */
+export {
+  ServicePerformanceInfo,
+  ServicePerformanceDisplay,
+  useServicePerformance,
+  calculateServicePerformance,
+} from "./service-performance.js";
+export type {
+  ServicePerformanceInfoProps,
+  ServicePerformanceDisplayProps,
+  ServicePerformance,
+} from "./service-performance.js";
+
+/**
+ * Service tree building utilities.
+ *
+ * @see {@link ServiceTreeNode} - Tree node structure
+ * @see {@link ServiceWithRelations} - Enhanced service info
+ */
+export {
+  buildDependencyTree,
+  enrichServicesWithRelations,
+  buildDependentsMap,
+  buildDependenciesMap,
+  getVisibleServiceIds,
+  getAllExpandableIds,
+  findParentServiceId,
+  countTreeNodes,
+} from "./services-tree.js";
+export type {
+  ServiceTreeNode,
+  ServiceWithRelations,
+} from "./services-tree.js";
+
 // =============================================================================
 // Tabbed Interface Components (Task Group 6)
 // =============================================================================

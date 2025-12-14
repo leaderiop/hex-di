@@ -92,7 +92,7 @@ describe("DevToolsPanel Tabbed Interface", () => {
 
       // CollapsibleSection headers should not be present
       expect(screen.queryByTestId("graph-view-header")).toBeNull();
-      expect(screen.queryByTestId("container-browser-header")).toBeNull();
+      expect(screen.queryByTestId("services-header")).toBeNull();
     });
   });
 
@@ -105,7 +105,7 @@ describe("DevToolsPanel Tabbed Interface", () => {
 
       // Should render the section headers (existing behavior)
       expect(screen.getByTestId("graph-view-header")).toBeDefined();
-      expect(screen.getByTestId("container-browser-header")).toBeDefined();
+      expect(screen.getByTestId("services-header")).toBeDefined();
     });
 
     it("does not render tab navigation when mode is 'sections'", () => {

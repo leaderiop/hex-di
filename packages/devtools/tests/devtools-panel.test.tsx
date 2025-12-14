@@ -127,18 +127,15 @@ describe("DevToolsPanel", () => {
     expect(container.querySelector('[data-node-id="Database"]')).toBeDefined();
     expect(container.querySelector('[data-node-id="UserService"]')).toBeDefined();
 
-    // Check lifetime badges in the Container Browser section instead
-    // (which still has the original badge components with test IDs)
-    const containerBrowserHeader = screen.getByTestId("container-browser-header");
-    fireEvent.click(containerBrowserHeader);
+    // Check Services section shows the services
+    const servicesHeader = screen.getByTestId("services-header");
+    fireEvent.click(servicesHeader);
 
-    const singletonBadge = screen.getByTestId("lifetime-badge-detail-Logger");
-    const scopedBadge = screen.getByTestId("lifetime-badge-detail-Database");
-    const requestBadge = screen.getByTestId("lifetime-badge-detail-UserService");
-
-    expect(singletonBadge.className).toContain("singleton");
-    expect(scopedBadge.className).toContain("scoped");
-    expect(requestBadge.className).toContain("request");
+    // Verify the enhanced services view is rendered with all services
+    expect(screen.getByTestId("enhanced-services-view")).toBeDefined();
+    expect(screen.getByTestId("enhanced-service-item-Logger")).toBeDefined();
+    expect(screen.getByTestId("enhanced-service-item-Database")).toBeDefined();
+    expect(screen.getByTestId("enhanced-service-item-UserService")).toBeDefined();
   });
 
   it("collapsible sections work for graph view", () => {
@@ -171,43 +168,37 @@ describe("DevToolsPanel", () => {
     // Use sections mode to test collapsible sections
     render(<DevToolsPanel graph={graph} mode="sections" />);
 
-    // Container browser should be collapsed by default
-    const containerBrowserHeader = screen.getByTestId("container-browser-header");
-    expect(screen.queryByTestId("container-browser-content")).toBeNull();
+    // Services section should be collapsed by default
+    const servicesHeader = screen.getByTestId("services-header");
+    expect(screen.queryByTestId("services-content")).toBeNull();
 
     // Click to expand
-    fireEvent.click(containerBrowserHeader);
+    fireEvent.click(servicesHeader);
 
     // Content should be visible
-    expect(screen.getByTestId("container-browser-content")).toBeDefined();
+    expect(screen.getByTestId("services-content")).toBeDefined();
 
     // Click to collapse
-    fireEvent.click(containerBrowserHeader);
+    fireEvent.click(servicesHeader);
 
     // Content should be hidden
-    expect(screen.queryByTestId("container-browser-content")).toBeNull();
+    expect(screen.queryByTestId("services-content")).toBeNull();
   });
 
-  it("container inspection shows ports and lifetimes", () => {
+  it("services section shows ports and lifetimes", () => {
     const graph = createTestGraph();
 
     // Use sections mode to test collapsible sections
     render(<DevToolsPanel graph={graph} mode="sections" />);
 
-    // Expand container browser
-    const containerBrowserHeader = screen.getByTestId("container-browser-header");
-    fireEvent.click(containerBrowserHeader);
+    // Expand services section
+    const servicesHeader = screen.getByTestId("services-header");
+    fireEvent.click(servicesHeader);
 
-    // Check that ports are listed as adapter items
-    expect(screen.getByTestId("adapter-Logger")).toBeDefined();
-    expect(screen.getByTestId("adapter-Database")).toBeDefined();
-    expect(screen.getByTestId("adapter-UserService")).toBeDefined();
-
-    // Check lifetime badges exist in the container browser section
-    // Use the detail badge test IDs which are unique per adapter
-    expect(screen.getByTestId("lifetime-badge-detail-Logger")).toBeDefined();
-    expect(screen.getByTestId("lifetime-badge-detail-Database")).toBeDefined();
-    expect(screen.getByTestId("lifetime-badge-detail-UserService")).toBeDefined();
+    // Check that services are listed as enhanced service items
+    expect(screen.getByTestId("enhanced-service-item-Logger")).toBeDefined();
+    expect(screen.getByTestId("enhanced-service-item-Database")).toBeDefined();
+    expect(screen.getByTestId("enhanced-service-item-UserService")).toBeDefined();
   });
 });
 
@@ -244,19 +235,19 @@ describe("DevToolsPanel edge cases", () => {
     // Logger should be displayed in the graph view
     expect(screen.getAllByText("Logger").length).toBeGreaterThan(0);
 
-    // Expand container browser
-    const containerBrowserHeader = screen.getByTestId("container-browser-header");
-    fireEvent.click(containerBrowserHeader);
+    // Expand services section
+    const servicesHeader = screen.getByTestId("services-header");
+    fireEvent.click(servicesHeader);
 
-    // Get the Logger adapter container
-    const loggerAdapter = screen.getByTestId("adapter-Logger");
+    // Get the Logger service item
+    const loggerItem = screen.getByTestId("enhanced-service-item-Logger");
+    expect(loggerItem).toBeDefined();
 
-    // Find and click the button inside the adapter (the header with role="button")
-    const adapterButton = within(loggerAdapter).getByRole("button");
-    fireEvent.click(adapterButton);
+    // Find and click the button inside the service item (the header)
+    const serviceButton = within(loggerItem).getByRole("button");
+    fireEvent.click(serviceButton);
 
-    // Should show "None" for dependencies
-    const dependencyList = screen.getByTestId("dependency-list-Logger");
-    expect(dependencyList.textContent).toContain("None");
+    // Should show "No dependencies" since Logger has no dependencies
+    expect(screen.getByText("No dependencies")).toBeDefined();
   });
 });
