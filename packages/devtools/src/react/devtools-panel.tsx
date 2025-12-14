@@ -12,7 +12,12 @@
  * @packageDocumentation
  */
 
-import React, { useState, useMemo, useCallback, type ReactElement } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  type ReactElement,
+} from "react";
 import type { Port } from "@hex-di/ports";
 import type { Graph } from "@hex-di/graph";
 import type { Container } from "@hex-di/runtime";
@@ -161,7 +166,10 @@ function CollapsibleSection({
         </span>
       </div>
       {isExpanded && (
-        <div data-testid={`${testIdPrefix}-content`} style={sectionStyles.content}>
+        <div
+          data-testid={`${testIdPrefix}-content`}
+          style={sectionStyles.content}
+        >
           {children}
         </div>
       )}
@@ -177,7 +185,10 @@ interface LifetimeBadgeProps {
   readonly portName: string;
 }
 
-function LifetimeBadge({ lifetime, portName }: LifetimeBadgeProps): ReactElement {
+function LifetimeBadge({
+  lifetime,
+  portName,
+}: LifetimeBadgeProps): ReactElement {
   return (
     <span
       data-testid={`lifetime-badge-${portName}`}
@@ -213,7 +224,14 @@ function GraphView({ exportedGraph }: GraphViewProps): ReactElement {
   }));
 
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+    <div
+      style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+      }}
+    >
       <DependencyGraph
         nodes={graphNodes}
         edges={exportedGraph.edges}
@@ -253,7 +271,10 @@ function AdapterItem({ node, dependencies }: AdapterItemProps): ReactElement {
         aria-expanded={isExpanded}
       >
         <span style={adapterStyles.portName}>{node.id}</span>
-        <LifetimeBadge lifetime={node.lifetime} portName={`detail-${node.id}`} />
+        <LifetimeBadge
+          lifetime={node.lifetime}
+          portName={`detail-${node.id}`}
+        />
       </div>
       {isExpanded && (
         <div style={adapterStyles.details}>
@@ -301,7 +322,9 @@ interface ContainerBrowserProps {
   readonly exportedGraph: ExportedGraph;
 }
 
-function ContainerBrowser({ exportedGraph }: ContainerBrowserProps): ReactElement {
+function ContainerBrowser({
+  exportedGraph,
+}: ContainerBrowserProps): ReactElement {
   // Build a map of node id -> dependencies
   const dependencyMap = useMemo(() => {
     const map = new Map<string, string[]>();
@@ -469,7 +492,10 @@ export function DevToolsPanel({
             testIdPrefix="container-inspector"
             defaultExpanded={false}
           >
-            <ContainerInspector container={container} exportedGraph={exportedGraph} />
+            <ContainerInspector
+              container={container}
+              exportedGraph={exportedGraph}
+            />
           </CollapsibleSection>
         )}
 
@@ -507,7 +533,12 @@ export function DevToolsPanel({
             id="tabpanel-graph"
             role="tabpanel"
             aria-labelledby="tab-graph"
-            style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              minHeight: 0,
+            }}
           >
             <GraphView exportedGraph={exportedGraph} />
           </div>
@@ -519,7 +550,12 @@ export function DevToolsPanel({
             id="tabpanel-services"
             role="tabpanel"
             aria-labelledby="tab-services"
-            style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              minHeight: 0,
+            }}
           >
             <ContainerBrowser exportedGraph={exportedGraph} />
           </div>
@@ -531,7 +567,12 @@ export function DevToolsPanel({
             id="tabpanel-tracing"
             role="tabpanel"
             aria-labelledby="tab-tracing"
-            style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              minHeight: 0,
+            }}
           >
             <ResolutionTracingSection
               {...(tracingAPI !== undefined ? { tracingAPI } : {})}
@@ -545,9 +586,17 @@ export function DevToolsPanel({
             id="tabpanel-inspector"
             role="tabpanel"
             aria-labelledby="tab-inspector"
-            style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              minHeight: 0,
+            }}
           >
-            <ContainerInspector container={container} exportedGraph={exportedGraph} />
+            <ContainerInspector
+              container={container}
+              exportedGraph={exportedGraph}
+            />
           </div>
         )}
       </div>

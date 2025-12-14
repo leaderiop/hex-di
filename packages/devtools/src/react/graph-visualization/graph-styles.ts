@@ -65,7 +65,7 @@ interface TooltipStyleDef {
 export const graphContainerStyles: GraphContainerStyleDef = {
   wrapper: {
     width: "100%",
-    flex: 1,
+    height: "100%",
     minHeight: "200px",
     position: "relative",
     overflow: "hidden",

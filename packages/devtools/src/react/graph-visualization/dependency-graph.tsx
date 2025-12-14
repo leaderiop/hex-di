@@ -14,7 +14,11 @@ import React, {
   useCallback,
 } from "react";
 import type { DependencyGraphProps } from "./types.js";
-import { computeLayout, findConnectedNodes, findConnectedEdges } from "./graph-layout.js";
+import {
+  computeLayout,
+  findConnectedNodes,
+  findConnectedEdges,
+} from "./graph-layout.js";
 import { GraphRenderer } from "./graph-renderer.js";
 import { GraphTooltip } from "./graph-tooltip.js";
 
@@ -58,7 +62,10 @@ export function DependencyGraph({
   // Interaction state
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
+  const [mousePosition, setMousePosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   // Compute layout using Dagre
   const layout = useMemo(
@@ -138,7 +145,7 @@ export function DependencyGraph({
 
   return (
     <div
-      style={{ position: "relative" }}
+      style={{ position: "relative", height: "100%" }}
       onMouseMove={handleMouseMove}
     >
       <GraphRenderer

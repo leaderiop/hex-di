@@ -145,11 +145,6 @@ export function GraphRenderer({
     };
   }, [minZoom, maxZoom]);
 
-  // Fit graph to view when layout changes
-  useEffect(() => {
-    fitToView();
-  }, [layout.width, layout.height]);
-
   // Fit the graph to the container
   const fitToView = useCallback(() => {
     if (!svgRef.current || !containerRef.current || !zoomBehaviorRef.current) {
@@ -184,6 +179,27 @@ export function GraphRenderer({
         zoomIdentity.translate(translateX, translateY).scale(scale)
       );
   }, [layout.width, layout.height]);
+
+  // Fit graph to view when layout changes
+  useEffect(() => {
+    fitToView();
+  }, [layout.width, layout.height, fitToView]);
+
+  // Watch container size changes and re-fit graph
+  useEffect(() => {
+    // Skip in test environments where ResizeObserver is not available
+    if (!containerRef.current || typeof ResizeObserver === "undefined") return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      fitToView();
+    });
+
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [fitToView]);
 
   // Zoom in handler
   const handleZoomIn = useCallback(() => {
