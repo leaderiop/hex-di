@@ -759,6 +759,7 @@ interface ServiceItemStyleDef {
   statusResolved: CSSProperties;
   statusPending: CSSProperties;
   statusScopeRequired: CSSProperties;
+  statusTransient: CSSProperties;
   serviceName: CSSProperties;
   details: CSSProperties;
   detailRow: CSSProperties;
@@ -1030,6 +1031,9 @@ export const serviceItemStyles: ServiceItemStyleDef = {
     backgroundColor: "transparent",
     border: "2px solid var(--hex-devtools-request, #fab387)",
   },
+  statusTransient: {
+    backgroundColor: "var(--hex-devtools-request, #fab387)",
+  },
   serviceName: {
     flex: 1,
     fontWeight: 600,
@@ -1062,11 +1066,15 @@ export const serviceItemStyles: ServiceItemStyleDef = {
  */
 export function getStatusIndicatorStyle(
   isResolved: boolean,
-  isScopeRequired: boolean
+  isScopeRequired: boolean,
+  isTransient?: boolean
 ): CSSProperties {
   const baseStyle = serviceItemStyles.statusIndicator;
   if (isScopeRequired) {
     return { ...baseStyle, ...serviceItemStyles.statusScopeRequired };
+  }
+  if (isTransient === true) {
+    return { ...baseStyle, ...serviceItemStyles.statusTransient };
   }
   if (isResolved) {
     return { ...baseStyle, ...serviceItemStyles.statusResolved };

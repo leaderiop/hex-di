@@ -294,8 +294,9 @@ export type {
  * container state without exposing mutable internals.
  *
  * @see {@link createInspector} - Create an inspector for a container
+ * @see {@link getInternalAccessor} - Get the internal accessor from a container
  * @see {@link ContainerInspector} - Interface returned by createInspector
  * @see {@link ContainerSnapshot} - Snapshot structure returned by inspector.snapshot()
  * @see {@link ScopeTree} - Hierarchical scope tree structure
  */
-export { createInspector } from "./create-inspector.js";
+export { createInspector, getInternalAccessor } from "./create-inspector.js";

@@ -14,12 +14,15 @@ import type { Graph } from "@hex-di/graph";
 import {
   createContainer,
   TRACING_ACCESS,
+  INTERNAL_ACCESS,
+  getInternalAccessor,
   type Container,
   type Scope,
   type Lifetime,
   type ResolutionHooks,
   type ResolutionHookContext,
   type ResolutionResultContext,
+  type ContainerInternalState,
 } from "@hex-di/runtime";
 import type { TraceCollector } from "./collector.js";
 import type {
@@ -54,10 +57,15 @@ export interface TracingContainerOptions {
 }
 
 /**
- * Extended container type with tracing capabilities.
+ * Extended container type with tracing and internal access capabilities.
+ *
+ * TracingContainer extends Container with:
+ * - TRACING_ACCESS: Access to tracing API for performance monitoring
+ * - INTERNAL_ACCESS: Access to internal state for DevTools Inspector
  */
 export type TracingContainer<TProvides extends Port<unknown, string>> = Container<TProvides> & {
   readonly [TRACING_ACCESS]: TracingAPI;
+  readonly [INTERNAL_ACCESS]: () => ContainerInternalState;
 };
 
 // =============================================================================
@@ -298,26 +306,16 @@ export function createTracingContainer<TProvides extends Port<unknown, string>>(
   // Create the container with hooks
   const baseContainer = createContainer(graph, { hooks });
 
-  // Create the tracing container wrapper that exposes TRACING_ACCESS
-  const tracingContainer = {
-    resolve<P extends TProvides>(port: P): InferService<P> {
-      return baseContainer.resolve(port);
-    },
+  // Get the internal accessor from base container (type-safe via helper)
+  const baseInternalAccessor = getInternalAccessor(baseContainer);
 
-    createScope(): Scope<TProvides> {
-      return baseContainer.createScope();
-    },
-
-    dispose(): Promise<void> {
-      return baseContainer.dispose();
-    },
-
-    get isDisposed(): boolean {
-      return baseContainer.isDisposed;
-    },
-
+  // Create the tracing container by spreading base container and adding tracing
+  const tracingContainer: TracingContainer<TProvides> = {
+    ...baseContainer,
+    // Forward INTERNAL_ACCESS from base container for DevTools Inspector
+    [INTERNAL_ACCESS]: baseInternalAccessor,
     [TRACING_ACCESS]: tracingAPI,
   };
 
-  return Object.freeze(tracingContainer) as TracingContainer<TProvides>;
+  return Object.freeze(tracingContainer);
 }

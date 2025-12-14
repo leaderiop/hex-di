@@ -214,20 +214,22 @@ export const graphControlsStyles: GraphControlsStyleDef = {
 export const tooltipStyles: TooltipStyleDef = {
   container: {
     position: "absolute",
-    padding: "8px 12px",
+    padding: "12px 16px",
     backgroundColor: "var(--hex-devtools-bg-secondary, #2a2a3e)",
     border: "1px solid var(--hex-devtools-border, #45475a)",
-    borderRadius: "6px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+    borderRadius: "8px",
+    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.4)",
     zIndex: 100,
     pointerEvents: "none",
-    minWidth: "120px",
+    minWidth: "160px",
   },
   title: {
-    fontSize: "12px",
+    fontSize: "13px",
     fontWeight: 600,
     color: "var(--hex-devtools-text, #cdd6f4)",
-    marginBottom: "6px",
+    marginBottom: "10px",
+    paddingBottom: "10px",
+    borderBottom: "1px solid var(--hex-devtools-border, #45475a)",
     fontFamily: "var(--hex-devtools-font-mono, 'JetBrains Mono', monospace)",
   },
   row: {
@@ -235,14 +237,17 @@ export const tooltipStyles: TooltipStyleDef = {
     justifyContent: "space-between",
     alignItems: "center",
     fontSize: "11px",
-    marginTop: "4px",
+    marginTop: "8px",
+    gap: "16px",
   },
   label: {
     color: "var(--hex-devtools-text-muted, #a6adc8)",
+    flexShrink: 0,
   },
   value: {
     color: "var(--hex-devtools-text, #cdd6f4)",
     fontWeight: 500,
+    textAlign: "right",
   },
 };
 

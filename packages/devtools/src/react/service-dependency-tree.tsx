@@ -24,11 +24,7 @@ import {
   getAllExpandableIds,
   findParentServiceId,
 } from "./services-tree.js";
-import {
-  getLifetimeBadgeStyle,
-  getStatusIndicatorStyle,
-  serviceItemStyles,
-} from "./styles.js";
+import { getLifetimeBadgeStyle } from "./styles.js";
 import { useServicePerformance } from "./service-performance.js";
 
 // =============================================================================
@@ -210,11 +206,6 @@ function TreeNodeComponent({
 
   const performance = useServicePerformance(service.portName, tracingAPI, 100);
 
-  const statusStyle = getStatusIndicatorStyle(
-    service.isResolved,
-    service.isScopeRequired
-  );
-
   const nodeRowStyle: CSSProperties = {
     ...treeStyles.nodeRow,
     ...(isFocused ? treeStyles.nodeRowFocused : {}),
@@ -296,12 +287,6 @@ function TreeNodeComponent({
         ) : (
           <span style={treeStyles.expandTogglePlaceholder} />
         )}
-
-        {/* Status Indicator */}
-        <span
-          style={statusStyle}
-          aria-label={service.isResolved ? "Resolved" : "Pending"}
-        />
 
         {/* Port Name */}
         <span style={treeStyles.portName}>{service.portName}</span>

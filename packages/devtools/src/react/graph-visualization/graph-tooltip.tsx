@@ -59,16 +59,27 @@ export function GraphTooltip({
       <div style={tooltipStyles.title}>{node.label}</div>
 
       {/* Lifetime */}
-      <div style={tooltipStyles.row}>
+      <div style={{ ...tooltipStyles.row, marginTop: "4px" }}>
         <span style={tooltipStyles.label}>Lifetime</span>
-        <span
-          style={{
-            ...tooltipStyles.value,
-            color: lifetimeColor,
-            textTransform: "capitalize",
-          }}
-        >
-          {node.lifetime}
+        <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span
+            style={{
+              width: "8px",
+              height: "8px",
+              borderRadius: "50%",
+              backgroundColor: lifetimeColor,
+              flexShrink: 0,
+            }}
+          />
+          <span
+            style={{
+              ...tooltipStyles.value,
+              color: lifetimeColor,
+              textTransform: "capitalize",
+            }}
+          >
+            {node.lifetime}
+          </span>
         </span>
       </div>
 

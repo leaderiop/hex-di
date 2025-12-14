@@ -11,11 +11,7 @@
 import React, { useState, type ReactElement, type CSSProperties } from "react";
 import type { TracingAPI } from "../tracing/types.js";
 import type { ServiceWithRelations } from "./services-tree.js";
-import {
-  serviceItemStyles,
-  getLifetimeBadgeStyle,
-  getStatusIndicatorStyle,
-} from "./styles.js";
+import { serviceItemStyles, getLifetimeBadgeStyle } from "./styles.js";
 import {
   ServicePerformanceDisplay,
   useServicePerformance,
@@ -239,11 +235,6 @@ export function EnhancedServiceItem({
     100
   );
 
-  const statusStyle = getStatusIndicatorStyle(
-    service.isResolved,
-    service.isScopeRequired
-  );
-
   const headerStyle = isExpanded
     ? enhancedStyles.headerExpanded
     : enhancedStyles.header;
@@ -297,10 +288,6 @@ export function EnhancedServiceItem({
         tabIndex={0}
         aria-expanded={isExpanded}
       >
-        <span
-          style={statusStyle}
-          aria-label={service.isResolved ? "Resolved" : "Pending"}
-        />
         <span style={serviceItemStyles.serviceName}>{service.portName}</span>
 
         {/* Dependency count badge */}

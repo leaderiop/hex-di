@@ -536,6 +536,7 @@ export function DevToolsPanel({
             <ContainerInspector
               container={container}
               exportedGraph={exportedGraph}
+              tracingAPI={tracingAPI}
             />
           </CollapsibleSection>
         )}
@@ -642,6 +643,7 @@ export function DevToolsPanel({
             <ContainerInspector
               container={container}
               exportedGraph={exportedGraph}
+              tracingAPI={tracingAPI}
             />
           </div>
         )}

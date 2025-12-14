@@ -12,6 +12,7 @@ import React, {
   useMemo,
   useState,
   useCallback,
+  useRef,
 } from "react";
 import type { DependencyGraphProps } from "./types.js";
 import {
@@ -59,6 +60,9 @@ export function DependencyGraph({
   minZoom = 0.25,
   maxZoom = 2,
 }: DependencyGraphProps): ReactElement {
+  // Refs
+  const containerRef = useRef<HTMLDivElement>(null);
+
   // Interaction state
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -111,9 +115,14 @@ export function DependencyGraph({
     [onNodeClick]
   );
 
-  // Track mouse position for tooltip
+  // Track mouse position for tooltip (container-relative coordinates)
   const handleMouseMove = useCallback((event: React.MouseEvent) => {
-    setMousePosition({ x: event.clientX, y: event.clientY });
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setMousePosition({
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    });
   }, []);
 
   // Get hovered node data for tooltip
@@ -145,6 +154,7 @@ export function DependencyGraph({
 
   return (
     <div
+      ref={containerRef}
       style={{ position: "relative", height: "100%" }}
       onMouseMove={handleMouseMove}
     >

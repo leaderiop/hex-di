@@ -114,7 +114,7 @@ export const LoggerAdapter = createAdapter({
   provides: LoggerPort,
   requires: [],
   lifetime: "singleton",
-  factory: (): Logger => ({
+  factory: () => ({
     log: (message: string): void => {
       console.log(`[ChatApp] ${message}`);
     },

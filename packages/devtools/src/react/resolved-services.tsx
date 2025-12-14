@@ -45,6 +45,12 @@ export interface ServiceInfo {
   readonly resolutionOrder: number | undefined;
   /** Dependency port names */
   readonly dependencies: readonly string[];
+  /** Number of times resolved (for request-scoped services) */
+  readonly callCount?: number | undefined;
+  /** Timestamp of last resolution (for request-scoped services) */
+  readonly lastResolvedAt?: number | undefined;
+  /** Average resolution duration in ms (for request-scoped services) */
+  readonly averageDuration?: number | undefined;
 }
 
 /**
@@ -228,9 +234,12 @@ interface ServiceItemProps {
 function ServiceItem({ service }: ServiceItemProps): ReactElement {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // For request services with call count, show transient (orange) status
+  const hasBeenCalled = service.lifetime === "request" && service.callCount !== undefined && service.callCount > 0;
   const statusStyle = getStatusIndicatorStyle(
     service.isResolved,
-    service.isScopeRequired
+    service.isScopeRequired,
+    hasBeenCalled
   );
 
   const headerStyle = {
@@ -269,13 +278,15 @@ function ServiceItem({ service }: ServiceItemProps): ReactElement {
         tabIndex={0}
         aria-expanded={isExpanded}
       >
-        <span style={statusStyle} aria-label={service.isResolved ? "Resolved" : "Pending"} />
+        <span style={statusStyle} aria-label={hasBeenCalled ? "Transient" : service.isResolved ? "Resolved" : "Pending"} />
         <span style={serviceItemStyles.serviceName}>{service.portName}</span>
         <span
           className={getLifetimeClassName(service.lifetime)}
           style={getLifetimeBadgeStyle(service.lifetime)}
         >
-          {service.lifetime}
+          {service.lifetime === "request" && service.callCount !== undefined && service.callCount > 0
+            ? `${service.callCount} call${service.callCount > 1 ? "s" : ""}`
+            : service.lifetime}
         </span>
       </div>
 
@@ -289,15 +300,35 @@ function ServiceItem({ service }: ServiceItemProps): ReactElement {
             <span style={serviceItemStyles.detailValue}>
               {service.isScopeRequired
                 ? "Requires scope"
-                : service.isResolved
-                  ? "Resolved (cached)"
-                  : "Not resolved"}
+                : service.lifetime === "request"
+                  ? service.callCount !== undefined && service.callCount > 0
+                    ? `Transient (${service.callCount} resolution${service.callCount > 1 ? "s" : ""})`
+                    : "Transient (not tracked)"
+                  : service.isResolved
+                    ? "Resolved (cached)"
+                    : "Not resolved"}
             </span>
           </div>
           <div style={serviceItemStyles.detailRow}>
             <span style={serviceItemStyles.detailLabel}>Lifetime:</span>
             <span style={serviceItemStyles.detailValue}>{service.lifetime}</span>
           </div>
+          {service.lifetime === "request" && service.lastResolvedAt !== undefined && (
+            <div style={serviceItemStyles.detailRow}>
+              <span style={serviceItemStyles.detailLabel}>Last called:</span>
+              <span style={serviceItemStyles.detailValue}>
+                {formatTimestamp(service.lastResolvedAt)}
+              </span>
+            </div>
+          )}
+          {service.lifetime === "request" && service.averageDuration !== undefined && (
+            <div style={serviceItemStyles.detailRow}>
+              <span style={serviceItemStyles.detailLabel}>Avg time:</span>
+              <span style={serviceItemStyles.detailValue}>
+                {service.averageDuration.toFixed(2)}ms
+              </span>
+            </div>
+          )}
           {service.isResolved && service.resolvedAt !== undefined && (
             <div style={serviceItemStyles.detailRow}>
               <span style={serviceItemStyles.detailLabel}>Created At:</span>

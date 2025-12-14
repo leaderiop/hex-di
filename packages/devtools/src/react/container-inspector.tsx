@@ -25,6 +25,7 @@ import type {
   ScopeTree,
 } from "../index.js";
 import type { ExportedGraph } from "../types.js";
+import type { TracingAPI } from "../tracing/types.js";
 import { containerInspectorStyles } from "./styles.js";
 import { ScopeHierarchy } from "./scope-hierarchy.js";
 import { ResolvedServices, type ServiceInfo } from "./resolved-services.js";
@@ -41,6 +42,20 @@ export interface ContainerInspectorProps {
   readonly container: Container<Port<unknown, string>>;
   /** The exported dependency graph for metadata */
   readonly exportedGraph: ExportedGraph;
+  /** Optional tracing API for request service stats */
+  readonly tracingAPI?: TracingAPI | undefined;
+}
+
+/**
+ * Stats computed from trace data for request-scoped services.
+ */
+interface RequestServiceStats {
+  /** Total number of times the service was resolved */
+  readonly callCount: number;
+  /** Timestamp of the most recent resolution */
+  readonly lastResolvedAt: number;
+  /** Average resolution duration in milliseconds */
+  readonly averageDuration: number;
 }
 
 // =============================================================================
@@ -48,23 +63,58 @@ export interface ContainerInspectorProps {
 // =============================================================================
 
 /**
+ * Computes resolution stats for a request-scoped service from trace data.
+ *
+ * @param portName - The port name to compute stats for
+ * @param tracingAPI - The tracing API to query (optional)
+ * @returns Stats object or undefined if no tracing data available
+ */
+function getRequestServiceStats(
+  portName: string,
+  tracingAPI: TracingAPI | undefined
+): RequestServiceStats | undefined {
+  if (tracingAPI === undefined) {
+    return undefined;
+  }
+
+  const traces = tracingAPI.getTraces({ portName });
+  const requestTraces = traces.filter((t) => t.lifetime === "request");
+
+  if (requestTraces.length === 0) {
+    return undefined;
+  }
+
+  const totalDuration = requestTraces.reduce((sum, t) => sum + t.duration, 0);
+  const lastResolvedAt = Math.max(...requestTraces.map((t) => t.startTime));
+
+  return {
+    callCount: requestTraces.length,
+    lastResolvedAt,
+    averageDuration: totalDuration / requestTraces.length,
+  };
+}
+
+/**
  * Builds the service info list from snapshot and graph data.
  *
  * Combines information from:
  * - Container snapshot (resolution status, timestamps)
  * - Exported graph (lifetime, dependencies)
+ * - Tracing API (for request service stats)
  *
  * @param snapshot - The container snapshot
  * @param exportedGraph - The exported dependency graph
  * @param selectedScopeId - The currently selected scope ID (null = root)
  * @param inspector - The container inspector instance
+ * @param tracingAPI - Optional tracing API for request service stats
  * @returns Array of ServiceInfo for display
  */
 function buildServiceList(
   snapshot: ContainerSnapshot,
   exportedGraph: ExportedGraph,
   selectedScopeId: string | null,
-  inspector: InspectorType
+  inspector: InspectorType,
+  tracingAPI: TracingAPI | undefined
 ): readonly ServiceInfo[] {
   const services: ServiceInfo[] = [];
 
@@ -116,6 +166,20 @@ function buildServiceList(
       resolutionOrder = singletonEntry.resolutionOrder;
     }
 
+    // Get stats for request-scoped services from tracing data
+    let callCount: number | undefined;
+    let lastResolvedAt: number | undefined;
+    let averageDuration: number | undefined;
+
+    if (node.lifetime === "request") {
+      const stats = getRequestServiceStats(node.id, tracingAPI);
+      if (stats !== undefined) {
+        callCount = stats.callCount;
+        lastResolvedAt = stats.lastResolvedAt;
+        averageDuration = stats.averageDuration;
+      }
+    }
+
     services.push({
       portName: node.id,
       lifetime: node.lifetime,
@@ -124,6 +188,9 @@ function buildServiceList(
       resolvedAt,
       resolutionOrder,
       dependencies,
+      callCount,
+      lastResolvedAt,
+      averageDuration,
     });
   }
 
@@ -182,6 +249,7 @@ function buildServiceList(
 export function ContainerInspector({
   container,
   exportedGraph,
+  tracingAPI,
 }: ContainerInspectorProps): ReactElement {
   // Create inspector once
   const inspector = useMemo(() => createInspector(container), [container]);
@@ -238,8 +306,8 @@ export function ContainerInspector({
     if (snapshot === null) {
       return [];
     }
-    return buildServiceList(snapshot, exportedGraph, selectedScopeId, inspector);
-  }, [snapshot, exportedGraph, selectedScopeId, inspector]);
+    return buildServiceList(snapshot, exportedGraph, selectedScopeId, inspector, tracingAPI);
+  }, [snapshot, exportedGraph, selectedScopeId, inspector, tracingAPI]);
 
   // Handle auto-refresh toggle
   const handleAutoRefreshToggle = useCallback(() => {

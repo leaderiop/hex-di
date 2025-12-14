@@ -109,6 +109,7 @@ describe("@hex-di/runtime exports", () => {
         "ScopeRequiredError",
         "INTERNAL_ACCESS",
         "TRACING_ACCESS",
+        "getInternalAccessor",
       ];
 
       // Verify all expected exports exist

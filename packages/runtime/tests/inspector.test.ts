@@ -253,6 +253,67 @@ describe("createInspector Factory", () => {
     expect(Object.isFrozen(tree)).toBe(true);
   });
 
+  test("scope totalCount reflects only scoped-lifetime adapters", () => {
+    // Create adapters with different lifetimes
+    const SingletonAdapter = createAdapter({
+      provides: LoggerPort,
+      requires: [],
+      lifetime: "singleton",
+      factory: () => ({ log: vi.fn() }),
+    });
+
+    const ScopedAdapter1 = createAdapter({
+      provides: RequestContextPort,
+      requires: [],
+      lifetime: "scoped",
+      factory: () => ({ requestId: "test" }),
+    });
+
+    const ScopedAdapter2 = createAdapter({
+      provides: DatabasePort,
+      requires: [],
+      lifetime: "scoped",
+      factory: () => ({ query: vi.fn() }),
+    });
+
+    const RequestAdapter = createAdapter({
+      provides: UserServicePort,
+      requires: [],
+      lifetime: "request",
+      factory: () => ({ getUser: vi.fn() }),
+    });
+
+    // 1 singleton + 2 scoped + 1 request = 4 total adapters
+    const graph = GraphBuilder.create()
+      .provide(SingletonAdapter)
+      .provide(ScopedAdapter1)
+      .provide(ScopedAdapter2)
+      .provide(RequestAdapter)
+      .build();
+    const container = createContainer(graph);
+
+    // Resolve the singleton
+    container.resolve(LoggerPort);
+
+    // Create a scope and resolve one scoped service
+    const scope = container.createScope();
+    scope.resolve(RequestContextPort);
+
+    const inspector = createInspector(container);
+    const tree = inspector.getScopeTree();
+
+    // Container totalCount should be all adapters (4)
+    expect(tree.totalCount).toBe(4);
+    expect(tree.resolvedCount).toBe(1); // Only the singleton
+
+    // Scope totalCount should be only scoped adapters (2)
+    expect(tree.children.length).toBe(1);
+    const scopeNode = tree.children[0];
+    expect(scopeNode).toBeDefined();
+    expect(scopeNode!.totalCount).toBe(2); // Only scoped-lifetime adapters
+    expect(scopeNode!.resolvedCount).toBe(1); // Only RequestContextPort resolved
+  });
+
   test("inspector creation is O(1) (no iteration during creation)", () => {
     // Create a graph with several adapters
     const LoggerAdapter = createAdapter({

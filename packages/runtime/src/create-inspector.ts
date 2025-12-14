@@ -30,19 +30,30 @@ import { DisposedScopeError } from "./errors.js";
 export type { ContainerInspector, ContainerSnapshot, SingletonEntry, ScopeTree };
 
 // =============================================================================
-// Internal Helpers
+// Internal Access Helper
 // =============================================================================
 
 /**
  * Safely access the internal state accessor from a container.
- * Handles the type narrowing for Symbol-indexed properties.
+ *
+ * This helper handles the type narrowing for Symbol-indexed properties,
+ * providing type-safe access to container internals for DevTools and
+ * container wrappers.
  *
  * @param container - The container to access
- * @returns The accessor function
+ * @returns The accessor function that returns frozen internal state
  * @throws Error if the accessor is not found
- * @internal
+ *
+ * @example
+ * ```typescript
+ * import { createContainer, getInternalAccessor } from '@hex-di/runtime';
+ *
+ * const container = createContainer(graph);
+ * const accessor = getInternalAccessor(container);
+ * const state = accessor(); // ContainerInternalState
+ * ```
  */
-function getInternalAccessor(
+export function getInternalAccessor(
   container: Container<Port<unknown, string>>
 ): () => ContainerInternalState {
   const accessor = (container as Record<symbol, unknown>)[INTERNAL_ACCESS];
@@ -217,10 +228,21 @@ export function createInspector<TProvides extends Port<unknown, string>>(
    */
   function buildContainerScopeTree(state: ContainerInternalState): ScopeTree {
     const totalCount = state.adapterMap.size;
+
+    // Calculate scoped adapter count for child scopes
+    // Scopes only cache scoped-lifetime services, so their totalCount
+    // should reflect only scoped adapters for semantic consistency
+    let scopedAdapterCount = 0;
+    for (const adapterInfo of state.adapterMap.values()) {
+      if (adapterInfo.lifetime === "scoped") {
+        scopedAdapterCount++;
+      }
+    }
+
     const children: ScopeTree[] = [];
 
     for (const childState of state.childScopes) {
-      children.push(buildScopeTreeNode(childState, totalCount));
+      children.push(buildScopeTreeNode(childState, scopedAdapterCount));
     }
 
     const root: ScopeTree = {
