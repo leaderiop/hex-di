@@ -18,7 +18,6 @@ import {
 } from "./ports.js";
 import type {
   Config,
-  Logger,
   Message,
   MessageStore,
   MessageListener,
