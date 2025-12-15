@@ -865,6 +865,7 @@ export type MissingDependencyError<MissingPorts extends Port<unknown, string> | 
   [MissingPorts] extends [never]
     ? never
     : {
+        readonly __valid: false;
         readonly __errorBrand: "MissingDependencyError";
         readonly __message: `Missing dependencies: ${ExtractPortNames<MissingPorts>}`;
         readonly __missing: MissingPorts;
@@ -903,6 +904,7 @@ export type MissingDependencyError<MissingPorts extends Port<unknown, string> | 
  * ```
  */
 export type DuplicateProviderError<DuplicatePort extends Port<unknown, string>> = {
+  readonly __valid: false;
   readonly __errorBrand: "DuplicateProviderError";
   readonly __message: `Duplicate provider for: ${InferPortName<DuplicatePort>}`;
   readonly __duplicate: DuplicatePort;

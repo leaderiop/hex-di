@@ -57,7 +57,6 @@ import {
 export const appGraph = GraphBuilder.create()
   // Singleton adapters (no dependencies first)
   .provide(ConfigAdapter)
-  .provide(LoggerAdapter)
   // Singleton adapter with dependencies
   .provide(MessageStoreAdapter)
   // Scoped adapters
