@@ -239,13 +239,14 @@ describe("build() returns error type when unsatisfied", () => {
     expectTypeOf<HasAdapters>().toEqualTypeOf<true>();
   });
 
-  it("build() on unsatisfied graph returns MissingDependencyError", () => {
+  it("build() on unsatisfied graph requires MissingDependencyError argument", () => {
     const builder = GraphBuilder.create().provide(UserServiceAdapter);
 
-    type BuildResult = ReturnType<typeof builder.build>;
+    type BuildParams = Parameters<typeof builder.build>;
+    type ErrorArg = BuildParams[0];
 
-    // Should be an error type with brand
-    type IsError = BuildResult extends { __errorBrand: "MissingDependencyError" }
+    // Should require an error type with brand
+    type IsError = ErrorArg extends { __errorBrand: "MissingDependencyError" }
       ? true
       : false;
     expectTypeOf<IsError>().toEqualTypeOf<true>();
@@ -254,10 +255,11 @@ describe("build() returns error type when unsatisfied", () => {
   it("error message at build() is readable and actionable", () => {
     const builder = GraphBuilder.create().provide(UserServiceAdapter);
 
-    type BuildResult = ReturnType<typeof builder.build>;
+    type BuildParams = Parameters<typeof builder.build>;
+    type ErrorArg = BuildParams[0];
 
     // Should have the message property with missing deps
-    type Message = BuildResult extends { __message: infer M } ? M : never;
+    type Message = ErrorArg extends { __message: infer M } ? M : never;
 
     // Message should contain "Missing dependencies:" prefix
     type HasPrefix = Message extends `Missing dependencies: ${string}`
@@ -269,8 +271,9 @@ describe("build() returns error type when unsatisfied", () => {
   it("error message shows specific missing port names", () => {
     const builder = GraphBuilder.create().provide(UserServiceAdapter);
 
-    type BuildResult = ReturnType<typeof builder.build>;
-    type Message = BuildResult extends { __message: infer M } ? M : never;
+    type BuildParams = Parameters<typeof builder.build>;
+    type ErrorArg = BuildParams[0];
+    type Message = ErrorArg extends { __message: infer M } ? M : never;
 
     // Message should be a union of "Missing dependencies: Logger" | "Missing dependencies: Database"
     expectTypeOf<Message>().toEqualTypeOf<

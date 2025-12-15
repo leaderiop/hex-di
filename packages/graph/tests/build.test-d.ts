@@ -183,25 +183,30 @@ describe("build() callable when all deps satisfied", () => {
 // =============================================================================
 
 describe("build() blocked with type error when deps missing", () => {
-  it("returns error type when single dependency missing", () => {
+  it("requires error argument when single dependency missing", () => {
     const builder = GraphBuilder.create().provide(CacheAdapter);
 
-    type BuildResult = ReturnType<typeof builder.build>;
+    // build() should require an argument when deps are missing
+    type BuildParams = Parameters<typeof builder.build>;
+    type RequiresArg = BuildParams extends [infer Arg] ? true : false;
+    expectTypeOf<RequiresArg>().toEqualTypeOf<true>();
 
-    // Should be an error type
-    type IsError = BuildResult extends MissingDependencyError<ConfigPortType>
+    // The required argument should be the MissingDependencyError
+    type ArgType = BuildParams[0];
+    type IsError = ArgType extends MissingDependencyError<ConfigPortType>
       ? true
       : false;
     expectTypeOf<IsError>().toEqualTypeOf<true>();
   });
 
-  it("returns error type when multiple dependencies missing", () => {
+  it("requires error argument when multiple dependencies missing", () => {
     const builder = GraphBuilder.create().provide(UserServiceAdapter);
 
-    type BuildResult = ReturnType<typeof builder.build>;
+    type BuildParams = Parameters<typeof builder.build>;
+    type ArgType = BuildParams[0];
 
-    // Should be MissingDependencyError with both missing ports
-    type IsError = BuildResult extends MissingDependencyError<
+    // Should require MissingDependencyError with both missing ports
+    type IsError = ArgType extends MissingDependencyError<
       LoggerPortType | DatabasePortType
     >
       ? true
@@ -209,28 +214,30 @@ describe("build() blocked with type error when deps missing", () => {
     expectTypeOf<IsError>().toEqualTypeOf<true>();
   });
 
-  it("returns error type when some but not all deps provided", () => {
+  it("requires error argument when some but not all deps provided", () => {
     const builder = GraphBuilder.create()
       .provide(UserServiceAdapter)
       .provide(LoggerAdapter);
     // Database is still missing
 
-    type BuildResult = ReturnType<typeof builder.build>;
+    type BuildParams = Parameters<typeof builder.build>;
+    type ArgType = BuildParams[0];
 
-    // Should be error with just Database missing
-    type IsError = BuildResult extends MissingDependencyError<DatabasePortType>
+    // Should require error with just Database missing
+    type IsError = ArgType extends MissingDependencyError<DatabasePortType>
       ? true
       : false;
     expectTypeOf<IsError>().toEqualTypeOf<true>();
   });
 
-  it("error type has __errorBrand for discrimination", () => {
+  it("error argument has __errorBrand for discrimination", () => {
     const builder = GraphBuilder.create().provide(UserServiceAdapter);
 
-    type BuildResult = ReturnType<typeof builder.build>;
+    type BuildParams = Parameters<typeof builder.build>;
+    type ArgType = BuildParams[0];
 
     // Should have the MissingDependencyError brand
-    type Brand = BuildResult extends { __errorBrand: infer B } ? B : never;
+    type Brand = ArgType extends { __errorBrand: infer B } ? B : never;
     expectTypeOf<Brand>().toEqualTypeOf<"MissingDependencyError">();
   });
 });
@@ -243,8 +250,9 @@ describe("error message shows missing port names", () => {
   it("error __message includes single missing port name", () => {
     const builder = GraphBuilder.create().provide(CacheAdapter);
 
-    type BuildResult = ReturnType<typeof builder.build>;
-    type Message = BuildResult extends { __message: infer M } ? M : never;
+    type BuildParams = Parameters<typeof builder.build>;
+    type ArgType = BuildParams[0];
+    type Message = ArgType extends { __message: infer M } ? M : never;
 
     expectTypeOf<Message>().toEqualTypeOf<"Missing dependencies: Config">();
   });
@@ -252,8 +260,9 @@ describe("error message shows missing port names", () => {
   it("error __message includes multiple missing port names", () => {
     const builder = GraphBuilder.create().provide(UserServiceAdapter);
 
-    type BuildResult = ReturnType<typeof builder.build>;
-    type Message = BuildResult extends { __message: infer M } ? M : never;
+    type BuildParams = Parameters<typeof builder.build>;
+    type ArgType = BuildParams[0];
+    type Message = ArgType extends { __message: infer M } ? M : never;
 
     // Should be a union of error messages for each missing port
     expectTypeOf<Message>().toEqualTypeOf<
@@ -264,8 +273,9 @@ describe("error message shows missing port names", () => {
   it("error __message has correct prefix format", () => {
     const builder = GraphBuilder.create().provide(CacheAdapter);
 
-    type BuildResult = ReturnType<typeof builder.build>;
-    type Message = BuildResult extends { __message: infer M } ? M : never;
+    type BuildParams = Parameters<typeof builder.build>;
+    type ArgType = BuildParams[0];
+    type Message = ArgType extends { __message: infer M } ? M : never;
 
     // Verify the message starts with the expected prefix
     type HasPrefix = Message extends `Missing dependencies: ${string}`
@@ -277,8 +287,9 @@ describe("error message shows missing port names", () => {
   it("error carries __missing property with missing ports", () => {
     const builder = GraphBuilder.create().provide(UserServiceAdapter);
 
-    type BuildResult = ReturnType<typeof builder.build>;
-    type MissingPorts = BuildResult extends { __missing: infer M } ? M : never;
+    type BuildParams = Parameters<typeof builder.build>;
+    type ArgType = BuildParams[0];
+    type MissingPorts = ArgType extends { __missing: infer M } ? M : never;
 
     expectTypeOf<MissingPorts>().toEqualTypeOf<
       LoggerPortType | DatabasePortType
@@ -390,7 +401,6 @@ describe("build() returns Graph with correct type information", () => {
     const invalidBuilder = GraphBuilder.create().provide(UserServiceAdapter);
 
     type ValidResult = ReturnType<typeof validBuilder.build>;
-    type InvalidResult = ReturnType<typeof invalidBuilder.build>;
 
     // Valid result should have adapters (Graph has adapters)
     type HasAdapters = ValidResult extends { adapters: readonly unknown[] }
@@ -404,11 +414,12 @@ describe("build() returns Graph with correct type information", () => {
       : false;
     expectTypeOf<ValidHasErrorBrand>().toEqualTypeOf<false>();
 
-    // Invalid result should be error - has __errorBrand
-    type InvalidHasErrorBrand = InvalidResult extends { __errorBrand: string }
+    // Invalid builder requires error argument - check parameter has error brand
+    type InvalidParams = Parameters<typeof invalidBuilder.build>;
+    type InvalidParamHasErrorBrand = InvalidParams[0] extends { __errorBrand: string }
       ? true
       : false;
-    expectTypeOf<InvalidHasErrorBrand>().toEqualTypeOf<true>();
+    expectTypeOf<InvalidParamHasErrorBrand>().toEqualTypeOf<true>();
   });
 });
 
@@ -504,20 +515,21 @@ describe("built graph contains all registered adapters", () => {
 // =============================================================================
 
 describe("error appears at .build() call site", () => {
-  it("build() return type directly shows error information", () => {
+  it("build() parameter type shows error information when deps missing", () => {
     const incompleteBuilder = GraphBuilder.create().provide(UserServiceAdapter);
 
-    // The error information is directly on the return type of build()
-    type BuildReturnType = ReturnType<typeof incompleteBuilder.build>;
+    // The error information is in the required parameter of build()
+    type BuildParams = Parameters<typeof incompleteBuilder.build>;
+    type ErrorArg = BuildParams[0];
 
     // Error should have all diagnostic properties
-    type HasErrorBrand = BuildReturnType extends { __errorBrand: string }
+    type HasErrorBrand = ErrorArg extends { __errorBrand: string }
       ? true
       : false;
-    type HasMessage = BuildReturnType extends { __message: string }
+    type HasMessage = ErrorArg extends { __message: string }
       ? true
       : false;
-    type HasMissing = BuildReturnType extends {
+    type HasMissing = ErrorArg extends {
       __missing: Port<unknown, string>;
     }
       ? true
@@ -543,18 +555,18 @@ describe("error appears at .build() call site", () => {
     expectTypeOf<Provides>().toEqualTypeOf<UserServicePortType>();
   });
 
-  it("error is contained in return type, not method signature", () => {
-    // This tests that the error message appears when you TRY to use the result,
-    // not when defining the builder
+  it("error is contained in parameter type, causing compile error on call", () => {
+    // This tests that the error appears when you TRY to call build()
+    // without providing the required dependencies
 
     const builder = GraphBuilder.create().provide(UserServiceAdapter);
 
-    // The build method is still callable (at the type level)
+    // The build method is still a function
     expectTypeOf(builder.build).toBeFunction();
 
-    // But the return type is the error - has the error brand
-    type Result = ReturnType<typeof builder.build>;
-    type HasErrorBrand = Result extends { __errorBrand: "MissingDependencyError" }
+    // But it requires an error argument - check parameter has error brand
+    type BuildParams = Parameters<typeof builder.build>;
+    type HasErrorBrand = BuildParams[0] extends { __errorBrand: "MissingDependencyError" }
       ? true
       : false;
     expectTypeOf<HasErrorBrand>().toEqualTypeOf<true>();

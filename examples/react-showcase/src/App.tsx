@@ -27,7 +27,6 @@ import { ChatRoom } from "./components/ChatRoom.js";
  * in the DevTools panel.
  */
 const container = createTracingContainer<AppPorts>(appGraph);
-
 // =============================================================================
 // App Component
 // =============================================================================
@@ -65,7 +64,8 @@ export function App(): JSX.Element {
               HexDI React Showcase
             </h1>
             <p className="mt-2 text-gray-600">
-              Real-Time Chat Dashboard demonstrating dependency injection patterns
+              Real-Time Chat Dashboard demonstrating dependency injection
+              patterns
             </p>
           </header>
 
@@ -75,8 +75,8 @@ export function App(): JSX.Element {
           {/* Feature explanation */}
           <footer className="mt-8 text-center text-sm text-gray-500">
             <p>
-              This showcase demonstrates singleton, scoped, and request lifetimes
-              with reactive updates and DevTools integration.
+              This showcase demonstrates singleton, scoped, and request
+              lifetimes with reactive updates and DevTools integration.
             </p>
           </footer>
         </div>

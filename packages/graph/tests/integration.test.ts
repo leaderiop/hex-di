@@ -238,13 +238,14 @@ describe("Integration: Multi-layer dependency chain", () => {
       }),
     });
 
-    // Build without Cache - should result in error type
+    // Build without Cache - should require error argument
     const builder = GraphBuilder.create()
       .provide(configAdapter)
       .provide(databaseAdapter);
 
-    type BuildResult = ReturnType<typeof builder.build>;
-    type IsMissingError = BuildResult extends MissingDependencyError<typeof CachePort>
+    type BuildParams = Parameters<typeof builder.build>;
+    type ErrorArg = BuildParams[0];
+    type IsMissingError = ErrorArg extends MissingDependencyError<typeof CachePort>
       ? true
       : false;
     expectTypeOf<IsMissingError>().toEqualTypeOf<true>();
@@ -553,9 +554,10 @@ describe("Integration: Error recovery", () => {
       }))
       .provide(userServiceAdapter);
 
-    // Verify it's an error type
-    type IncompleteResult = ReturnType<typeof incompleteBuilder.build>;
-    type IsError = IncompleteResult extends MissingDependencyError<typeof DatabasePort>
+    // Verify build requires error argument when incomplete
+    type IncompleteParams = Parameters<typeof incompleteBuilder.build>;
+    type ErrorArg = IncompleteParams[0];
+    type IsError = ErrorArg extends MissingDependencyError<typeof DatabasePort>
       ? true
       : false;
     expectTypeOf<IsError>().toEqualTypeOf<true>();
@@ -570,7 +572,11 @@ describe("Integration: Error recovery", () => {
       })
     );
 
-    // Verify it's now a valid graph
+    // Verify it's now a valid graph - build takes no arguments
+    type CompleteParams = Parameters<typeof completeBuilder.build>;
+    type TakesNoArgs = CompleteParams extends [] ? true : false;
+    expectTypeOf<TakesNoArgs>().toEqualTypeOf<true>();
+
     type CompleteResult = ReturnType<typeof completeBuilder.build>;
     type IsValidGraph = CompleteResult extends Graph<infer _P> ? true : false;
     expectTypeOf<IsValidGraph>().toEqualTypeOf<true>();

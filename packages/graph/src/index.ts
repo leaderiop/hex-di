@@ -1198,21 +1198,22 @@ export class GraphBuilder<
    * Builds the dependency graph after validating all dependencies are satisfied.
    *
    * This method validates at compile-time that all required ports have providers.
-   * When dependencies are missing, the return type becomes a `MissingDependencyError`
-   * that displays a readable error message in IDE tooltips.
+   * When dependencies are missing, calling `build()` produces a compile error
+   * with a descriptive message showing which dependencies are missing.
    *
-   * @returns
-   * - When all dependencies satisfied: `Graph<TProvides>` - The validated graph
-   * - When dependencies missing: `MissingDependencyError<MissingPorts>` - Error type with message
+   * @returns `Graph<TProvides>` - The validated, immutable dependency graph
+   *
+   * @throws Compile-time error when dependencies are missing. The error message
+   * includes a `MissingDependencyError` type showing which ports need providers.
    *
    * @remarks
-   * - The error type is branded and cannot be used as a valid graph
+   * - The method is only callable when all dependencies are satisfied
+   * - Missing dependencies cause a compile error, not a runtime error
    * - Error messages include the names of missing ports for actionable feedback
-   * - The error appears at the `.build()` call site, not deep in type definitions
    * - Empty graphs (no adapters, no requirements) build successfully
    *
    * @see {@link Graph} - The successful return type
-   * @see {@link MissingDependencyError} - The error type for missing dependencies
+   * @see {@link MissingDependencyError} - The error type shown in compile errors
    *
    * @example Complete graph - builds successfully
    * ```typescript
@@ -1228,9 +1229,8 @@ export class GraphBuilder<
    * ```typescript
    * const incomplete = GraphBuilder.create()
    *   .provide(UserServiceAdapter) // requires Logger and Database
-   *   .build();
-   * // Type: MissingDependencyError<typeof LoggerPort | typeof DatabasePort>
-   * // IDE shows: { __message: 'Missing dependencies: Logger' | 'Missing dependencies: Database' }
+   *   .build(); // Error: Expected 1 argument, but got 0.
+   * // Error shows: MissingDependencyError<typeof LoggerPort | typeof DatabasePort>
    * ```
    *
    * @example Empty graph - builds successfully
@@ -1239,10 +1239,14 @@ export class GraphBuilder<
    * // graph: Graph<never>
    * ```
    */
-  build(): BuildResult<TProvides, TRequires> {
+  build(
+    ..._: IsSatisfied<TProvides, TRequires> extends true
+      ? []
+      : [error: MissingDependencyError<UnsatisfiedDependencies<TProvides, TRequires>>]
+  ): Graph<TProvides> {
     return Object.freeze({
       adapters: this.adapters,
       __provides: undefined as unknown as TProvides,
-    }) as BuildResult<TProvides, TRequires>;
+    }) as Graph<TProvides>;
   }
 }
