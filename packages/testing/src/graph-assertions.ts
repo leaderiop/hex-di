@@ -14,7 +14,7 @@ import type { Graph, Adapter, Lifetime } from "@hex-di/graph";
 // Type augmentation for V8-specific Error.captureStackTrace
 declare global {
   interface ErrorConstructor {
-    captureStackTrace?(targetObject: object, constructorOpt?: Function): void;
+    captureStackTrace(targetObject: object, constructorOpt?: Function): void;
   }
 }
 

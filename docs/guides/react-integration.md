@@ -1,3 +1,9 @@
+---
+title: React Integration
+description: Complete guide to integrating HexDI with React using typed hooks, providers, and automatic scope lifecycle management.
+sidebar_position: 1
+---
+
 # React Integration
 
 This guide covers integrating HexDI with React applications using `@hex-di/react`.

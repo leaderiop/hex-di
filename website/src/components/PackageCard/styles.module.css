@@ -1,0 +1,257 @@
+/**
+ * PackageCard Styles
+ *
+ * Based on design specifications:
+ * - Background: Gradient from Primary 50 to Primary 100
+ * - Border: 2px solid Primary 300
+ * - Border radius: 16px
+ * - Padding: 28px
+ * - Hover: Transform scale(1.02), shadow increase
+ * - Transition: all 0.3s ease
+ */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+  background: linear-gradient(135deg, var(--hexdi-primary-50), var(--hexdi-primary-100));
+  border: 2px solid var(--hexdi-primary-300);
+  border-radius: 16px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(94, 53, 177, 0.15);
+}
+
+/* Dark mode styles */
+[data-theme='dark'] .card {
+  background: linear-gradient(135deg, rgba(30, 20, 50, 0.8), rgba(45, 27, 78, 0.6));
+  border-color: var(--hexdi-primary-400);
+}
+
+[data-theme='dark'] .card:hover {
+  box-shadow: 0 8px 24px rgba(149, 117, 205, 0.25);
+}
+
+/**
+ * Header section with name and badge
+ */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/**
+ * Package Name
+ * - Font: Fira Code Medium, 18px
+ * - Color: Primary 700
+ * - Margin: 0 0 8px 0
+ */
+.name {
+  margin: 0;
+  font-family: var(--font-code);
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--hexdi-primary-700);
+}
+
+[data-theme='dark'] .name {
+  color: var(--hexdi-primary-300);
+}
+
+/**
+ * Badge
+ * - Background: Primary 600 (Core) / TS 500 (Optional)
+ * - Color: White
+ * - Padding: 4px 12px
+ * - Border radius: 12px
+ * - Font: Inter SemiBold, 12px
+ * - Display: inline-block
+ */
+.badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 4px 12px;
+  font-family: var(--font-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  border-radius: 12px;
+}
+
+.badgeCore {
+  background: linear-gradient(135deg, var(--hexdi-primary-600), var(--hexdi-primary-500));
+}
+
+.badgeOptional {
+  background: linear-gradient(135deg, var(--hexdi-ts-700), var(--hexdi-ts-500));
+}
+
+/**
+ * Description
+ * - Font: Inter Regular, 15px
+ * - Color: Text Primary
+ * - Line height: 1.6
+ * - Margin: 0 0 16px 0
+ */
+.description {
+  margin: 0 0 16px 0;
+  font-family: var(--font-primary);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--hexdi-text-primary);
+}
+
+/**
+ * Feature List
+ * - Font: Inter Regular, 14px
+ * - Color: Text Secondary
+ * - List style: Custom checkmark
+ * - Margin: 16px 0
+ */
+.features {
+  margin: 0 0 16px 0;
+  padding: 0;
+  list-style: none;
+  flex-grow: 1;
+}
+
+.feature {
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-family: var(--font-primary);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--hexdi-text-secondary);
+}
+
+.feature:last-child {
+  margin-bottom: 0;
+}
+
+/* Custom checkmark bullet */
+.feature::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 14px;
+  height: 8px;
+  border-left: 2px solid var(--hexdi-success-500);
+  border-bottom: 2px solid var(--hexdi-success-500);
+  transform: rotate(-45deg);
+}
+
+/**
+ * Link Button
+ * - Font: Inter Medium, 15px
+ * - Color: Primary 600
+ * - Arrow: Unicode right arrow
+ * - Hover: Underline + color Primary 500
+ * - Transition: color 0.2s ease
+ */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  font-family: var(--font-primary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--hexdi-primary-600);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.link:hover {
+  color: var(--hexdi-primary-500);
+  text-decoration: underline;
+}
+
+[data-theme='dark'] .link {
+  color: var(--hexdi-primary-300);
+}
+
+[data-theme='dark'] .link:hover {
+  color: var(--hexdi-primary-200);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  .link {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Responsive Styles for PackageCard
+   ========================================================================== */
+
+/* Mobile - smaller padding */
+@media screen and (max-width: 639px) {
+  .card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .name {
+    font-size: 1rem;
+  }
+
+  .badge {
+    padding: 3px 10px;
+    font-size: 0.6875rem;
+  }
+
+  .description {
+    font-size: 0.875rem;
+    margin-bottom: 12px;
+  }
+
+  .features {
+    margin-bottom: 12px;
+  }
+
+  .feature {
+    font-size: 0.8125rem;
+    padding-left: 20px;
+  }
+
+  .link {
+    font-size: 0.875rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* Touch target enhancement */
+@media (hover: none) and (pointer: coarse) {
+  .card {
+    /* Disable hover effects on touch devices */
+    transform: none !important;
+  }
+
+  .card:active {
+    transform: scale(0.98) !important;
+  }
+}

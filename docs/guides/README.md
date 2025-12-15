@@ -1,3 +1,9 @@
+---
+title: Guides
+description: In-depth guides for integrating HexDI with React, testing strategies, DevTools, and error handling.
+sidebar_position: 2
+---
+
 # Guides
 
 In-depth guides for specific HexDI use cases and integrations.

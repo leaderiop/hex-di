@@ -1,3 +1,9 @@
+---
+title: TypeScript Integration
+description: Leverage HexDI's TypeScript type inference, utilities, and compile-time validation for type-safe dependency injection.
+sidebar_position: 5
+---
+
 # TypeScript Integration
 
 HexDI is designed for TypeScript and leverages its type system for compile-time validation. This guide covers type inference, utilities, and best practices.

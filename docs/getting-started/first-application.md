@@ -1,3 +1,9 @@
+---
+title: First Application
+description: Build your first HexDI application step-by-step with a complete task management service example.
+sidebar_position: 3
+---
+
 # First Application
 
 Let's build a complete application step by step to see HexDI in action. We'll create a simple task management service with logging.

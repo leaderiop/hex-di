@@ -1,3 +1,10 @@
+---
+title: Service Lifetimes
+description: Master singleton, scoped, and request service lifetimes in HexDI for proper instance management.
+sidebar_position: 4
+sidebar_label: Lifetimes
+---
+
 # Service Lifetimes
 
 HexDI provides three lifetime scopes that control when service instances are created and how long they live.

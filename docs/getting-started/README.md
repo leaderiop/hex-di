@@ -1,3 +1,9 @@
+---
+title: Getting Started
+description: Learn how to install and configure HexDI in your TypeScript project with step-by-step guidance.
+sidebar_position: 1
+---
+
 # Getting Started with HexDI
 
 This section will guide you through installing and using HexDI in your TypeScript project.

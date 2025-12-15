@@ -1,3 +1,9 @@
+---
+title: Project Structure
+description: Recommended patterns for organizing HexDI code including directory structure, domain organization, and monorepo setups.
+sidebar_position: 1
+---
+
 # Project Structure
 
 This guide covers recommended patterns for organizing HexDI code in your projects.

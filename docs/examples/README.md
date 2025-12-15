@@ -1,10 +1,16 @@
+---
+title: Examples
+description: Real-world examples and code references for HexDI including React showcase, code snippets, and integration patterns.
+sidebar_position: 5
+---
+
 # Examples
 
 Real-world examples and code references for HexDI.
 
 ## React Showcase
 
-The [React Showcase](../../examples/react-showcase) is a complete example application demonstrating:
+The React Showcase is a complete example application demonstrating:
 
 - All three lifetime scopes (singleton, scoped, request)
 - React integration with typed hooks
@@ -12,16 +18,18 @@ The [React Showcase](../../examples/react-showcase) is a complete example applic
 - DevTools integration
 - Reactive updates with subscriptions
 
+You can find the example at `examples/react-showcase` in the repository.
+
 ### Key Files
 
 | File | Description |
 |------|-------------|
-| [`src/di/ports.ts`](../../examples/react-showcase/src/di/ports.ts) | Port definitions |
-| [`src/di/adapters.ts`](../../examples/react-showcase/src/di/adapters.ts) | Adapter implementations |
-| [`src/di/graph.ts`](../../examples/react-showcase/src/di/graph.ts) | Graph composition |
-| [`src/di/hooks.ts`](../../examples/react-showcase/src/di/hooks.ts) | React typed hooks |
-| [`src/App.tsx`](../../examples/react-showcase/src/App.tsx) | Main application |
-| [`tests/`](../../examples/react-showcase/tests) | Testing patterns |
+| `src/di/ports.ts` | Port definitions |
+| `src/di/adapters.ts` | Adapter implementations |
+| `src/di/graph.ts` | Graph composition |
+| `src/di/hooks.ts` | React typed hooks |
+| `src/App.tsx` | Main application |
+| `tests/` | Testing patterns |
 
 ### Running the Showcase
 
@@ -337,7 +345,7 @@ export const appGraph = process.env.NODE_ENV === 'production'
 |------|---------------|
 | Create a port | [Ports API](../api/ports.md) |
 | Create an adapter | [Graph API](../api/graph.md) |
-| Build a graph | [Graph API](../api/graph.md#graphbuilder) |
+| Build a graph | [Graph API](../api/graph.md#graphbuildertprovides-trequires) |
 | Create a container | [Runtime API](../api/runtime.md) |
 | Use in React | [React Guide](../guides/react-integration.md) |
 | Write tests | [Testing Guide](../guides/testing-strategies.md) |
@@ -345,4 +353,4 @@ export const appGraph = process.env.NODE_ENV === 'production'
 
 ## Community Examples
 
-Have you built something with HexDI? [Open an issue](https://github.com/your-org/hex-di/issues) to share your example!
+Have you built something with HexDI? [Open an issue](https://github.com/purebase/hex-di/issues) to share your example!

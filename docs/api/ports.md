@@ -1,3 +1,10 @@
+---
+title: "@hex-di/ports"
+description: API reference for the foundational @hex-di/ports package providing typed, branded port tokens for service interfaces.
+sidebar_position: 1
+sidebar_label: "@hex-di/ports"
+---
+
 # @hex-di/ports API Reference
 
 The foundational layer of HexDI with zero dependencies. Provides typed, branded port tokens for service interfaces.
@@ -17,7 +24,7 @@ pnpm add @hex-di/ports
 
 ## Types
 
-### Port<T, TName>
+### `Port<T, TName>`
 
 A branded port type that serves as a compile-time contract for a service interface.
 
@@ -49,7 +56,7 @@ type LoggerPort = Port<Logger, 'Logger'>;
 const LoggerPort = createPort<'Logger', Logger>('Logger');
 ```
 
-### InferService<P>
+### `InferService<P>`
 
 Extracts the service interface type from a Port type.
 
@@ -66,7 +73,7 @@ type LoggerService = InferService<typeof LoggerPort>;
 // LoggerService = Logger
 ```
 
-### InferPortName<P>
+### `InferPortName<P>`
 
 Extracts the port name literal type from a Port type.
 

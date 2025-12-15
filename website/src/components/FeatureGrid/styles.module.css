@@ -1,0 +1,41 @@
+/**
+ * FeatureGrid Styles
+ *
+ * Based on design specifications:
+ * - Display: grid
+ * - Grid template columns: repeat(auto-fit, minmax(300px, 1fr))
+ * - Gap: 24px
+ * - Margin: 48px 0
+ *
+ * Responsive breakpoints:
+ * - Desktop (>=1024px): 3 columns
+ * - Tablet (768px-1023px): 2 columns
+ * - Mobile (<768px): 1 column
+ */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 24px;
+  margin: 48px 0;
+  width: 100%;
+}
+
+/* Tablet layout: 2 columns */
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop layout: 3 columns */
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Ensure children stretch to fill grid cells evenly */
+.grid > * {
+  height: 100%;
+}

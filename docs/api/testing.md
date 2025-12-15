@@ -1,3 +1,10 @@
+---
+title: "@hex-di/testing"
+description: API reference for @hex-di/testing providing mock adapters, TestGraphBuilder, graph assertions, and React testing utilities.
+sidebar_position: 6
+sidebar_label: "@hex-di/testing"
+---
+
 # @hex-di/testing API Reference
 
 Testing utilities for HexDI applications including mocks, overrides, and assertions.

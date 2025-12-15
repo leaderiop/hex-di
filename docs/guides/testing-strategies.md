@@ -1,3 +1,9 @@
+---
+title: Testing Strategies
+description: Learn how to test HexDI applications with unit tests, integration tests, mock adapters, and React component testing.
+sidebar_position: 2
+---
+
 # Testing Strategies
 
 This guide covers testing HexDI-powered applications using `@hex-di/testing`.

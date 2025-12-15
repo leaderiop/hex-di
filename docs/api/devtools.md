@@ -1,3 +1,10 @@
+---
+title: "@hex-di/devtools"
+description: API reference for @hex-di/devtools providing graph visualization, export formats (JSON, DOT, Mermaid), and tracing containers.
+sidebar_position: 5
+sidebar_label: "@hex-di/devtools"
+---
+
 # @hex-di/devtools API Reference
 
 Visualization and debugging tools for HexDI dependency graphs.

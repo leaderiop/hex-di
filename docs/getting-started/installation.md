@@ -1,3 +1,9 @@
+---
+title: Installation
+description: Install HexDI packages and configure TypeScript for type-safe dependency injection.
+sidebar_position: 1
+---
+
 # Installation
 
 This guide covers installing HexDI packages and configuring your TypeScript project.

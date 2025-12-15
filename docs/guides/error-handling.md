@@ -1,3 +1,9 @@
+---
+title: Error Handling
+description: Understand HexDI's error hierarchy, error codes, and best practices for handling compile-time and runtime errors.
+sidebar_position: 4
+---
+
 # Error Handling
 
 This guide covers HexDI's error hierarchy and best practices for handling errors.

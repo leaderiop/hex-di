@@ -1,3 +1,10 @@
+---
+title: "@hex-di/react"
+description: API reference for @hex-di/react providing typed hooks, ContainerProvider, ScopeProvider, and AutoScopeProvider for React integration.
+sidebar_position: 4
+sidebar_label: "@hex-di/react"
+---
+
 # @hex-di/react API Reference
 
 React integration for HexDI with typed hooks, providers, and automatic scope lifecycle management.
@@ -50,7 +57,7 @@ const {
 
 ## Types
 
-### TypedReactIntegration<TProvides>
+### `TypedReactIntegration<TProvides>`
 
 The return type of `createTypedHooks()`.
 

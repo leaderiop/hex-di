@@ -1,3 +1,9 @@
+---
+title: Composing Graphs
+description: Advanced patterns for composing dependency graphs including base graphs, feature modules, environment-specific configurations, and branching.
+sidebar_position: 2
+---
+
 # Composing Graphs
 
 This guide covers advanced patterns for composing dependency graphs.

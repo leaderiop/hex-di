@@ -1,0 +1,121 @@
+/**
+ * LifetimeBadge Styles
+ *
+ * Based on design specifications:
+ * - Display: inline-flex
+ * - Align items: center
+ * - Padding: 6px 12px
+ * - Border radius: 16px
+ * - Font: Inter SemiBold, 13px
+ * - Letter spacing: 0.3px
+ * - Text transform: uppercase
+ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border-radius: 16px;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.icon {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+/**
+ * Singleton Badge (Teal)
+ * - Background: linear-gradient(135deg, #00897B, #26A69A)
+ * - Color: White
+ * - Icon: Single circle
+ */
+.singleton {
+  background: linear-gradient(135deg, var(--hexdi-singleton-600), var(--hexdi-singleton-400));
+}
+
+/**
+ * Scoped Badge (Amber)
+ * - Background: linear-gradient(135deg, #FF8F00, #FFA726)
+ * - Color: White
+ * - Icon: Nested circles
+ */
+.scoped {
+  background: linear-gradient(135deg, var(--hexdi-scoped-600), var(--hexdi-scoped-400));
+}
+
+/**
+ * Request Badge (Purple)
+ * - Background: linear-gradient(135deg, #7B1FA2, #AB47BC)
+ * - Color: White
+ * - Icon: Multiple circles
+ */
+.request {
+  background: linear-gradient(135deg, var(--hexdi-request-600), var(--hexdi-request-400));
+}
+
+/**
+ * Light Background Variant
+ * For use when the badge is displayed on a light-colored surface
+ * and needs to use lighter background colors with dark text.
+ *
+ * Based on design specs:
+ * - Singleton: Background #B2DFDB, Color #004D40
+ * - Scoped: Background #FFECB3, Color #E65100
+ * - Request: Background #E1BEE7, Color #4A148C
+ */
+.lightBg.singleton {
+  background: var(--hexdi-singleton-100);
+  color: #004D40;
+}
+
+.lightBg.scoped {
+  background: var(--hexdi-scoped-100);
+  color: #E65100;
+}
+
+.lightBg.request {
+  background: var(--hexdi-request-100);
+  color: #4A148C;
+}
+
+/* Dark mode adjustments for light background variant */
+[data-theme='dark'] .lightBg.singleton {
+  background: rgba(0, 137, 123, 0.2);
+  color: var(--hexdi-singleton-400);
+}
+
+[data-theme='dark'] .lightBg.scoped {
+  background: rgba(255, 143, 0, 0.2);
+  color: var(--hexdi-scoped-400);
+}
+
+[data-theme='dark'] .lightBg.request {
+  background: rgba(123, 31, 162, 0.2);
+  color: var(--hexdi-request-400);
+}
+
+/* ==========================================================================
+   Responsive Styles for LifetimeBadge
+   ========================================================================== */
+
+/* Mobile - smaller badge */
+@media screen and (max-width: 639px) {
+  .badge {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    gap: 4px;
+  }
+
+  .icon {
+    font-size: 0.8125rem;
+  }
+}

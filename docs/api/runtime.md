@@ -1,3 +1,10 @@
+---
+title: "@hex-di/runtime"
+description: API reference for @hex-di/runtime providing Containers, Scopes, error classes, and type-safe service resolution.
+sidebar_position: 3
+sidebar_label: "@hex-di/runtime"
+---
+
 # @hex-di/runtime API Reference
 
 The runtime layer of HexDI that creates containers from validated graphs and provides type-safe service resolution with lifetime management.
@@ -88,7 +95,7 @@ const container = createContainer(graph, {
 
 ## Types
 
-### Container<TProvides>
+### `Container<TProvides>`
 
 Root container for service resolution.
 
@@ -131,7 +138,7 @@ await container.dispose();
 // All singleton finalizers called in LIFO order
 ```
 
-### Scope<TProvides>
+### `Scope<TProvides>`
 
 Child scope for managing scoped service lifetimes.
 
@@ -181,7 +188,7 @@ await scope.dispose();
 
 ## Type Utilities
 
-### InferContainerProvides<C>
+### `InferContainerProvides<C>`
 
 Extracts the TProvides type from a Container.
 
@@ -190,7 +197,7 @@ type Provides = InferContainerProvides<typeof container>;
 // typeof LoggerPort | typeof UserServicePort | ...
 ```
 
-### InferScopeProvides<S>
+### `InferScopeProvides<S>`
 
 Extracts the TProvides type from a Scope.
 
@@ -198,7 +205,7 @@ Extracts the TProvides type from a Scope.
 type Provides = InferScopeProvides<typeof scope>;
 ```
 
-### IsResolvable<C, P>
+### `IsResolvable<C, P>`
 
 Checks if a port is resolvable from a container.
 
@@ -207,7 +214,7 @@ type CanResolve = IsResolvable<typeof container, typeof LoggerPort>;
 // true or false
 ```
 
-### ServiceFromContainer<C, P>
+### `ServiceFromContainer<C, P>`
 
 Gets the service type for a port from a container.
 
@@ -349,7 +356,7 @@ interface ContainerSnapshot {
 
 For compile-time prevention of captive dependencies.
 
-### LifetimeLevel
+### `LifetimeLevel<L>`
 
 Maps lifetime to numeric level.
 
@@ -360,7 +367,7 @@ type LifetimeLevel<L extends Lifetime> =
   L extends 'request' ? 1 : never;
 ```
 
-### CaptiveDependencyError
+### `CaptiveDependencyError<...>`
 
 Error type for captive dependency violations.
 

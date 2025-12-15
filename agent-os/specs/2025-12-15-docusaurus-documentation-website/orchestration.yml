@@ -1,0 +1,49 @@
+task_groups:
+  - name: Docusaurus Initialization
+    claude_code_subagent: implementer
+  - name: CSS Custom Properties & Brand Colors
+    claude_code_subagent: implementer
+  - name: Typography System
+    claude_code_subagent: implementer
+  - name: Dark Mode Configuration
+    claude_code_subagent: implementer
+  - name: Callout/Admonition Styling
+    claude_code_subagent: implementer
+  - name: Code Block Enhancements
+    claude_code_subagent: implementer
+  - name: Custom React Components
+    claude_code_subagent: implementer
+  - name: Hero Section
+    claude_code_subagent: implementer
+  - name: Features Section
+    claude_code_subagent: implementer
+  - name: Quick Start Code Example Section
+    claude_code_subagent: implementer
+  - name: Package Architecture Section
+    claude_code_subagent: implementer
+  - name: Lifetime Scopes & Why HexDI Sections
+    claude_code_subagent: implementer
+  - name: CTA Section & Footer
+    claude_code_subagent: implementer
+  - name: Navigation Bar Configuration
+    claude_code_subagent: implementer
+  - name: Sidebar Configuration
+    claude_code_subagent: implementer
+  - name: Table of Contents & Breadcrumbs
+    claude_code_subagent: implementer
+  - name: Documentation Content Verification
+    claude_code_subagent: library-docs-writer
+  - name: Search Implementation
+    claude_code_subagent: implementer
+  - name: Responsive Design
+    claude_code_subagent: implementer
+  - name: Accessibility Audit
+    claude_code_subagent: implementer
+  - name: Performance Optimization
+    claude_code_subagent: implementer
+  - name: SEO Configuration
+    claude_code_subagent: implementer
+  - name: GitHub Actions CI/CD
+    claude_code_subagent: implementer
+  - name: Final Deployment & Verification
+    claude_code_subagent: implementation-verifier

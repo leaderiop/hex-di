@@ -1,3 +1,9 @@
+---
+title: Patterns
+description: Best practices and common patterns for project structure, graph composition, scoped services, and resource cleanup in HexDI.
+sidebar_position: 3
+---
+
 # Patterns
 
 Best practices and common patterns for using HexDI effectively.

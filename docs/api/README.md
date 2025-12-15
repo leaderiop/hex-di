@@ -1,3 +1,9 @@
+---
+title: API Reference
+description: Complete API documentation for all HexDI packages including ports, graph, runtime, react, devtools, and testing.
+sidebar_position: 4
+---
+
 # API Reference
 
 Complete API documentation for all HexDI packages.

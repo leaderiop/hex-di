@@ -1,3 +1,9 @@
+---
+title: Finalizers and Cleanup
+description: Resource cleanup patterns using finalizers for database connections, file handles, event listeners, and graceful shutdown.
+sidebar_position: 4
+---
+
 # Finalizers and Cleanup
 
 This guide covers resource cleanup patterns using finalizers and proper disposal.

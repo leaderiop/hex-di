@@ -1,3 +1,10 @@
+---
+title: "@hex-di/graph"
+description: API reference for @hex-di/graph providing Adapters, GraphBuilder, and compile-time dependency validation.
+sidebar_position: 2
+sidebar_label: "@hex-di/graph"
+---
+
 # @hex-di/graph API Reference
 
 The compile-time validation layer of HexDI. Provides Adapter type, createAdapter function, and GraphBuilder with type-level dependency tracking.
@@ -33,7 +40,7 @@ type Lifetime = 'singleton' | 'scoped' | 'request';
 | `'scoped'` | One instance per scope |
 | `'request'` | New instance every resolution |
 
-### Adapter<TProvides, TRequires, TLifetime>
+### `Adapter<TProvides, TRequires, TLifetime>`
 
 A branded adapter type that captures the complete contract for a service implementation.
 
@@ -58,7 +65,7 @@ type Adapter<
 - `TRequires` - Union of Ports required, or `never`
 - `TLifetime` - The lifetime literal type
 
-### ResolvedDeps<TRequires>
+### `ResolvedDeps<TRequires>`
 
 Maps a union of Port types to a dependencies object type.
 
@@ -76,7 +83,7 @@ type Deps = ResolvedDeps<typeof LoggerPort | typeof DatabasePort>;
 // { Logger: Logger; Database: Database }
 ```
 
-### Graph<TProvides>
+### `Graph<TProvides>`
 
 The validated dependency graph returned by `GraphBuilder.build()`.
 
@@ -158,7 +165,7 @@ const DatabaseAdapter = createAdapter({
 
 ## Classes
 
-### GraphBuilder<TProvides, TRequires>
+### `GraphBuilder<TProvides, TRequires>`
 
 An immutable builder for constructing dependency graphs with compile-time validation.
 
@@ -230,7 +237,7 @@ const graph = GraphBuilder.create()
 
 ## Type Utilities
 
-### InferAdapterProvides<A>
+### `InferAdapterProvides<A>`
 
 Extracts the provided port from an Adapter type.
 
@@ -239,7 +246,7 @@ type Provides = InferAdapterProvides<typeof UserServiceAdapter>;
 // typeof UserServicePort
 ```
 
-### InferAdapterRequires<A>
+### `InferAdapterRequires<A>`
 
 Extracts the required ports union from an Adapter type.
 
@@ -248,7 +255,7 @@ type Requires = InferAdapterRequires<typeof UserServiceAdapter>;
 // typeof LoggerPort | typeof DatabasePort
 ```
 
-### InferAdapterLifetime<A>
+### `InferAdapterLifetime<A>`
 
 Extracts the lifetime from an Adapter type.
 
@@ -257,7 +264,7 @@ type Life = InferAdapterLifetime<typeof LoggerAdapter>;
 // 'singleton'
 ```
 
-### InferGraphProvides<G>
+### `InferGraphProvides<G>`
 
 Extracts the provided ports union from a GraphBuilder type.
 
@@ -266,7 +273,7 @@ type Provides = InferGraphProvides<typeof builder>;
 // typeof LoggerPort | typeof UserServicePort
 ```
 
-### InferGraphRequires<G>
+### `InferGraphRequires<G>`
 
 Extracts the required ports union from a GraphBuilder type.
 
@@ -277,7 +284,7 @@ type Requires = InferGraphRequires<typeof builder>;
 
 ## Validation Types
 
-### UnsatisfiedDependencies<TProvides, TRequires>
+### `UnsatisfiedDependencies<TProvides, TRequires>`
 
 Computes missing dependencies.
 
@@ -289,7 +296,7 @@ type Missing = UnsatisfiedDependencies<
 // typeof DatabasePort
 ```
 
-### IsSatisfied<TProvides, TRequires>
+### `IsSatisfied<TProvides, TRequires>`
 
 Boolean predicate for dependency satisfaction.
 
@@ -301,7 +308,7 @@ type Complete = IsSatisfied<
 // true
 ```
 
-### ValidGraph<TProvides, TRequires>
+### `ValidGraph<TProvides, TRequires>`
 
 Conditional type for validation result.
 
@@ -313,7 +320,7 @@ type Result = ValidGraph<TProvides, TRequires>;
 
 ## Error Types
 
-### MissingDependencyError<MissingPorts>
+### `MissingDependencyError<MissingPorts>`
 
 Compile-time error type for missing dependencies.
 
@@ -327,7 +334,7 @@ type Error = MissingDependencyError<typeof LoggerPort>;
 // }
 ```
 
-### DuplicateProviderError<DuplicatePort>
+### `DuplicateProviderError<DuplicatePort>`
 
 Compile-time error type for duplicate providers.
 

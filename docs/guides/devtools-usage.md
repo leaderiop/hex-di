@@ -1,3 +1,9 @@
+---
+title: DevTools Usage
+description: Visualize dependency graphs and debug service resolution with HexDI DevTools including export, tracing, and React components.
+sidebar_position: 3
+---
+
 # DevTools Usage
 
 This guide covers using `@hex-di/devtools` for visualizing dependency graphs and debugging service resolution.

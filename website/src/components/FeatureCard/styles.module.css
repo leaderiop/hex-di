@@ -1,0 +1,155 @@
+/**
+ * FeatureCard Styles
+ *
+ * Based on design specifications:
+ * - Width: Flexible (grid: 3 columns on desktop)
+ * - Background: #FFFFFF (light) / #161B22 (dark)
+ * - Border: 1px solid #E1E4E8 (light) / #30363D (dark)
+ * - Border radius: 12px
+ * - Padding: 32px
+ * - Box shadow: 0 2px 8px rgba(0,0,0,0.04)
+ * - Hover shadow: 0 4px 16px rgba(0,0,0,0.08)
+ * - Transition: all 0.2s ease
+ */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 32px;
+  background: var(--hexdi-background);
+  border: 1px solid var(--hexdi-border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: var(--hexdi-primary-300);
+}
+
+/* Dark mode styles */
+[data-theme='dark'] .card {
+  background: var(--hexdi-surface);
+  border-color: var(--hexdi-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-color: var(--hexdi-primary-400);
+}
+
+/**
+ * Icon Wrapper
+ * - Size: 48x48px
+ * - Background: Gradient (Primary 600 to Primary 400)
+ * - Border radius: 12px
+ * - Padding: 12px (icon is 24x24px)
+ * - Margin bottom: 16px
+ */
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--hexdi-primary-600), var(--hexdi-primary-400));
+  border-radius: 12px;
+  color: #ffffff;
+}
+
+.iconWrapper svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/**
+ * Title
+ * - Font: Manrope SemiBold, 20px
+ * - Color: Text Primary
+ * - Margin: 0 0 12px 0
+ */
+.title {
+  margin: 0 0 12px 0;
+  font-family: var(--font-headings);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--hexdi-text-primary);
+}
+
+/**
+ * Description
+ * - Font: Inter Regular, 15px
+ * - Color: Text Secondary
+ * - Line height: 1.6
+ * - Margin: 0
+ */
+.description {
+  margin: 0;
+  font-family: var(--font-primary);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--hexdi-text-secondary);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   Responsive Styles for FeatureCard
+   ========================================================================== */
+
+/* Mobile - smaller padding and icon */
+@media screen and (max-width: 639px) {
+  .card {
+    padding: 24px;
+  }
+
+  .iconWrapper {
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+  }
+
+  .iconWrapper svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .title {
+    font-size: 1.125rem;
+    margin-bottom: 8px;
+  }
+
+  .description {
+    font-size: 0.875rem;
+  }
+}
+
+/* Touch target enhancement */
+@media (hover: none) and (pointer: coarse) {
+  .card {
+    /* Disable hover effects on touch devices to prevent sticky states */
+    transform: none !important;
+  }
+
+  .card:active {
+    transform: scale(0.98) !important;
+  }
+}

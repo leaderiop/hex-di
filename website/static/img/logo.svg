@@ -1,0 +1,23 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer hexagon with gradient -->
+  <defs>
+    <linearGradient id="hexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7E57C2"/>
+      <stop offset="100%" stop-color="#5E35B1"/>
+    </linearGradient>
+    <linearGradient id="innerGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2196F3"/>
+      <stop offset="100%" stop-color="#64B5F6"/>
+    </linearGradient>
+  </defs>
+  <!-- Main hexagon -->
+  <path d="M20 2L36.66 11.5V30.5L20 40L3.34 30.5V11.5L20 2Z" fill="url(#hexGradient)"/>
+  <!-- Inner hexagon -->
+  <path d="M20 8L31.32 14.5V27.5L20 34L8.68 27.5V14.5L20 8Z" fill="url(#innerGradient)" fill-opacity="0.9"/>
+  <!-- Center connection nodes -->
+  <circle cx="20" cy="14" r="2.5" fill="white"/>
+  <circle cx="14" cy="23" r="2.5" fill="white"/>
+  <circle cx="26" cy="23" r="2.5" fill="white"/>
+  <!-- Connection lines -->
+  <path d="M20 14L14 23M20 14L26 23M14 23L26 23" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

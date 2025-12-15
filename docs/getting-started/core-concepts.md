@@ -1,3 +1,9 @@
+---
+title: Core Concepts
+description: Understand the fundamental concepts of HexDI including Ports, Adapters, Graphs, Containers, and Scopes.
+sidebar_position: 2
+---
+
 # Core Concepts
 
 This guide explains the fundamental concepts in HexDI: Ports, Adapters, Graphs, Containers, and Scopes.

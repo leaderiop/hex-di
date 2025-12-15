@@ -1,3 +1,10 @@
+---
+title: HexDI Documentation
+description: Complete documentation for HexDI, a type-safe dependency injection framework for TypeScript with compile-time validation.
+sidebar_position: 1
+sidebar_label: Overview
+---
+
 # HexDI Documentation
 
 Welcome to the HexDI documentation. HexDI is a type-safe dependency injection framework for TypeScript with compile-time validation.

@@ -1,0 +1,198 @@
+/**
+ * CodeExample Styles
+ *
+ * A wrapper component that adds a header with title and optional
+ * "View Full Tutorial" link to standard code blocks.
+ */
+
+.container {
+  margin: 32px 0;
+  border: 1px solid var(--hexdi-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--hexdi-background);
+}
+
+[data-theme='dark'] .container {
+  background: var(--hexdi-surface);
+  border-color: var(--hexdi-border);
+}
+
+/**
+ * Header section
+ * - Contains title, optional description, and tutorial link
+ * - Background: Subtle surface color
+ * - Border-bottom to separate from code
+ */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 24px;
+  background: var(--hexdi-surface);
+  border-bottom: 1px solid var(--hexdi-border);
+}
+
+/* On larger screens, layout header items horizontally */
+@media (min-width: 640px) {
+  .header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+}
+
+[data-theme='dark'] .header {
+  background: var(--hexdi-surface-hover);
+  border-bottom-color: var(--hexdi-border);
+}
+
+.headerContent {
+  flex: 1;
+  min-width: 0;
+}
+
+/**
+ * Title
+ * - Font: Manrope SemiBold
+ * - Color: Text Primary
+ */
+.title {
+  margin: 0;
+  font-family: var(--font-headings);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--hexdi-text-primary);
+}
+
+/**
+ * Description
+ * - Font: Inter Regular
+ * - Color: Text Secondary
+ */
+.description {
+  margin: 4px 0 0 0;
+  font-family: var(--font-primary);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--hexdi-text-secondary);
+}
+
+/**
+ * Tutorial Link
+ * - Font: Inter Medium
+ * - Color: Primary
+ * - Arrow indicator
+ */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--hexdi-primary-600);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.link:hover {
+  color: var(--hexdi-primary-500);
+  text-decoration: underline;
+}
+
+[data-theme='dark'] .link {
+  color: var(--hexdi-primary-300);
+}
+
+[data-theme='dark'] .link:hover {
+  color: var(--hexdi-primary-200);
+}
+
+/**
+ * Code Wrapper
+ * - Contains the actual code block
+ * - Remove default margins from nested code blocks
+ */
+.codeWrapper {
+  /* Remove any extra margin/padding from nested code blocks */
+}
+
+/* Reset margins on nested code block elements */
+.codeWrapper pre,
+.codeWrapper [class*="codeBlockContainer"],
+.codeWrapper [class*="codeBlock"] {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+
+/* Ensure the code block fills the container */
+.codeWrapper pre {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* If there's a title bar in the nested code block, hide duplicate styling */
+.codeWrapper [class*="codeBlockTitle"] {
+  border-radius: 0;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .link {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Responsive Styles for CodeExample
+   ========================================================================== */
+
+/* Mobile */
+@media screen and (max-width: 639px) {
+  .container {
+    margin: 24px 0;
+    border-radius: 8px;
+    /* Full width on mobile */
+    margin-left: -16px;
+    margin-right: -16px;
+    border-radius: 0;
+    width: calc(100% + 32px);
+  }
+
+  .header {
+    padding: 16px;
+    gap: 8px;
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+
+  .description {
+    font-size: 0.8125rem;
+  }
+
+  .link {
+    font-size: 0.8125rem;
+    min-height: 44px;
+    padding: 8px 0;
+  }
+}
+
+/* Tablet */
+@media screen and (min-width: 640px) and (max-width: 1023px) {
+  .container {
+    margin: 24px 0;
+  }
+
+  .header {
+    padding: 16px 20px;
+  }
+}
