@@ -1,0 +1,154 @@
+/**
+ * HexDI Table of Contents (TOC) Styling
+ *
+ * Right-side Table of Contents for documentation pages.
+ * Shows h2, h3, h4 headings with scroll spy highlighting.
+ */
+
+/* ==========================================================================
+   Table of Contents (TOC) Styling
+   ========================================================================== */
+
+/* TOC container */
+.table-of-contents {
+  width: 280px;
+  max-width: 280px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  padding-left: 16px;
+}
+
+/* TOC sticky positioning */
+.tableOfContents_node_modules-\@docusaurus-theme-classic-lib-theme-TOC-styles-module,
+[class*="tableOfContents_"] {
+  position: sticky;
+  top: calc(var(--ifm-navbar-height) + 16px);
+  max-height: calc(100vh - var(--ifm-navbar-height) - 32px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* TOC wrapper */
+.theme-doc-toc-desktop {
+  width: 280px;
+  max-width: 280px;
+}
+
+/* "On this page" header */
+.table-of-contents::before,
+[class*="tableOfContents_"]::before {
+  content: 'On this page';
+  display: block;
+  font-family: var(--font-headings);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--hexdi-text-tertiary);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ifm-toc-border-color);
+}
+
+/* TOC list styling */
+.table-of-contents ul,
+.table-of-contents__left-border ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+/* TOC item styling */
+.table-of-contents li {
+  margin: 0;
+}
+
+/* TOC links */
+.table-of-contents__link {
+  display: block;
+  padding: 6px 0;
+  color: var(--ifm-toc-link-color);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  padding-left: 12px;
+  margin-left: -12px;
+  transition: color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+/* TOC link hover state */
+.table-of-contents__link:hover {
+  color: var(--hexdi-text-primary);
+  text-decoration: none;
+}
+
+/* TOC active link (scroll spy) */
+.table-of-contents__link--active,
+.table-of-contents__link.table-of-contents__link--active {
+  color: var(--ifm-color-primary);
+  font-weight: var(--weight-medium);
+  border-left-color: var(--ifm-color-primary);
+}
+
+/* TOC nested indentation - h3 (second level) */
+.table-of-contents ul ul .table-of-contents__link {
+  padding-left: 24px;
+  margin-left: -12px;
+  font-size: 0.75rem;
+}
+
+/* TOC nested indentation - h4 (third level) */
+.table-of-contents ul ul ul .table-of-contents__link {
+  padding-left: 36px;
+  margin-left: -12px;
+  font-size: 0.75rem;
+  color: var(--hexdi-text-tertiary);
+}
+
+/* TOC nested active link styling */
+.table-of-contents ul ul .table-of-contents__link--active,
+.table-of-contents ul ul ul .table-of-contents__link--active {
+  color: var(--ifm-color-primary);
+  border-left-color: var(--ifm-color-primary);
+}
+
+/* TOC left border styling */
+.table-of-contents__left-border {
+  border-left: 1px solid var(--ifm-toc-border-color);
+  padding-left: 12px;
+}
+
+/* Dark mode TOC adjustments */
+[data-theme='dark'] .table-of-contents__link {
+  color: var(--hexdi-text-secondary);
+}
+
+[data-theme='dark'] .table-of-contents__link:hover {
+  color: var(--hexdi-text-primary);
+}
+
+[data-theme='dark'] .table-of-contents__link--active {
+  color: var(--ifm-color-primary);
+}
+
+[data-theme='dark'] .table-of-contents ul ul ul .table-of-contents__link {
+  color: var(--hexdi-text-tertiary);
+}
+
+/* TOC scrollbar styling */
+.table-of-contents::-webkit-scrollbar,
+[class*="tableOfContents_"]::-webkit-scrollbar {
+  width: 4px;
+}
+
+.table-of-contents::-webkit-scrollbar-thumb,
+[class*="tableOfContents_"]::-webkit-scrollbar-thumb {
+  background: var(--hexdi-border);
+  border-radius: 2px;
+}
+
+.table-of-contents::-webkit-scrollbar-thumb:hover,
+[class*="tableOfContents_"]::-webkit-scrollbar-thumb:hover {
+  background: var(--hexdi-text-tertiary);
+}

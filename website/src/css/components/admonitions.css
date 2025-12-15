@@ -1,0 +1,236 @@
+/**
+ * HexDI Admonition/Callout Box Styling
+ *
+ * Override Docusaurus admonition styles for consistent HexDI branding.
+ * Types: note (INFO), tip (TIP), caution (WARNING), danger (DANGER)
+ */
+
+/* ==========================================================================
+   Admonition/Callout Box Styling
+   ========================================================================== */
+
+/* Base admonition styles */
+.theme-admonition,
+[class*="admonition_"] {
+  border-radius: 6px;
+  border-left-width: 4px;
+  border-left-style: solid;
+  padding: 16px 16px 16px 48px;
+  margin: 24px 0;
+  position: relative;
+}
+
+/* Admonition icon positioning */
+.theme-admonition .admonitionHeading_node_modules-\@docusaurus-theme-classic-lib-theme-Admonition-styles-module::before,
+[class*="admonitionHeading"]::before,
+.theme-admonition [class*="admonitionIcon"],
+[class*="admonition_"] [class*="admonitionIcon"] {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Admonition title/heading styling */
+.theme-admonition .admonitionHeading_node_modules-\@docusaurus-theme-classic-lib-theme-Admonition-styles-module,
+[class*="admonitionHeading"] {
+  font-family: var(--font-headings);
+  font-weight: var(--weight-semibold);
+  font-size: 0.9375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+/* Admonition content styling */
+.theme-admonition .admonitionContent_node_modules-\@docusaurus-theme-classic-lib-theme-Admonition-styles-module,
+[class*="admonitionContent"] {
+  font-family: var(--font-primary);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+/* Admonition content paragraphs - remove margin on last paragraph */
+.theme-admonition p:last-child,
+[class*="admonition_"] p:last-child {
+  margin-bottom: 0;
+}
+
+/* -------------------------------------------------------------------------
+   INFO Admonition (note) - Blue
+   ------------------------------------------------------------------------- */
+.theme-admonition-note,
+[class*="admonition_"][class*="note"],
+.admonition-note {
+  background-color: var(--hexdi-info-bg-light);
+  border-left-color: var(--hexdi-info-500);
+}
+
+.theme-admonition-note [class*="admonitionIcon"] svg,
+[class*="admonition_"][class*="note"] [class*="admonitionIcon"] svg,
+.admonition-note [class*="admonitionIcon"] svg {
+  color: var(--hexdi-info-500);
+  fill: var(--hexdi-info-500);
+}
+
+.theme-admonition-note [class*="admonitionHeading"],
+[class*="admonition_"][class*="note"] [class*="admonitionHeading"],
+.admonition-note [class*="admonitionHeading"] {
+  color: var(--hexdi-info-500);
+}
+
+/* INFO admonition - Dark mode */
+[data-theme='dark'] .theme-admonition-note,
+[data-theme='dark'] [class*="admonition_"][class*="note"],
+[data-theme='dark'] .admonition-note {
+  background-color: var(--hexdi-info-bg-dark);
+}
+
+/* Also style 'info' type which Docusaurus may use */
+.theme-admonition-info,
+[class*="admonition_"][class*="info"],
+.admonition-info {
+  background-color: var(--hexdi-info-bg-light);
+  border-left-color: var(--hexdi-info-500);
+}
+
+.theme-admonition-info [class*="admonitionIcon"] svg,
+[class*="admonition_"][class*="info"] [class*="admonitionIcon"] svg,
+.admonition-info [class*="admonitionIcon"] svg {
+  color: var(--hexdi-info-500);
+  fill: var(--hexdi-info-500);
+}
+
+.theme-admonition-info [class*="admonitionHeading"],
+[class*="admonition_"][class*="info"] [class*="admonitionHeading"],
+.admonition-info [class*="admonitionHeading"] {
+  color: var(--hexdi-info-500);
+}
+
+[data-theme='dark'] .theme-admonition-info,
+[data-theme='dark'] [class*="admonition_"][class*="info"],
+[data-theme='dark'] .admonition-info {
+  background-color: var(--hexdi-info-bg-dark);
+}
+
+/* -------------------------------------------------------------------------
+   TIP Admonition - Teal
+   ------------------------------------------------------------------------- */
+.theme-admonition-tip,
+[class*="admonition_"][class*="tip"],
+.admonition-tip {
+  background-color: var(--hexdi-tip-bg-light);
+  border-left-color: var(--hexdi-tip-500);
+}
+
+.theme-admonition-tip [class*="admonitionIcon"] svg,
+[class*="admonition_"][class*="tip"] [class*="admonitionIcon"] svg,
+.admonition-tip [class*="admonitionIcon"] svg {
+  color: var(--hexdi-tip-500);
+  fill: var(--hexdi-tip-500);
+}
+
+.theme-admonition-tip [class*="admonitionHeading"],
+[class*="admonition_"][class*="tip"] [class*="admonitionHeading"],
+.admonition-tip [class*="admonitionHeading"] {
+  color: var(--hexdi-tip-500);
+}
+
+/* TIP admonition - Dark mode */
+[data-theme='dark'] .theme-admonition-tip,
+[data-theme='dark'] [class*="admonition_"][class*="tip"],
+[data-theme='dark'] .admonition-tip {
+  background-color: var(--hexdi-tip-bg-dark);
+}
+
+/* -------------------------------------------------------------------------
+   WARNING Admonition (caution) - Orange
+   ------------------------------------------------------------------------- */
+.theme-admonition-caution,
+[class*="admonition_"][class*="caution"],
+.admonition-caution,
+.theme-admonition-warning,
+[class*="admonition_"][class*="warning"],
+.admonition-warning {
+  background-color: var(--hexdi-caution-bg-light);
+  border-left-color: var(--hexdi-caution-500);
+}
+
+.theme-admonition-caution [class*="admonitionIcon"] svg,
+[class*="admonition_"][class*="caution"] [class*="admonitionIcon"] svg,
+.admonition-caution [class*="admonitionIcon"] svg,
+.theme-admonition-warning [class*="admonitionIcon"] svg,
+[class*="admonition_"][class*="warning"] [class*="admonitionIcon"] svg,
+.admonition-warning [class*="admonitionIcon"] svg {
+  color: var(--hexdi-caution-500);
+  fill: var(--hexdi-caution-500);
+}
+
+.theme-admonition-caution [class*="admonitionHeading"],
+[class*="admonition_"][class*="caution"] [class*="admonitionHeading"],
+.admonition-caution [class*="admonitionHeading"],
+.theme-admonition-warning [class*="admonitionHeading"],
+[class*="admonition_"][class*="warning"] [class*="admonitionHeading"],
+.admonition-warning [class*="admonitionHeading"] {
+  color: var(--hexdi-caution-500);
+}
+
+/* WARNING admonition - Dark mode */
+[data-theme='dark'] .theme-admonition-caution,
+[data-theme='dark'] [class*="admonition_"][class*="caution"],
+[data-theme='dark'] .admonition-caution,
+[data-theme='dark'] .theme-admonition-warning,
+[data-theme='dark'] [class*="admonition_"][class*="warning"],
+[data-theme='dark'] .admonition-warning {
+  background-color: var(--hexdi-caution-bg-dark);
+}
+
+/* -------------------------------------------------------------------------
+   DANGER Admonition - Red
+   ------------------------------------------------------------------------- */
+.theme-admonition-danger,
+[class*="admonition_"][class*="danger"],
+.admonition-danger {
+  background-color: var(--hexdi-danger-bg-light);
+  border-left-color: var(--hexdi-danger-500);
+}
+
+.theme-admonition-danger [class*="admonitionIcon"] svg,
+[class*="admonition_"][class*="danger"] [class*="admonitionIcon"] svg,
+.admonition-danger [class*="admonitionIcon"] svg {
+  color: var(--hexdi-danger-500);
+  fill: var(--hexdi-danger-500);
+}
+
+.theme-admonition-danger [class*="admonitionHeading"],
+[class*="admonition_"][class*="danger"] [class*="admonitionHeading"],
+.admonition-danger [class*="admonitionHeading"] {
+  color: var(--hexdi-danger-500);
+}
+
+/* DANGER admonition - Dark mode */
+[data-theme='dark'] .theme-admonition-danger,
+[data-theme='dark'] [class*="admonition_"][class*="danger"],
+[data-theme='dark'] .admonition-danger {
+  background-color: var(--hexdi-danger-bg-dark);
+}
+
+/* -------------------------------------------------------------------------
+   Admonition Icon SVG Sizing
+   ------------------------------------------------------------------------- */
+.theme-admonition [class*="admonitionIcon"] svg,
+[class*="admonition_"] [class*="admonitionIcon"] svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* -------------------------------------------------------------------------
+   Admonition Transitions for Theme Switch
+   ------------------------------------------------------------------------- */
+.theme-admonition,
+[class*="admonition_"] {
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+}

@@ -1,0 +1,241 @@
+/**
+ * HexDI Code Block Styling
+ *
+ * Styles for code blocks including Fira Code ligatures,
+ * container styling, header bar, copy button, and dark mode.
+ */
+
+/* ==========================================================================
+   Code Block Styling with Fira Code Ligatures
+   ========================================================================== */
+
+/* Enable Fira Code ligatures for all code elements */
+code, pre, .prism-code,
+code[class*="language-"],
+pre[class*="language-"] {
+  font-family: var(--font-code);
+  font-size: var(--text-code);
+  line-height: var(--text-code-line);
+  font-weight: var(--text-code-weight);
+  /* Enable ligatures */
+  font-feature-settings: 'liga' 1, 'calt' 1;
+  font-variant-ligatures: common-ligatures contextual;
+  -webkit-font-feature-settings: 'liga' 1, 'calt' 1;
+  -moz-font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/* Inline code styling */
+code:not(pre code) {
+  font-family: var(--font-code);
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/* Code blocks */
+pre {
+  font-family: var(--font-code);
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/* Docusaurus code block container */
+.codeBlockContainer_node_modules-\@docusaurus-theme-classic-lib-theme-CodeBlock-Container-styles-module code,
+[class*="codeBlockContainer"] code {
+  font-family: var(--font-code);
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/* Theme code blocks */
+.theme-code-block pre {
+  font-family: var(--font-code);
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/* ==========================================================================
+   Code Block Container Styling
+   ========================================================================== */
+
+/* Main code block container */
+[class*="codeBlockContainer"] {
+  background-color: var(--hexdi-code-block-bg);
+  border: 1px solid var(--hexdi-border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+/* Code block content area */
+[class*="codeBlockContent"] {
+  background-color: var(--hexdi-code-block-bg);
+}
+
+/* Code block pre element */
+[class*="codeBlockContainer"] pre {
+  background-color: var(--hexdi-code-block-bg);
+  padding: 16px;
+  margin: 0;
+  border-radius: 0;
+}
+
+/* ==========================================================================
+   Code Block Header Bar Styling
+   ========================================================================== */
+
+/* Code block title/header bar */
+[class*="codeBlockTitle"] {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background-color: var(--hexdi-code-header-bg);
+  border-bottom: 1px solid var(--hexdi-border);
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--hexdi-text-secondary);
+}
+
+/* Language badge styling */
+[class*="codeBlockTitle"] + [class*="codeBlockContent"]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 8px;
+  right: 48px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--hexdi-text-tertiary);
+  background-color: var(--hexdi-surface);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Code Block Copy Button Styling
+   ========================================================================== */
+
+/* Copy button container */
+[class*="buttonGroup"] {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+}
+
+/* When there's a title bar, adjust copy button position */
+[class*="codeBlockTitle"] + [class*="codeBlockContent"] [class*="buttonGroup"] {
+  top: 48px; /* 40px header + 8px offset */
+}
+
+/* Copy button styling */
+[class*="copyButton"] {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--hexdi-text-secondary);
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+/* Copy button icon */
+[class*="copyButton"] svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Copy button hover state */
+[class*="copyButton"]:hover {
+  background-color: var(--hexdi-code-copy-button-hover-bg);
+  color: var(--hexdi-text-primary);
+}
+
+/* Copy button active/clicked state */
+[class*="copyButton"]:active {
+  transform: scale(0.95);
+}
+
+/* Copy button success state (after copying) */
+[class*="copyButton"][class*="copied"],
+[class*="copyButton"]:focus {
+  background-color: var(--hexdi-primary-50);
+  color: var(--hexdi-primary-600);
+}
+
+/* Dark mode copy button success state */
+[data-theme='dark'] [class*="copyButton"][class*="copied"],
+[data-theme='dark'] [class*="copyButton"]:focus {
+  background-color: rgba(149, 117, 205, 0.2);
+  color: var(--hexdi-primary-300);
+}
+
+/* ==========================================================================
+   Dark Mode Code Block Specific Styles
+   ========================================================================== */
+
+/* Ensure code blocks use the dark palette in dark mode */
+[data-theme='dark'] pre,
+[data-theme='dark'] code,
+[data-theme='dark'] .prism-code {
+  background-color: var(--hexdi-code-block-bg);
+}
+
+/* Code block container in dark mode */
+[data-theme='dark'] [class*="codeBlockContainer"] {
+  background-color: var(--hexdi-surface);
+  border-color: var(--hexdi-border);
+}
+
+/* Code block content in dark mode */
+[data-theme='dark'] [class*="codeBlockContent"] {
+  background-color: var(--hexdi-code-block-bg);
+}
+
+/* Code block header/title bar in dark mode */
+[data-theme='dark'] [class*="codeBlockTitle"] {
+  background-color: var(--hexdi-code-header-bg);
+  border-bottom-color: var(--hexdi-border);
+  color: var(--hexdi-text-secondary);
+}
+
+/* Language badge in dark mode */
+[data-theme='dark'] [class*="codeBlockTitle"] + [class*="codeBlockContent"]::before {
+  background-color: var(--hexdi-surface-hover);
+  color: var(--hexdi-text-tertiary);
+}
+
+/* Line numbers in dark mode */
+[data-theme='dark'] .prism-code .token-line .line-number,
+[data-theme='dark'] [class*="codeLineNumber"] {
+  color: var(--hexdi-code-line-number-color);
+}
+
+/* Copy button in dark mode */
+[data-theme='dark'] [class*="copyButton"] {
+  color: var(--hexdi-text-secondary);
+}
+
+[data-theme='dark'] [class*="copyButton"]:hover {
+  color: var(--hexdi-text-primary);
+  background-color: var(--hexdi-code-copy-button-hover-bg);
+}
+
+/* ==========================================================================
+   Dark Mode Toggle Button Styling
+   ========================================================================== */
+
+/* Color mode toggle in navbar */
+.navbar__items [class*="colorModeToggle"] button,
+[class*="toggle_node_modules"] {
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Ensure the toggle icon is visible in both modes */
+[data-theme='dark'] .navbar__items [class*="colorModeToggle"] button:hover,
+[data-theme='dark'] [class*="toggle_node_modules"]:hover {
+  background-color: var(--hexdi-surface-hover);
+}

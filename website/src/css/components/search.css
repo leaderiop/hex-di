@@ -1,0 +1,591 @@
+/**
+ * HexDI Search Styling
+ *
+ * Styles for local search plugin (@easyops-cn/docusaurus-search-local)
+ * and search modal components.
+ */
+
+/* ==========================================================================
+   Local Search Plugin Styling (@easyops-cn/docusaurus-search-local)
+   ========================================================================== */
+
+/*
+ * Search bar in navbar
+ */
+.navbar .DocSearch.DocSearch-SearchBar,
+.navbar [class*="searchBar"] {
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+/* Search button styling */
+.aa-DetachedSearchButton,
+button[class*="searchButton"],
+.navbar__search-input,
+.DocSearch-Button {
+  font-family: var(--font-primary);
+  font-size: 0.875rem;
+  padding: 0 12px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: var(--hexdi-surface);
+  border: 1px solid var(--hexdi-border);
+  color: var(--hexdi-text-tertiary);
+  cursor: pointer;
+  transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.aa-DetachedSearchButton:hover,
+button[class*="searchButton"]:hover,
+.DocSearch-Button:hover {
+  border-color: var(--ifm-color-primary);
+  background-color: var(--hexdi-surface-hover);
+}
+
+[data-theme='dark'] .aa-DetachedSearchButton,
+[data-theme='dark'] button[class*="searchButton"] {
+  background-color: var(--hexdi-background);
+  border-color: var(--hexdi-border);
+}
+
+[data-theme='dark'] .aa-DetachedSearchButton:hover,
+[data-theme='dark'] button[class*="searchButton"]:hover {
+  background-color: var(--hexdi-surface-hover);
+  border-color: var(--ifm-color-primary);
+}
+
+/* Search button icon */
+.aa-DetachedSearchButton svg,
+button[class*="searchButton"] svg {
+  width: 16px;
+  height: 16px;
+  color: var(--hexdi-text-tertiary);
+}
+
+/* Search placeholder text */
+.aa-DetachedSearchButton .aa-DetachedSearchButtonPlaceholder,
+button[class*="searchButton"] span,
+.DocSearch-Button-Placeholder {
+  color: var(--hexdi-text-tertiary);
+  font-size: 0.875rem;
+  margin-left: 8px;
+}
+
+/* Keyboard shortcut badge */
+.aa-DetachedSearchButton .aa-DetachedSearchButtonIcon,
+.DocSearch-Button-Keys,
+[class*="searchHint"] {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.aa-DetachedSearchButton kbd,
+.DocSearch-Button-Key,
+[class*="searchHintKey"] {
+  font-family: var(--font-primary);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-medium);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: var(--hexdi-border);
+  color: var(--hexdi-text-secondary);
+  border: none;
+  box-shadow: none;
+}
+
+[data-theme='dark'] .aa-DetachedSearchButton kbd,
+[data-theme='dark'] .DocSearch-Button-Key,
+[data-theme='dark'] [class*="searchHintKey"] {
+  background-color: var(--hexdi-surface-hover);
+  color: var(--hexdi-text-secondary);
+}
+
+/* ==========================================================================
+   Search Modal Styling
+   ========================================================================== */
+
+/*
+ * Modal overlay with backdrop blur
+ */
+.aa-DetachedOverlay,
+.DocSearch-Modal,
+[class*="searchModal"] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+}
+
+[data-theme='dark'] .aa-DetachedOverlay,
+[data-theme='dark'] .DocSearch-Modal,
+[data-theme='dark'] [class*="searchModal"] {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/*
+ * Search modal container
+ */
+.aa-DetachedContainer,
+.DocSearch-Container,
+[class*="searchModalContainer"] {
+  width: 100%;
+  max-width: 640px;
+  max-height: 70vh;
+  background-color: var(--hexdi-background);
+  border-radius: 12px;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.1),
+    0 12px 24px rgba(0, 0, 0, 0.15),
+    0 0 0 1px var(--hexdi-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: searchModalFadeIn 0.15s ease-out;
+}
+
+@keyframes searchModalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+[data-theme='dark'] .aa-DetachedContainer,
+[data-theme='dark'] .DocSearch-Container,
+[data-theme='dark'] [class*="searchModalContainer"] {
+  background-color: var(--hexdi-surface);
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.2),
+    0 12px 24px rgba(0, 0, 0, 0.3),
+    0 0 0 1px var(--hexdi-border);
+}
+
+/*
+ * Search input in modal
+ */
+.aa-DetachedFormContainer,
+.DocSearch-SearchBar,
+[class*="searchInputContainer"] {
+  padding: 16px;
+  border-bottom: 1px solid var(--hexdi-border);
+  background-color: var(--hexdi-background);
+}
+
+[data-theme='dark'] .aa-DetachedFormContainer,
+[data-theme='dark'] .DocSearch-SearchBar,
+[data-theme='dark'] [class*="searchInputContainer"] {
+  background-color: var(--hexdi-surface);
+  border-bottom-color: var(--hexdi-border);
+}
+
+.aa-DetachedFormContainer input,
+.aa-Form input,
+.DocSearch-Input,
+[class*="searchInput"] {
+  width: 100%;
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  padding: 12px 16px 12px 44px;
+  border: 1px solid var(--hexdi-border);
+  border-radius: 8px;
+  background-color: var(--hexdi-surface);
+  color: var(--hexdi-text-primary);
+  outline: none;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.aa-DetachedFormContainer input:focus,
+.aa-Form input:focus,
+.DocSearch-Input:focus,
+[class*="searchInput"]:focus {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 3px rgba(94, 53, 177, 0.1);
+}
+
+[data-theme='dark'] .aa-DetachedFormContainer input,
+[data-theme='dark'] .aa-Form input,
+[data-theme='dark'] .DocSearch-Input,
+[data-theme='dark'] [class*="searchInput"] {
+  background-color: var(--hexdi-background);
+  border-color: var(--hexdi-border);
+  color: var(--hexdi-text-primary);
+}
+
+[data-theme='dark'] .aa-DetachedFormContainer input:focus,
+[data-theme='dark'] .aa-Form input:focus,
+[data-theme='dark'] .DocSearch-Input:focus,
+[data-theme='dark'] [class*="searchInput"]:focus {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 3px rgba(149, 117, 205, 0.15);
+}
+
+.aa-DetachedFormContainer input::placeholder,
+.aa-Form input::placeholder,
+.DocSearch-Input::placeholder,
+[class*="searchInput"]::placeholder {
+  color: var(--hexdi-text-tertiary);
+}
+
+/* Search icon in input */
+.aa-DetachedFormContainer .aa-InputWrapperPrefix,
+.aa-Form .aa-InputWrapperPrefix,
+.DocSearch-MagnifierLabel,
+[class*="searchInputIcon"] {
+  position: absolute;
+  left: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--hexdi-text-tertiary);
+  pointer-events: none;
+}
+
+.aa-DetachedFormContainer .aa-InputWrapperPrefix svg,
+.aa-Form .aa-InputWrapperPrefix svg,
+.DocSearch-MagnifierLabel svg,
+[class*="searchInputIcon"] svg {
+  width: 20px;
+  height: 20px;
+}
+
+/*
+ * Search results container
+ */
+.aa-Panel,
+.DocSearch-Dropdown,
+[class*="searchResults"] {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  background-color: var(--hexdi-background);
+}
+
+[data-theme='dark'] .aa-Panel,
+[data-theme='dark'] .DocSearch-Dropdown,
+[data-theme='dark'] [class*="searchResults"] {
+  background-color: var(--hexdi-surface);
+}
+
+/*
+ * Result category/section headers
+ */
+.aa-SourceHeader,
+.DocSearch-Help,
+[class*="searchResultCategory"] {
+  padding: 8px 12px;
+  font-family: var(--font-headings);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--hexdi-text-tertiary);
+  border-bottom: 1px solid var(--hexdi-border-light);
+  margin-bottom: 4px;
+}
+
+[data-theme='dark'] .aa-SourceHeader,
+[data-theme='dark'] .DocSearch-Help,
+[data-theme='dark'] [class*="searchResultCategory"] {
+  border-bottom-color: var(--hexdi-border);
+}
+
+/*
+ * Individual search result items
+ */
+.aa-Item,
+.DocSearch-Hit,
+[class*="searchResultItem"] {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.1s ease-in-out;
+  margin-bottom: 2px;
+  text-decoration: none;
+}
+
+.aa-Item:hover,
+.aa-Item[aria-selected="true"],
+.DocSearch-Hit:hover,
+.DocSearch-Hit[aria-selected="true"],
+[class*="searchResultItem"]:hover,
+[class*="searchResultItem"][data-selected="true"] {
+  background-color: var(--hexdi-surface-hover);
+}
+
+[data-theme='dark'] .aa-Item:hover,
+[data-theme='dark'] .aa-Item[aria-selected="true"],
+[data-theme='dark'] .DocSearch-Hit:hover,
+[data-theme='dark'] .DocSearch-Hit[aria-selected="true"],
+[data-theme='dark'] [class*="searchResultItem"]:hover,
+[data-theme='dark'] [class*="searchResultItem"][data-selected="true"] {
+  background-color: var(--hexdi-surface-hover);
+}
+
+/* Result item icon */
+.aa-Item .aa-ItemIcon,
+.DocSearch-Hit-icon,
+[class*="searchResultIcon"] {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  border-radius: 4px;
+  background-color: var(--hexdi-primary-50);
+  color: var(--hexdi-primary-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.aa-Item .aa-ItemIcon svg,
+.DocSearch-Hit-icon svg,
+[class*="searchResultIcon"] svg {
+  width: 14px;
+  height: 14px;
+}
+
+[data-theme='dark'] .aa-Item .aa-ItemIcon,
+[data-theme='dark'] .DocSearch-Hit-icon,
+[data-theme='dark'] [class*="searchResultIcon"] {
+  background-color: rgba(149, 117, 205, 0.15);
+  color: var(--hexdi-primary-300);
+}
+
+/* Result item content */
+.aa-Item .aa-ItemContent,
+.DocSearch-Hit-content-wrapper,
+[class*="searchResultContent"] {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Result item title */
+.aa-Item .aa-ItemContentTitle,
+.DocSearch-Hit-title,
+[class*="searchResultTitle"] {
+  font-family: var(--font-primary);
+  font-size: 0.9375rem;
+  font-weight: var(--weight-medium);
+  color: var(--hexdi-text-primary);
+  margin-bottom: 2px;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Result item path/breadcrumb */
+.aa-Item .aa-ItemContentSubtitle,
+.DocSearch-Hit-path,
+[class*="searchResultPath"] {
+  font-size: 0.75rem;
+  color: var(--hexdi-text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Search term highlighting in results */
+.aa-Item mark,
+.DocSearch-Hit mark,
+[class*="searchResultItem"] mark,
+.search-result-match {
+  background-color: rgba(94, 53, 177, 0.15);
+  color: var(--hexdi-primary-600);
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: var(--weight-semibold);
+}
+
+[data-theme='dark'] .aa-Item mark,
+[data-theme='dark'] .DocSearch-Hit mark,
+[data-theme='dark'] [class*="searchResultItem"] mark,
+[data-theme='dark'] .search-result-match {
+  background-color: rgba(149, 117, 205, 0.2);
+  color: var(--hexdi-primary-300);
+}
+
+/*
+ * Keyboard navigation indicator
+ */
+.aa-Item[aria-selected="true"],
+.DocSearch-Hit[aria-selected="true"],
+[class*="searchResultItem"][data-selected="true"] {
+  background-color: var(--hexdi-primary-50);
+  outline: 2px solid var(--hexdi-primary-400);
+  outline-offset: -2px;
+}
+
+[data-theme='dark'] .aa-Item[aria-selected="true"],
+[data-theme='dark'] .DocSearch-Hit[aria-selected="true"],
+[data-theme='dark'] [class*="searchResultItem"][data-selected="true"] {
+  background-color: rgba(149, 117, 205, 0.15);
+  outline-color: var(--hexdi-primary-400);
+}
+
+/*
+ * No results message
+ */
+.aa-NoResults,
+.DocSearch-NoResults,
+[class*="searchNoResults"] {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--hexdi-text-secondary);
+}
+
+.aa-NoResults .aa-NoResultsTitle,
+.DocSearch-NoResults-Prefill-List,
+[class*="searchNoResultsTitle"] {
+  font-family: var(--font-headings);
+  font-size: 1rem;
+  font-weight: var(--weight-semibold);
+  margin-bottom: 8px;
+  color: var(--hexdi-text-primary);
+}
+
+.aa-NoResults .aa-NoResultsLabel,
+[class*="searchNoResultsText"] {
+  font-size: 0.875rem;
+  color: var(--hexdi-text-tertiary);
+}
+
+/*
+ * Search footer with keyboard shortcuts
+ */
+.aa-DetachedFooter,
+.DocSearch-Footer,
+[class*="searchFooter"] {
+  padding: 12px 16px;
+  border-top: 1px solid var(--hexdi-border);
+  background-color: var(--hexdi-surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--hexdi-text-tertiary);
+}
+
+[data-theme='dark'] .aa-DetachedFooter,
+[data-theme='dark'] .DocSearch-Footer,
+[data-theme='dark'] [class*="searchFooter"] {
+  background-color: var(--hexdi-background);
+  border-top-color: var(--hexdi-border);
+}
+
+/* Footer keyboard shortcuts */
+.aa-DetachedFooter kbd,
+.DocSearch-Commands kbd,
+[class*="searchFooter"] kbd {
+  font-family: var(--font-primary);
+  font-size: 0.625rem;
+  font-weight: var(--weight-medium);
+  padding: 2px 5px;
+  border-radius: 3px;
+  background-color: var(--hexdi-border);
+  color: var(--hexdi-text-secondary);
+  margin: 0 2px;
+}
+
+[data-theme='dark'] .aa-DetachedFooter kbd,
+[data-theme='dark'] .DocSearch-Commands kbd,
+[data-theme='dark'] [class*="searchFooter"] kbd {
+  background-color: var(--hexdi-surface-hover);
+}
+
+/*
+ * Search loading state
+ */
+.aa-DetachedFormContainer .aa-LoadingIndicator,
+.DocSearch-LoadingIndicator,
+[class*="searchLoading"] {
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--hexdi-border);
+  border-top-color: var(--ifm-color-primary);
+  border-radius: 50%;
+  animation: searchLoadingSpin 0.6s linear infinite;
+}
+
+@keyframes searchLoadingSpin {
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+/*
+ * Highlighted terms on target page
+ */
+.search-result-highlight {
+  background-color: rgba(94, 53, 177, 0.2);
+  padding: 2px 4px;
+  border-radius: 3px;
+  animation: highlightFade 2s ease-out forwards;
+}
+
+@keyframes highlightFade {
+  0% {
+    background-color: rgba(94, 53, 177, 0.4);
+  }
+  100% {
+    background-color: rgba(94, 53, 177, 0.1);
+  }
+}
+
+[data-theme='dark'] .search-result-highlight {
+  background-color: rgba(149, 117, 205, 0.3);
+}
+
+[data-theme='dark'] .search-result-highlight {
+  animation-name: highlightFadeDark;
+}
+
+@keyframes highlightFadeDark {
+  0% {
+    background-color: rgba(149, 117, 205, 0.5);
+  }
+  100% {
+    background-color: rgba(149, 117, 205, 0.15);
+  }
+}
+
+/*
+ * Responsive search modal
+ */
+@media (max-width: 640px) {
+  .aa-DetachedOverlay,
+  .DocSearch-Modal,
+  [class*="searchModal"] {
+    padding-top: 0;
+    align-items: stretch;
+  }
+
+  .aa-DetachedContainer,
+  .DocSearch-Container,
+  [class*="searchModalContainer"] {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    height: 100%;
+  }
+}

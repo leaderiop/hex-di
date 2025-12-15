@@ -1,0 +1,90 @@
+/**
+ * HexDI Line Highlighting Styling
+ *
+ * Styles for code block line numbers and line highlighting
+ * including highlighted, error, and success lines.
+ */
+
+/* ==========================================================================
+   Line Numbers Styling
+   ========================================================================== */
+
+/* Line numbers column */
+.prism-code .token-line .line-number,
+[class*="codeLineNumber"] {
+  display: inline-block;
+  width: 40px;
+  min-width: 40px;
+  padding-right: 16px;
+  text-align: right;
+  color: var(--hexdi-code-line-number-color);
+  font-size: 13px;
+  font-family: var(--font-code);
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Line number gutter styling */
+.theme-code-block [class*="lineNumber"] {
+  width: 40px;
+  min-width: 40px;
+  padding-right: 16px;
+  text-align: right;
+  color: var(--hexdi-code-line-number-color);
+  user-select: none;
+}
+
+/* Docusaurus line numbers styling */
+[data-word-wrap="true"] [class*="codeLineNumber"] {
+  width: 40px;
+  min-width: 40px;
+}
+
+/* ==========================================================================
+   Line Highlighting Styling
+   ========================================================================== */
+
+/* Default highlighted line (using // highlight-next-line or highlight-start/end) */
+.theme-code-block-highlighted-line {
+  background-color: var(--docusaurus-highlighted-code-line-bg);
+  display: block;
+  margin: 0 -16px;
+  padding: 0 16px;
+  border-left: 3px solid var(--hexdi-primary-500);
+}
+
+/* Error line highlighting (using // error-line or error-start/end) */
+.code-block-error-line {
+  background-color: rgba(211, 47, 47, 0.1);
+  display: block;
+  margin: 0 -16px;
+  padding: 0 16px;
+  border-left: 3px solid var(--hexdi-error-500);
+}
+
+/* Success line highlighting (using // success-line or success-start/end) */
+.code-block-success-line {
+  background-color: rgba(76, 175, 80, 0.1);
+  display: block;
+  margin: 0 -16px;
+  padding: 0 16px;
+  border-left: 3px solid var(--hexdi-success-500);
+}
+
+/* Dark mode adjustments for line highlighting */
+[data-theme='dark'] .theme-code-block-highlighted-line {
+  background-color: var(--docusaurus-highlighted-code-line-bg);
+  border-left-color: var(--hexdi-primary-400);
+}
+
+[data-theme='dark'] .code-block-error-line {
+  background-color: rgba(239, 83, 80, 0.15);
+  border-left-color: var(--hexdi-error-300);
+}
+
+[data-theme='dark'] .code-block-success-line {
+  background-color: rgba(129, 199, 132, 0.15);
+  border-left-color: var(--hexdi-success-300);
+}

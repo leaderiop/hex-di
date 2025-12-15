@@ -1,0 +1,113 @@
+/**
+ * HexDI Syntax Highlighting Color Customization
+ *
+ * Token colors for Prism syntax highlighting in both
+ * light mode (GitHub-style) and dark mode (Dracula-style).
+ */
+
+/* ==========================================================================
+   Syntax Highlighting Color Customization
+   ========================================================================== */
+
+/*
+ * Light Mode Syntax Colors (GitHub-style with brand adjustments)
+ * These complement the Prism GitHub theme
+ */
+
+/* Keywords: import, const, function, return, etc. */
+.token.keyword {
+  color: #D73A49;
+}
+
+/* Strings */
+.token.string {
+  color: #032F62;
+}
+
+/* Functions */
+.token.function {
+  color: #6F42C1;
+}
+
+/* Types and classes */
+.token.class-name,
+.token.maybe-class-name {
+  color: #005CC5;
+}
+
+/* Comments */
+.token.comment {
+  color: #6A737D;
+  font-style: italic;
+}
+
+/* Operators */
+.token.operator {
+  color: #D73A49;
+}
+
+/* Punctuation */
+.token.punctuation {
+  color: #24292E;
+}
+
+/* Numbers */
+.token.number {
+  color: #005CC5;
+}
+
+/* Boolean */
+.token.boolean {
+  color: #005CC5;
+}
+
+/* Property names */
+.token.property {
+  color: #005CC5;
+}
+
+/*
+ * Dark Mode Syntax Colors (Dracula-style with brand adjustments)
+ * These complement the Prism Dracula theme
+ */
+[data-theme='dark'] .token.keyword {
+  color: #FF7B72;
+}
+
+[data-theme='dark'] .token.string {
+  color: #A5D6FF;
+}
+
+[data-theme='dark'] .token.function {
+  color: #D2A8FF;
+}
+
+[data-theme='dark'] .token.class-name,
+[data-theme='dark'] .token.maybe-class-name {
+  color: #79C0FF;
+}
+
+[data-theme='dark'] .token.comment {
+  color: #8B949E;
+  font-style: italic;
+}
+
+[data-theme='dark'] .token.operator {
+  color: #FF7B72;
+}
+
+[data-theme='dark'] .token.punctuation {
+  color: #C9D1D9;
+}
+
+[data-theme='dark'] .token.number {
+  color: #79C0FF;
+}
+
+[data-theme='dark'] .token.boolean {
+  color: #79C0FF;
+}
+
+[data-theme='dark'] .token.property {
+  color: #79C0FF;
+}

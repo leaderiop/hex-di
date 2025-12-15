@@ -1,0 +1,163 @@
+/**
+ * HexDI Previous/Next Navigation Styling
+ *
+ * Previous and Next navigation links at the bottom of documentation pages.
+ * Allows navigation between sequential pages.
+ */
+
+/* ==========================================================================
+   Previous/Next Navigation Styling
+   ========================================================================== */
+
+/* Pagination navigation container */
+.pagination-nav {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--hexdi-border);
+}
+
+/* Pagination navigation link (both prev and next) */
+.pagination-nav__link {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px;
+  border: 1px solid var(--hexdi-border);
+  border-radius: 8px;
+  background-color: var(--hexdi-background);
+  text-decoration: none;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+/* Pagination link hover state */
+.pagination-nav__link:hover {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 2px 8px rgba(94, 53, 177, 0.1);
+  text-decoration: none;
+}
+
+/* Previous link - align left */
+.pagination-nav__link--prev {
+  align-items: flex-start;
+  text-align: left;
+}
+
+/* Next link - align right */
+.pagination-nav__link--next {
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* Pagination sublabel ("Previous" / "Next" text) */
+.pagination-nav__sublabel {
+  font-size: 0.75rem;
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--hexdi-text-tertiary);
+  margin-bottom: 4px;
+}
+
+/* Pagination label (page title) */
+.pagination-nav__label {
+  font-family: var(--font-headings);
+  font-size: 1rem;
+  font-weight: var(--weight-semibold);
+  color: var(--ifm-color-primary);
+  line-height: 1.4;
+  transition: color 0.15s ease-in-out;
+}
+
+/* Pagination label hover */
+.pagination-nav__link:hover .pagination-nav__label {
+  color: var(--ifm-color-primary-dark);
+}
+
+/* Arrow icons for pagination */
+.pagination-nav__link--prev .pagination-nav__sublabel::before {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-right: 6px solid var(--hexdi-text-tertiary);
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.pagination-nav__link--next .pagination-nav__sublabel::after {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 6px solid var(--hexdi-text-tertiary);
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* Dark mode pagination adjustments */
+[data-theme='dark'] .pagination-nav__link {
+  background-color: var(--hexdi-surface);
+  border-color: var(--hexdi-border);
+}
+
+[data-theme='dark'] .pagination-nav__link:hover {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 2px 8px rgba(149, 117, 205, 0.15);
+  background-color: var(--hexdi-surface-hover);
+}
+
+[data-theme='dark'] .pagination-nav__sublabel {
+  color: var(--hexdi-text-tertiary);
+}
+
+[data-theme='dark'] .pagination-nav__label {
+  color: var(--ifm-color-primary);
+}
+
+[data-theme='dark'] .pagination-nav__link:hover .pagination-nav__label {
+  color: var(--ifm-color-primary-light);
+}
+
+[data-theme='dark'] .pagination-nav__link--prev .pagination-nav__sublabel::before {
+  border-right-color: var(--hexdi-text-tertiary);
+}
+
+[data-theme='dark'] .pagination-nav__link--next .pagination-nav__sublabel::after {
+  border-left-color: var(--hexdi-text-tertiary);
+}
+
+/* Responsive pagination - stack on small screens */
+@media (max-width: 640px) {
+  .pagination-nav {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .pagination-nav__link--prev,
+  .pagination-nav__link--next {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .pagination-nav__link--next .pagination-nav__sublabel::after {
+    display: none;
+  }
+
+  .pagination-nav__link--next .pagination-nav__sublabel::before {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 6px solid var(--hexdi-text-tertiary);
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+}

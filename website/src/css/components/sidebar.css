@@ -1,0 +1,223 @@
+/**
+ * HexDI Sidebar Navigation Styling
+ *
+ * Custom sidebar styles for HexDI documentation.
+ * Width: 280px on desktop with collapsible categories and chevron indicators.
+ */
+
+/* ==========================================================================
+   Sidebar Navigation Styling
+   ========================================================================== */
+
+/* -------------------------------------------------------------------------
+   Sidebar Container - Width and Layout
+   ------------------------------------------------------------------------- */
+
+/* Sidebar width on desktop */
+.theme-doc-sidebar-container {
+  width: 280px !important;
+  min-width: 280px;
+  border-right: 1px solid var(--hexdi-border-light);
+}
+
+/* Sidebar viewport */
+[class*="sidebarViewport"] {
+  top: 0;
+  position: sticky;
+  max-height: 100vh;
+}
+
+/* -------------------------------------------------------------------------
+   Sidebar Menu Styling
+   ------------------------------------------------------------------------- */
+
+/* Main menu container */
+.menu {
+  padding: 16px 12px;
+  font-family: var(--font-primary);
+  font-weight: var(--weight-regular);
+}
+
+/* Menu list */
+.menu__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Nested menu lists (category items) */
+.menu__list .menu__list {
+  margin-left: 0;
+  padding-left: 12px;
+  border-left: 1px solid var(--hexdi-border-light);
+  margin-top: 4px;
+}
+
+/* -------------------------------------------------------------------------
+   Menu Links (Items)
+   ------------------------------------------------------------------------- */
+
+/* Base menu link style */
+.menu__link {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--hexdi-text-secondary);
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease-in-out,
+    color 0.15s ease-in-out;
+}
+
+/* Menu link hover state */
+.menu__link:hover {
+  background-color: var(--hexdi-surface-hover);
+  color: var(--hexdi-text-primary);
+  text-decoration: none;
+}
+
+/* Active menu link (current page) */
+.menu__link--active {
+  background-color: var(--ifm-menu-color-background-active);
+  color: var(--ifm-menu-color-active);
+  font-weight: var(--weight-medium);
+}
+
+.menu__link--active:hover {
+  background-color: var(--ifm-menu-color-background-active);
+  color: var(--ifm-menu-color-active);
+}
+
+/* -------------------------------------------------------------------------
+   Category Styling (Collapsible Sections)
+   ------------------------------------------------------------------------- */
+
+/* Category container */
+.menu__list-item--collapsed .menu__list {
+  display: none;
+}
+
+/* Category heading/toggle button */
+.menu__caret,
+.menu__link--sublist {
+  cursor: pointer;
+}
+
+/* Category label styling */
+.menu__link--sublist-caret {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  font-weight: var(--weight-medium);
+  color: var(--hexdi-text-primary);
+  background-color: transparent;
+  transition:
+    background-color 0.15s ease-in-out,
+    color 0.15s ease-in-out;
+}
+
+.menu__link--sublist-caret:hover {
+  background-color: var(--hexdi-surface-hover);
+}
+
+/* -------------------------------------------------------------------------
+   Chevron (Caret) Indicators
+   ------------------------------------------------------------------------- */
+
+/* Caret icon positioning */
+.menu__caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Alternative: Use Docusaurus default caret SVG */
+.menu__caret-icon {
+  transition: transform 0.2s ease-in-out;
+}
+
+.menu__list-item:not(.menu__list-item--collapsed) > * > .menu__caret-icon {
+  transform: rotate(90deg);
+}
+
+/* -------------------------------------------------------------------------
+   Sidebar Scrolling Behavior
+   ------------------------------------------------------------------------- */
+
+/* Enable independent scrolling for long doc lists */
+.theme-doc-sidebar-menu {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 64px); /* Navbar height */
+  padding-bottom: 24px;
+}
+
+/* Custom scrollbar for sidebar */
+.theme-doc-sidebar-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.theme-doc-sidebar-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.theme-doc-sidebar-menu::-webkit-scrollbar-thumb {
+  background: var(--hexdi-scrollbar-thumb);
+  border-radius: 3px;
+}
+
+.theme-doc-sidebar-menu::-webkit-scrollbar-thumb:hover {
+  background: var(--hexdi-scrollbar-thumb-hover);
+}
+
+/* -------------------------------------------------------------------------
+   Sidebar Dark Mode Adjustments
+   ------------------------------------------------------------------------- */
+
+[data-theme='dark'] .theme-doc-sidebar-container {
+  border-right-color: var(--hexdi-border);
+}
+
+[data-theme='dark'] .menu__list .menu__list {
+  border-left-color: var(--hexdi-border);
+}
+
+/* -------------------------------------------------------------------------
+   Sidebar Transitions for Theme Switch
+   ------------------------------------------------------------------------- */
+
+.theme-doc-sidebar-container,
+.menu,
+.menu__link,
+.menu__link--sublist-caret {
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+}
+
+/* -------------------------------------------------------------------------
+   Mobile Sidebar Adjustments
+   ------------------------------------------------------------------------- */
+
+@media (max-width: 996px) {
+  .theme-doc-sidebar-container {
+    width: 100% !important;
+    min-width: 100%;
+    border-right: none;
+  }
+
+  .theme-doc-sidebar-menu {
+    max-height: calc(100vh - 120px);
+  }
+}

@@ -1,0 +1,96 @@
+/**
+ * HexDI Reduced Motion Support
+ *
+ * Respects user preference for reduced motion by disabling
+ * animations and transitions.
+ */
+
+/* ==========================================================================
+   Reduced Motion Support
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  .navbar,
+  .footer,
+  .menu,
+  article,
+  pre,
+  code,
+  .card,
+  [class*="card"],
+  .alert,
+  [class*="admonition"],
+  .theme-admonition,
+  [class*="copyButton"],
+  .table-of-contents__link,
+  .breadcrumbs__link,
+  .pagination-nav__link,
+  .pagination-nav__label,
+  .navbar__link,
+  .header-github-link,
+  .menu__link,
+  .menu__link--sublist-caret,
+  .menu__caret,
+  .menu__caret-icon,
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   Enhanced Reduced Motion Support
+   Respects user preference for reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all transitions */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Keep essential transforms but remove animation */
+  .card:hover,
+  .whyBenefitCard:hover,
+  .lifetimeCard:hover,
+  [class*="card"]:hover {
+    transform: none !important;
+  }
+
+  /* Disable floating animation on hero visual */
+  .heroVisual {
+    animation: none !important;
+  }
+
+  /* Disable search modal animation */
+  @keyframes searchModalFadeIn {
+    from, to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Disable highlight fade animation */
+  .search-result-highlight {
+    animation: none !important;
+    background-color: rgba(94, 53, 177, 0.2) !important;
+  }
+
+  [data-theme='dark'] .search-result-highlight {
+    background-color: rgba(149, 117, 205, 0.3) !important;
+  }
+
+  /* Disable loading spinner animation */
+  .aa-DetachedFormContainer .aa-LoadingIndicator,
+  .DocSearch-LoadingIndicator,
+  [class*="searchLoading"] {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,206 @@
+/**
+ * HexDI Focus Indicators
+ *
+ * Comprehensive keyboard navigation support with WCAG 2.1 AA compliant
+ * focus indicators (minimum 2px outline with sufficient contrast).
+ */
+
+/* ==========================================================================
+   Accessibility Enhancements - WCAG 2.1 AA Compliance
+   ========================================================================== */
+
+/* -------------------------------------------------------------------------
+   Focus Indicators - Comprehensive Keyboard Navigation Support
+   Minimum 2px outline with sufficient contrast for WCAG 2.1 AA
+   ------------------------------------------------------------------------- */
+
+/* Base focus-visible styles */
+:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Remove default focus outline when using focus-visible */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Enhanced focus for links */
+a:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+  text-decoration: underline;
+}
+
+/* Enhanced focus for buttons */
+button:focus-visible,
+[role="button"]:focus-visible,
+.button:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 4px rgba(94, 53, 177, 0.2);
+}
+
+[data-theme='dark'] button:focus-visible,
+[data-theme='dark'] [role="button"]:focus-visible,
+[data-theme='dark'] .button:focus-visible {
+  box-shadow: 0 0 0 4px rgba(149, 117, 205, 0.3);
+}
+
+/* Enhanced focus for navbar links */
+.navbar__link:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+  background-color: var(--hexdi-surface-hover);
+}
+
+/* Enhanced focus for menu links in sidebar */
+.menu__link:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: -2px;
+  border-radius: 6px;
+  background-color: var(--hexdi-surface-hover);
+}
+
+/* Enhanced focus for TOC links */
+.table-of-contents__link:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Enhanced focus for breadcrumb links */
+.breadcrumbs__link:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+  background-color: var(--hexdi-surface);
+}
+
+/* Enhanced focus for pagination nav links */
+.pagination-nav__link:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 4px rgba(94, 53, 177, 0.15);
+}
+
+[data-theme='dark'] .pagination-nav__link:focus-visible {
+  box-shadow: 0 0 0 4px rgba(149, 117, 205, 0.2);
+}
+
+/* Enhanced focus for search button */
+.DocSearch-Button:focus-visible,
+[class*="searchButton"]:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-radius: 8px;
+  border-color: var(--ifm-color-primary);
+}
+
+/* Enhanced focus for copy button in code blocks */
+[class*="copyButton"]:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+  background-color: var(--hexdi-surface-hover);
+}
+
+/* Enhanced focus for theme toggle */
+[class*="colorModeToggle"] button:focus-visible,
+[class*="toggle"]:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+/* Enhanced focus for mobile menu toggle */
+.navbar__toggle:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+  background-color: var(--hexdi-surface-hover);
+}
+
+/* Enhanced focus for form inputs */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 0;
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 3px rgba(94, 53, 177, 0.15);
+}
+
+[data-theme='dark'] input:focus-visible,
+[data-theme='dark'] textarea:focus-visible,
+[data-theme='dark'] select:focus-visible {
+  box-shadow: 0 0 0 3px rgba(149, 117, 205, 0.2);
+}
+
+/* Enhanced focus for search input */
+.navbar__search-input:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: -2px;
+  border-color: var(--ifm-color-primary);
+}
+
+/* Enhanced focus for footer links */
+.footer__link-item:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* -------------------------------------------------------------------------
+   Skip to Content Link - Enhanced Accessibility
+   ------------------------------------------------------------------------- */
+
+/* Ensure skip link appears above everything when focused */
+.skip-to-content:focus-visible {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: auto;
+  height: auto;
+  padding: 16px 24px;
+  background: var(--hexdi-background);
+  border: 2px solid var(--ifm-color-primary);
+  border-radius: 8px;
+  color: var(--hexdi-text-primary);
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  outline: none;
+}
+
+[data-theme='dark'] .skip-to-content:focus-visible {
+  background: var(--hexdi-surface);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* -------------------------------------------------------------------------
+   High Contrast Focus Indicators for Better Visibility
+   ------------------------------------------------------------------------- */
+
+/* Ensure focus indicators have sufficient contrast in both modes */
+@media (prefers-contrast: more) {
+  :focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  a:focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 3px;
+  }
+}

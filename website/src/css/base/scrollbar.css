@@ -1,0 +1,30 @@
+/**
+ * HexDI Scrollbar Styling
+ *
+ * Custom scrollbar styles for both webkit browsers and Firefox.
+ */
+
+/* Webkit scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--hexdi-scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--hexdi-scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hexdi-scrollbar-thumb-hover);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--hexdi-scrollbar-thumb) var(--hexdi-scrollbar-track);
+}

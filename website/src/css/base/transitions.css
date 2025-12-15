@@ -1,0 +1,81 @@
+/**
+ * HexDI Color Mode Transitions
+ *
+ * Smooth transitions between light and dark modes,
+ * flash prevention, and theme initialization styles.
+ */
+
+/*
+ * Smooth transitions between light and dark modes
+ * Applied to all properties that change between themes
+ */
+html {
+  transition: background-color 0.2s ease-in-out;
+}
+
+body {
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
+}
+
+/* Apply transition to key elements that change in dark mode */
+.navbar,
+.navbar__inner,
+.footer,
+.menu,
+.main-wrapper,
+article,
+.markdown,
+.pagination-nav,
+.table-of-contents,
+.theme-doc-sidebar-container,
+.docSidebarContainer,
+[class*="docSidebarContainer"],
+[class*="sidebarViewport"] {
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+}
+
+/* Code block transition */
+pre,
+code,
+.prism-code,
+[class*="codeBlockContainer"],
+[class*="codeBlockContent"] {
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+}
+
+/* Card and surface transitions */
+.card,
+[class*="card"],
+.alert,
+[class*="admonition"] {
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+/*
+ * Prevent flash of incorrect theme on page load
+ * Docusaurus handles this via the colorMode.respectPrefersColorScheme setting
+ * and injects a script in <head> that sets the correct theme before paint.
+ *
+ * This CSS provides additional fallback for smooth appearance:
+ */
+html:not([data-theme]) {
+  /* Hide content briefly while theme is determined */
+  visibility: visible;
+}
+
+/* Ensure no layout shift during theme initialization */
+html {
+  color-scheme: light dark;
+}

@@ -1,0 +1,150 @@
+/**
+ * HexDI Color Variables
+ *
+ * Contains all brand color custom properties for light mode (:root)
+ * and dark mode overrides ([data-theme='dark']).
+ */
+
+:root {
+  /* -------------------------------------------------------------------------
+     Primary Brand Color (HexDI Purple)
+     ------------------------------------------------------------------------- */
+  --hexdi-primary-900: #1A0B2E;
+  --hexdi-primary-700: #2D1B4E;
+  --hexdi-primary-600: #4527A0;
+  --hexdi-primary-500: #5E35B1;
+  --hexdi-primary-400: #7E57C2;
+  --hexdi-primary-300: #9575CD;
+  --hexdi-primary-200: #B39DDB;
+  --hexdi-primary-100: #D1C4E9;
+  --hexdi-primary-50: #EDE7F6;
+
+  /* -------------------------------------------------------------------------
+     TypeScript Blue (Code & Technical)
+     ------------------------------------------------------------------------- */
+  --hexdi-ts-700: #1976D2;
+  --hexdi-ts-500: #2196F3;
+  --hexdi-ts-300: #64B5F6;
+  --hexdi-ts-100: #BBDEFB;
+
+  /* -------------------------------------------------------------------------
+     Semantic Colors - Success Green
+     ------------------------------------------------------------------------- */
+  --hexdi-success-700: #388E3C;
+  --hexdi-success-500: #4CAF50;
+  --hexdi-success-300: #81C784;
+  --hexdi-success-100: #C8E6C9;
+
+  /* -------------------------------------------------------------------------
+     Semantic Colors - Warning Orange
+     ------------------------------------------------------------------------- */
+  --hexdi-warning-700: #F57C00;
+  --hexdi-warning-500: #FF9800;
+  --hexdi-warning-300: #FFB74D;
+  --hexdi-warning-100: #FFE0B2;
+
+  /* -------------------------------------------------------------------------
+     Semantic Colors - Error Red
+     ------------------------------------------------------------------------- */
+  --hexdi-error-700: #D32F2F;
+  --hexdi-error-500: #F44336;
+  --hexdi-error-300: #E57373;
+  --hexdi-error-100: #FFCDD2;
+
+  /* -------------------------------------------------------------------------
+     Lifetime Scope Colors
+     ------------------------------------------------------------------------- */
+  /* Singleton (Shared - Teal) */
+  --hexdi-singleton-600: #00897B;
+  --hexdi-singleton-400: #26A69A;
+  --hexdi-singleton-100: #B2DFDB;
+
+  /* Scoped (Contextual - Amber) */
+  --hexdi-scoped-600: #FF8F00;
+  --hexdi-scoped-400: #FFA726;
+  --hexdi-scoped-100: #FFECB3;
+
+  /* Request (Transient - Purple) */
+  --hexdi-request-600: #7B1FA2;
+  --hexdi-request-400: #AB47BC;
+  --hexdi-request-100: #E1BEE7;
+
+  /* -------------------------------------------------------------------------
+     Semantic Colors - Info/Tip/Caution/Danger (for Admonitions)
+     ------------------------------------------------------------------------- */
+  --hexdi-info-500: #0288D1;
+  --hexdi-info-100: #B3E5FC;
+  --hexdi-info-bg-light: #E7F5FF;
+  --hexdi-info-bg-dark: rgba(2, 136, 209, 0.1);
+
+  --hexdi-tip-500: #00897B;
+  --hexdi-tip-100: #B2DFDB;
+  --hexdi-tip-bg-light: #E0F2F1;
+  --hexdi-tip-bg-dark: rgba(0, 137, 123, 0.1);
+
+  --hexdi-caution-500: #F57C00;
+  --hexdi-caution-100: #FFE0B2;
+  --hexdi-caution-bg-light: #FFF3E0;
+  --hexdi-caution-bg-dark: rgba(245, 124, 0, 0.1);
+
+  --hexdi-danger-500: #D32F2F;
+  --hexdi-danger-100: #FFCDD2;
+  --hexdi-danger-bg-light: #FFEBEE;
+  --hexdi-danger-bg-dark: rgba(211, 47, 47, 0.1);
+
+  /* -------------------------------------------------------------------------
+     Light Mode - Neutral Colors
+     ------------------------------------------------------------------------- */
+  --hexdi-background: #FFFFFF;
+  --hexdi-surface: #F8F9FA;
+  --hexdi-surface-hover: #F1F3F5;
+  --hexdi-border: #E1E4E8;
+  --hexdi-border-light: #EAECEF;
+  --hexdi-text-primary: #24292E;
+  --hexdi-text-secondary: #586069;
+  --hexdi-text-tertiary: #6A737D;
+  --hexdi-code-block-bg: #F6F8FA;
+
+  /* -------------------------------------------------------------------------
+     Code Block Specific Colors (Light Mode)
+     ------------------------------------------------------------------------- */
+  --hexdi-code-header-bg: #F1F3F5;
+  --hexdi-code-line-number-color: #6A737D;
+  --hexdi-code-copy-button-hover-bg: #E1E4E8;
+
+  /* Scrollbar colors (light mode) */
+  --hexdi-scrollbar-track: var(--hexdi-surface);
+  --hexdi-scrollbar-thumb: var(--hexdi-border);
+  --hexdi-scrollbar-thumb-hover: var(--hexdi-text-tertiary);
+}
+
+/* ==========================================================================
+   Dark Mode - Color Overrides
+   ========================================================================== */
+
+[data-theme='dark'] {
+  /* -------------------------------------------------------------------------
+     Dark Mode - Neutral Colors
+     ------------------------------------------------------------------------- */
+  --hexdi-background: #0D1117;
+  --hexdi-surface: #161B22;
+  --hexdi-surface-hover: #21262D;
+  --hexdi-border: #30363D;
+  --hexdi-border-light: #21262D;
+  --hexdi-text-primary: #C9D1D9;
+  --hexdi-text-secondary: #8B949E;
+  --hexdi-text-tertiary: #6E7681;
+  --hexdi-code-block-bg: #161B22;
+
+  /* -------------------------------------------------------------------------
+     Code Block Specific Colors (Dark Mode)
+     ------------------------------------------------------------------------- */
+  --hexdi-code-header-bg: #21262D;
+  --hexdi-code-line-number-color: #6E7681;
+  --hexdi-code-copy-button-hover-bg: #30363D;
+
+  /* Scrollbar colors (dark mode) */
+  --hexdi-scrollbar-track: var(--hexdi-surface);
+  --hexdi-scrollbar-thumb: var(--hexdi-border);
+  --hexdi-scrollbar-thumb-hover: var(--hexdi-text-tertiary);
+}

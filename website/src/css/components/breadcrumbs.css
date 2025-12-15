@@ -1,0 +1,109 @@
+/**
+ * HexDI Breadcrumb Navigation Styling
+ *
+ * Breadcrumb navigation at the top of documentation pages.
+ * Shows path like: Home > Getting Started > Installation
+ */
+
+/* ==========================================================================
+   Breadcrumb Navigation Styling
+   ========================================================================== */
+
+/* Breadcrumb container */
+.breadcrumbs,
+.theme-doc-breadcrumbs,
+[class*="breadcrumbsContainer"] {
+  margin-bottom: 16px;
+  padding: 0;
+}
+
+/* Breadcrumb list */
+.breadcrumbs__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Breadcrumb item */
+.breadcrumbs__item {
+  display: flex;
+  align-items: center;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+/* Breadcrumb link */
+.breadcrumbs__link {
+  color: var(--hexdi-text-secondary);
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+}
+
+/* Breadcrumb link hover state */
+.breadcrumbs__link:hover {
+  color: var(--ifm-color-primary);
+  background-color: var(--hexdi-surface);
+  text-decoration: none;
+}
+
+/* Breadcrumb current page (active) */
+.breadcrumbs__item--active .breadcrumbs__link {
+  color: var(--ifm-breadcrumb-color-active);
+  font-weight: var(--weight-medium);
+  background-color: transparent;
+}
+
+.breadcrumbs__item--active .breadcrumbs__link:hover {
+  background-color: transparent;
+  cursor: default;
+}
+
+/* Breadcrumb separator */
+.breadcrumbs__item:not(:last-child)::after {
+  content: '/';
+  margin-left: 8px;
+  color: var(--ifm-breadcrumb-separator-color);
+  font-size: 0.8125rem;
+  font-weight: var(--weight-regular);
+}
+
+/* Alternative chevron separator (if using SVG) */
+.breadcrumbs__item svg {
+  width: 12px;
+  height: 12px;
+  margin: 0 4px;
+  fill: var(--ifm-breadcrumb-separator-color);
+}
+
+/* Home icon in breadcrumbs */
+.breadcrumbs__item:first-child .breadcrumbs__link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.breadcrumbs__item:first-child .breadcrumbs__link svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+/* Dark mode breadcrumb adjustments */
+[data-theme='dark'] .breadcrumbs__link {
+  color: var(--hexdi-text-secondary);
+}
+
+[data-theme='dark'] .breadcrumbs__link:hover {
+  color: var(--ifm-color-primary);
+  background-color: var(--hexdi-surface-hover);
+}
+
+[data-theme='dark'] .breadcrumbs__item--active .breadcrumbs__link {
+  color: var(--hexdi-text-primary);
+}
