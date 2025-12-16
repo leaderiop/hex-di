@@ -97,9 +97,10 @@ describe("Edge case: Large graphs", () => {
     }
 
     // Build graph by chaining provides
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let builder: any = GraphBuilder.create();
+    // Dynamic adapter accumulation for stress test - type changes on each provide()
+    let builder: GraphBuilder<Port<unknown, string>, never> = GraphBuilder.create();
     for (const adapter of adapters) {
+      // @ts-expect-error Stress test with dynamic adapter array - TypeScript can't track type accumulation
       builder = builder.provide(adapter);
     }
     const graph = builder.build();
@@ -140,9 +141,10 @@ describe("Edge case: Large graphs", () => {
       adapters.push(adapter);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let builder: any = GraphBuilder.create();
+    // Dynamic adapter accumulation for stress test - type changes on each provide()
+    let builder: GraphBuilder<Port<unknown, string>, never> = GraphBuilder.create();
     for (const adapter of adapters) {
+      // @ts-expect-error Stress test with dynamic adapter array - TypeScript can't track type accumulation
       builder = builder.provide(adapter);
     }
     const graph = builder.build();

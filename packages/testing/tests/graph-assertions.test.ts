@@ -86,6 +86,7 @@ describe("assertGraphComplete", () => {
       GraphBuilder.create()
         .provide(LoggerAdapter)
         .provide(UserServiceAdapter)
+        // @ts-expect-error Testing runtime behavior with incomplete graph - TypeScript correctly requires error arg
         .build()
     );
 
@@ -119,6 +120,7 @@ describe("assertGraphComplete", () => {
     const incompleteGraph = asGraph(
       GraphBuilder.create()
         .provide(UserServiceAdapter)
+        // @ts-expect-error Testing runtime behavior with incomplete graph - TypeScript correctly requires error arg
         .build()
     );
 

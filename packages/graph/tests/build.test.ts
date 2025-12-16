@@ -117,7 +117,8 @@ describe("build() returns frozen graph object", () => {
       .build();
 
     expect(() => {
-      (graph.adapters as unknown[]).push(DatabaseAdapter);
+      // @ts-expect-error Testing runtime immutability - TypeScript correctly marks as readonly
+      graph.adapters.push(DatabaseAdapter);
     }).toThrow();
   });
 });
@@ -286,8 +287,8 @@ describe("graph is immutable at runtime", () => {
       .build();
 
     expect(() => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (graph as any).newProperty = "value";
+      // @ts-expect-error Testing runtime immutability - adding new property should throw
+      graph.newProperty = "value";
     }).toThrow();
   });
 
@@ -297,8 +298,8 @@ describe("graph is immutable at runtime", () => {
       .build();
 
     expect(() => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (graph as any).adapters = [];
+      // @ts-expect-error Testing runtime immutability - TypeScript correctly marks as readonly
+      graph.adapters = [];
     }).toThrow();
   });
 
@@ -310,18 +311,20 @@ describe("graph is immutable at runtime", () => {
 
     // Cannot push
     expect(() => {
-      (graph.adapters as unknown[]).push(ConfigAdapter);
+      // @ts-expect-error Testing runtime immutability - TypeScript correctly marks as readonly
+      graph.adapters.push(ConfigAdapter);
     }).toThrow();
 
     // Cannot pop
     expect(() => {
-      (graph.adapters as unknown[]).pop();
+      // @ts-expect-error Testing runtime immutability - TypeScript correctly marks as readonly
+      graph.adapters.pop();
     }).toThrow();
 
     // Cannot modify by index
     expect(() => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (graph.adapters as any)[0] = ConfigAdapter;
+      // @ts-expect-error Testing runtime immutability - TypeScript correctly marks as readonly
+      graph.adapters[0] = ConfigAdapter;
     }).toThrow();
   });
 });

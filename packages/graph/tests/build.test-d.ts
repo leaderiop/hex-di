@@ -342,8 +342,8 @@ describe("empty graph (no adapters) builds successfully", () => {
 
     type BuildResult = typeof graph;
 
-    // Should have __provides property (even if never)
-    type ProvidesType = BuildResult extends { __provides: infer P } ? P : unknown;
+    // Should have __provides property (even if never) - optional because phantom types have no runtime value
+    type ProvidesType = BuildResult extends { __provides?: infer P } ? P : unknown;
     expectTypeOf<ProvidesType>().toBeNever();
   });
 });
@@ -374,7 +374,8 @@ describe("build() returns Graph with correct type information", () => {
 
     const graph = builder.build();
 
-    type ProvidesType = (typeof graph)["__provides"];
+    // Use conditional type inference since __provides is optional (phantom type)
+    type ProvidesType = (typeof graph) extends { __provides?: infer P } ? P : never;
 
     expectTypeOf<ProvidesType>().toEqualTypeOf<
       LoggerPortType | DatabasePortType | UserServicePortType
@@ -445,7 +446,9 @@ describe("built graph is immutable (type-level readonly)", () => {
   it("Graph __provides is tracked correctly", () => {
     type TestGraph = Graph<LoggerPortType | DatabasePortType>;
 
-    type Provides = TestGraph["__provides"];
+    // Use conditional type inference to extract the phantom type parameter
+    // Direct property access returns T | undefined since __provides is optional
+    type Provides = TestGraph extends { __provides?: infer P } ? P : never;
     expectTypeOf<Provides>().toEqualTypeOf<LoggerPortType | DatabasePortType>();
   });
 
@@ -497,7 +500,8 @@ describe("built graph contains all registered adapters", () => {
       .provide(UserServiceAdapter)
       .build();
 
-    type ProvidesType = (typeof graph)["__provides"];
+    // Use conditional type inference since __provides is optional (phantom type)
+    type ProvidesType = (typeof graph) extends { __provides?: infer P } ? P : never;
 
     // All 5 ports should be tracked
     expectTypeOf<ProvidesType>().toEqualTypeOf<

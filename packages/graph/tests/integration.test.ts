@@ -150,7 +150,8 @@ describe("Integration: Complete workflow", () => {
     expectTypeOf<BuilderProvides>().toEqualTypeOf<typeof LoggerPort>();
 
     const graph = builder.build();
-    type GraphProvides = (typeof graph)["__provides"];
+    // Use conditional type inference since __provides is optional (phantom type)
+    type GraphProvides = (typeof graph) extends { __provides?: infer P } ? P : never;
     expectTypeOf<GraphProvides>().toEqualTypeOf<typeof LoggerPort>();
   });
 });
@@ -513,8 +514,8 @@ describe("Integration: Real-world usage pattern", () => {
     expect(graph.adapters.length).toBe(8);
     expect(Object.isFrozen(graph)).toBe(true);
 
-    // Verify type correctness
-    type ProvidedPorts = (typeof graph)["__provides"];
+    // Verify type correctness - use conditional inference since __provides is optional
+    type ProvidedPorts = (typeof graph) extends { __provides?: infer P } ? P : never;
     expectTypeOf<ProvidedPorts>().toEqualTypeOf<
       | typeof LoggerPort
       | typeof ConfigPort
@@ -676,8 +677,8 @@ describe("Integration: @hex-di/ports compatibility", () => {
     // Build graph
     const graph = GraphBuilder.create().provide(adapter).build();
 
-    // Verify the graph correctly types the provides
-    type GraphProvides = (typeof graph)["__provides"];
+    // Verify the graph correctly types the provides - use conditional inference
+    type GraphProvides = (typeof graph) extends { __provides?: infer P } ? P : never;
     expectTypeOf<GraphProvides>().toEqualTypeOf<typeof CustomPort>();
   });
 
@@ -721,7 +722,8 @@ describe("Integration: @hex-di/ports compatibility", () => {
 
     expect(graph.adapters.length).toBe(3);
 
-    type GraphProvides = (typeof graph)["__provides"];
+    // Use conditional inference since __provides is optional
+    type GraphProvides = (typeof graph) extends { __provides?: infer P } ? P : never;
     expectTypeOf<GraphProvides>().toEqualTypeOf<
       typeof PortA | typeof PortB | typeof PortC
     >();
@@ -774,7 +776,8 @@ describe("Integration: Complex generic type inference", () => {
       .provide(userRepoAdapter)
       .build();
 
-    type GraphProvides = (typeof graph)["__provides"];
+    // Use conditional inference since __provides is optional
+    type GraphProvides = (typeof graph) extends { __provides?: infer P } ? P : never;
     expectTypeOf<GraphProvides>().toEqualTypeOf<typeof DatabasePort | typeof UserRepoPort>();
   });
 

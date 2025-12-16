@@ -9,8 +9,7 @@
  */
 
 // Global declarations for Node.js types used in tests
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare function setTimeout(callback: (...args: any[]) => void, ms?: number): unknown;
+declare function setTimeout(callback: (...args: unknown[]) => void, ms?: number): unknown;
 
 import { describe, test, expect, vi, expectTypeOf } from "vitest";
 import { createPort } from "@hex-di/ports";

@@ -21,11 +21,12 @@
  * @example Using INTERNAL_ACCESS to inspect a container
  * ```typescript
  * import { INTERNAL_ACCESS } from '@hex-di/runtime';
- * import type { ContainerInternalState } from '@hex-di/runtime';
+ * import type { ContainerInternalState, Container } from '@hex-di/runtime';
+ * import type { Port } from '@hex-di/ports';
  *
- * function inspectContainer(container: Container<unknown>) {
- *   const accessor = (container as any)[INTERNAL_ACCESS];
- *   const snapshot: ContainerInternalState = accessor();
+ * function inspectContainer(container: Container<Port<unknown, string>>) {
+ *   // No cast needed - Container type includes [INTERNAL_ACCESS] property
+ *   const snapshot = container[INTERNAL_ACCESS]();
  *   console.log('Disposed:', snapshot.disposed);
  *   console.log('Singleton count:', snapshot.singletonMemo.size);
  * }
@@ -54,8 +55,8 @@
  * @example
  * ```typescript
  * const container = createContainer(graph);
- * const accessor = (container as any)[INTERNAL_ACCESS];
- * const state = accessor(); // Frozen snapshot
+ * // No cast needed - Container type includes [INTERNAL_ACCESS] property
+ * const state = container[INTERNAL_ACCESS](); // Frozen snapshot
  * ```
  */
 export const INTERNAL_ACCESS = Symbol.for("hex-di/internal-access");

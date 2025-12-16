@@ -178,10 +178,10 @@ describe("createAdapterTest", () => {
 
     // Missing Database dependency
     expect(() => {
+      // @ts-expect-error Testing runtime validation - TypeScript correctly requires Database
       createAdapterTest(UserServiceAdapter, {
         Logger: mockLogger,
-        // Database is missing
-      } as never);
+      });
     }).toThrow("Missing mock for required port 'Database'");
 
     // Missing Logger dependency
@@ -192,10 +192,10 @@ describe("createAdapterTest", () => {
     };
 
     expect(() => {
+      // @ts-expect-error Testing runtime validation - TypeScript correctly requires Logger
       createAdapterTest(UserServiceAdapter, {
         Database: mockDatabase,
-        // Logger is missing
-      } as never);
+      });
     }).toThrow("Missing mock for required port 'Logger'");
   });
 

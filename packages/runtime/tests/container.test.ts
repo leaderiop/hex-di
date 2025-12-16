@@ -100,9 +100,8 @@ describe("createContainer", () => {
     const graph = GraphBuilder.create().provide(LoggerAdapter).build();
     const container = createContainer(graph);
 
-    // Cast to any to bypass compile-time checks for this runtime test
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect(() => container.resolve(DatabasePort as any)).toThrow();
+    // @ts-expect-error Testing runtime error handling - TypeScript correctly prevents this
+    expect(() => container.resolve(DatabasePort)).toThrow();
   });
 
   test("singleton instances are cached across resolves", () => {

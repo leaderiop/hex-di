@@ -196,13 +196,18 @@ export type Adapter<
   TProvides extends Port<unknown, string>,
   TRequires extends Port<unknown, string> | never,
   TLifetime extends Lifetime,
+  TRequiresTuple extends readonly Port<unknown, string>[] = [TRequires] extends [never]
+    ? readonly []
+    : readonly Port<unknown, string>[],
 > = {
   /**
    * Brand property for nominal typing.
    * Contains a tuple of [TProvides, TRequires, TLifetime] at the type level.
-   * Value is undefined at runtime.
+   * Optional because the property exists only for type-level discrimination,
+   * not at runtime. TypeScript uses this for structural distinction between
+   * adapters with different type parameters.
    */
-  readonly [__adapterBrand]: [TProvides, TRequires, TLifetime];
+  readonly [__adapterBrand]?: [TProvides, TRequires, TLifetime];
 
   /**
    * The port this adapter provides/implements.
@@ -211,11 +216,9 @@ export type Adapter<
 
   /**
    * The ports this adapter depends on.
-   * Empty readonly array when TRequires is never, otherwise an array of Port tokens.
+   * Empty readonly array when TRequires is never, otherwise the original tuple type.
    */
-  readonly requires: [TRequires] extends [never]
-    ? readonly []
-    : readonly Port<unknown, string>[];
+  readonly requires: TRequiresTuple;
 
   /**
    * The lifetime scope for this adapter's service instances.
@@ -404,14 +407,24 @@ export function createAdapter<
   TLifetime extends Lifetime,
 >(
   config: AdapterConfig<TProvides, TRequires, TLifetime>
-): Adapter<TProvides, TupleToUnion<TRequires>, TLifetime> {
-  return Object.freeze({
+): Adapter<TProvides, TupleToUnion<TRequires>, TLifetime, TRequires> {
+  // Build base adapter without finalizer
+  const baseAdapter = {
     provides: config.provides,
-    requires: config.requires as unknown as Adapter<TProvides, TupleToUnion<TRequires>, TLifetime>["requires"],
+    requires: config.requires,
     lifetime: config.lifetime,
     factory: config.factory,
-    finalizer: config.finalizer,
-  }) as Adapter<TProvides, TupleToUnion<TRequires>, TLifetime>;
+  };
+
+  // Only add finalizer if provided (for exactOptionalPropertyTypes compliance)
+  if (config.finalizer !== undefined) {
+    return Object.freeze({
+      ...baseAdapter,
+      finalizer: config.finalizer,
+    });
+  }
+
+  return Object.freeze(baseAdapter);
 }
 
 // =============================================================================
@@ -437,7 +450,7 @@ export function createAdapter<
  * // typeof LoggerPort
  * ```
  */
-export type InferAdapterProvides<A> = A extends Adapter<infer TProvides, infer _TRequires, infer _TLifetime>
+export type InferAdapterProvides<A> = A extends Adapter<infer TProvides, infer _TRequires, infer _TLifetime, infer _TTuple>
   ? TProvides
   : never;
 
@@ -460,7 +473,7 @@ export type InferAdapterProvides<A> = A extends Adapter<infer TProvides, infer _
  * // typeof LoggerPort | typeof DatabasePort
  * ```
  */
-export type InferAdapterRequires<A> = A extends Adapter<infer _TProvides, infer TRequires, infer _TLifetime>
+export type InferAdapterRequires<A> = A extends Adapter<infer _TProvides, infer TRequires, infer _TLifetime, infer _TTuple>
   ? TRequires
   : never;
 
@@ -483,7 +496,7 @@ export type InferAdapterRequires<A> = A extends Adapter<infer _TProvides, infer 
  * // 'singleton'
  * ```
  */
-export type InferAdapterLifetime<A> = A extends Adapter<infer _TProvides, infer _TRequires, infer TLifetime>
+export type InferAdapterLifetime<A> = A extends Adapter<infer _TProvides, infer _TRequires, infer TLifetime, infer _TTuple>
   ? TLifetime
   : never;
 
@@ -933,7 +946,12 @@ export type DuplicateProviderError<DuplicatePort extends Port<unknown, string>> 
  */
 export type Graph<TProvides extends Port<unknown, string> | never> = {
   readonly adapters: readonly Adapter<Port<unknown, string>, Port<unknown, string> | never, Lifetime>[];
-  readonly __provides: TProvides;
+  /**
+   * Phantom type property for compile-time type tracking.
+   * Optional because it carries type information only - the runtime value is always undefined.
+   * Use `Graph<infer P>` conditional type inference to extract the TProvides type.
+   */
+  readonly __provides?: TProvides;
 };
 
 /**
@@ -1244,9 +1262,10 @@ export class GraphBuilder<
       ? []
       : [error: MissingDependencyError<UnsatisfiedDependencies<TProvides, TRequires>>]
   ): Graph<TProvides> {
+    // Omit __provides entirely - it's a phantom type property that only exists at the type level.
+    // With exactOptionalPropertyTypes, we cannot set it to undefined.
     return Object.freeze({
       adapters: this.adapters,
-      __provides: undefined as unknown as TProvides,
-    }) as Graph<TProvides>;
+    });
   }
 }

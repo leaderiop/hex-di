@@ -327,6 +327,8 @@ function createScopeWrapper<TProvides extends Port<unknown, string>>(
     },
     [INTERNAL_ACCESS]: (): ScopeInternalState => impl.getInternalState(),
     get [ScopeBrand](): { provides: TProvides } {
+      // Phantom type property for nominal typing - value is never used at runtime.
+      // The 'as never' cast is the standard pattern for phantom types.
       return undefined as never;
     },
   };
@@ -842,6 +844,8 @@ export function createContainer<TProvides extends Port<unknown, string>>(
     },
     [INTERNAL_ACCESS]: (): ContainerInternalState => impl.getInternalState(),
     get [ContainerBrand](): { provides: TProvides } {
+      // Phantom type property for nominal typing - value is never used at runtime.
+      // The 'as never' cast is the standard pattern for phantom types.
       return undefined as never;
     },
   };

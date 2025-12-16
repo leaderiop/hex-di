@@ -40,9 +40,22 @@ interface UserService {
   instanceId: string;
 }
 
+// Extended test interfaces that include internal properties for testing dependency chains
+interface UserServiceWithLoggerId extends UserService {
+  loggerId: string;
+}
+
+interface UserServiceWithContextId extends UserService {
+  contextId: string;
+}
+
 interface AuditService {
   audit(action: string): void;
   instanceId: string;
+}
+
+interface AuditServiceWithLoggerId extends AuditService {
+  loggerId: string;
 }
 
 const LoggerPort = createPort<"Logger", Logger>("Logger");
@@ -283,7 +296,10 @@ describe("mixed lifetimes in dependency chain", () => {
       instanceId: generateInstanceId(),
     }));
 
-    const userServiceFactory = vi.fn((deps: { Logger: Logger }) => ({
+    // Create port for extended type that includes loggerId for testing
+    const UserServiceWithLoggerIdPort = createPort<"UserService", UserServiceWithLoggerId>("UserService");
+
+    const userServiceFactory = vi.fn((deps: { Logger: Logger }): UserServiceWithLoggerId => ({
       getUser: vi.fn(),
       instanceId: generateInstanceId(),
       loggerId: deps.Logger.instanceId,
@@ -297,10 +313,10 @@ describe("mixed lifetimes in dependency chain", () => {
     });
 
     const UserServiceAdapter = createAdapter({
-      provides: UserServicePort,
+      provides: UserServiceWithLoggerIdPort,
       requires: [LoggerPort],
       lifetime: "singleton",
-      factory: userServiceFactory as unknown as (deps: Record<string, unknown>) => UserService,
+      factory: userServiceFactory,
     });
 
     const graph = GraphBuilder.create()
@@ -312,17 +328,15 @@ describe("mixed lifetimes in dependency chain", () => {
     const scope = container.createScope();
 
     // Resolve user service from both container and scope
-    const containerUserService = container.resolve(UserServicePort);
-    const scopeUserService = scope.resolve(UserServicePort);
+    const containerUserService = container.resolve(UserServiceWithLoggerIdPort);
+    const scopeUserService = scope.resolve(UserServiceWithLoggerIdPort);
 
     // Both should be the same singleton instance
     expect(containerUserService).toBe(scopeUserService);
 
     // Logger dependency should also be the same singleton
     const containerLogger = container.resolve(LoggerPort);
-    expect((containerUserService as unknown as { loggerId: string }).loggerId).toBe(
-      containerLogger.instanceId
-    );
+    expect(containerUserService.loggerId).toBe(containerLogger.instanceId);
 
     // Factories called only once
     expect(loggerFactory).toHaveBeenCalledTimes(1);
@@ -335,7 +349,10 @@ describe("mixed lifetimes in dependency chain", () => {
       instanceId: generateInstanceId(),
     }));
 
-    const auditFactory = vi.fn((deps: { Logger: Logger }) => ({
+    // Create port for extended type that includes loggerId for testing
+    const AuditServiceWithLoggerIdPort = createPort<"AuditService", AuditServiceWithLoggerId>("AuditService");
+
+    const auditFactory = vi.fn((deps: { Logger: Logger }): AuditServiceWithLoggerId => ({
       audit: vi.fn(),
       instanceId: generateInstanceId(),
       loggerId: deps.Logger.instanceId,
@@ -349,10 +366,10 @@ describe("mixed lifetimes in dependency chain", () => {
     });
 
     const AuditServiceAdapter = createAdapter({
-      provides: AuditServicePort,
+      provides: AuditServiceWithLoggerIdPort,
       requires: [LoggerPort],
       lifetime: "scoped",
-      factory: auditFactory as unknown as (deps: Record<string, unknown>) => AuditService,
+      factory: auditFactory,
     });
 
     const graph = GraphBuilder.create()
@@ -365,16 +382,16 @@ describe("mixed lifetimes in dependency chain", () => {
     const scope2 = container.createScope();
 
     // Resolve audit service from both scopes
-    const audit1 = scope1.resolve(AuditServicePort);
-    const audit2 = scope2.resolve(AuditServicePort);
+    const audit1 = scope1.resolve(AuditServiceWithLoggerIdPort);
+    const audit2 = scope2.resolve(AuditServiceWithLoggerIdPort);
 
     // Audit services should be different (scoped)
     expect(audit1).not.toBe(audit2);
 
     // But both should reference the same singleton logger
     const containerLogger = container.resolve(LoggerPort);
-    expect((audit1 as unknown as { loggerId: string }).loggerId).toBe(containerLogger.instanceId);
-    expect((audit2 as unknown as { loggerId: string }).loggerId).toBe(containerLogger.instanceId);
+    expect(audit1.loggerId).toBe(containerLogger.instanceId);
+    expect(audit2.loggerId).toBe(containerLogger.instanceId);
 
     // Logger factory called once, audit factory called twice (once per scope)
     expect(loggerFactory).toHaveBeenCalledTimes(1);
@@ -387,7 +404,10 @@ describe("mixed lifetimes in dependency chain", () => {
       instanceId: generateInstanceId(),
     }));
 
-    const userServiceFactory = vi.fn((deps: { RequestContext: RequestContext }) => ({
+    // Create port for extended type that includes contextId for testing
+    const UserServiceWithContextIdPort = createPort<"UserService", UserServiceWithContextId>("UserService");
+
+    const userServiceFactory = vi.fn((deps: { RequestContext: RequestContext }): UserServiceWithContextId => ({
       getUser: vi.fn(),
       instanceId: generateInstanceId(),
       contextId: deps.RequestContext.instanceId,
@@ -401,10 +421,10 @@ describe("mixed lifetimes in dependency chain", () => {
     });
 
     const UserServiceAdapter = createAdapter({
-      provides: UserServicePort,
+      provides: UserServiceWithContextIdPort,
       requires: [RequestContextPort],
       lifetime: "request",
-      factory: userServiceFactory as unknown as (deps: Record<string, unknown>) => UserService,
+      factory: userServiceFactory,
     });
 
     const graph = GraphBuilder.create()
@@ -416,20 +436,16 @@ describe("mixed lifetimes in dependency chain", () => {
     const scope = container.createScope();
 
     // Resolve user service multiple times from the same scope
-    const userService1 = scope.resolve(UserServicePort);
-    const userService2 = scope.resolve(UserServicePort);
+    const userService1 = scope.resolve(UserServiceWithContextIdPort);
+    const userService2 = scope.resolve(UserServiceWithContextIdPort);
 
     // Each user service is a new instance (request lifetime)
     expect(userService1).not.toBe(userService2);
 
     // But both should reference the same scoped request context
     const scopedContext = scope.resolve(RequestContextPort);
-    expect((userService1 as unknown as { contextId: string }).contextId).toBe(
-      scopedContext.instanceId
-    );
-    expect((userService2 as unknown as { contextId: string }).contextId).toBe(
-      scopedContext.instanceId
-    );
+    expect(userService1.contextId).toBe(scopedContext.instanceId);
+    expect(userService2.contextId).toBe(scopedContext.instanceId);
 
     // Request context factory called once (scoped), user service factory called twice (request)
     expect(requestContextFactory).toHaveBeenCalledTimes(1);

@@ -189,23 +189,14 @@ describe("Type exports (compile-time verification)", () => {
   });
 
   it("should export ValidateCaptiveDependency type", () => {
-    // Type-level verification - uses 'any' to bypass complex type requirements
-    type _ValidateCaptiveDependency = RuntimeExports.ValidateCaptiveDependency<
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      any
-    >;
+    // Type-level verification - verify export exists using never (subtype of all types)
+    type _ValidateCaptiveDependency = RuntimeExports.ValidateCaptiveDependency<never, never>;
     expect(true).toBe(true);
   });
 
   it("should export ValidateAllDependencies type", () => {
-    // Type-level verification - uses 'any' to bypass complex type requirements
-    type _ValidateAllDependencies = RuntimeExports.ValidateAllDependencies<
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      any,
-      []
-    >;
+    // Type-level verification - verify export exists using never (subtype of all types)
+    type _ValidateAllDependencies = RuntimeExports.ValidateAllDependencies<never, []>;
     expect(true).toBe(true);
   });
 

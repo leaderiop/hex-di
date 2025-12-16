@@ -104,7 +104,8 @@ describe("GraphBuilder immutability", () => {
 
     // Attempting to modify should throw in strict mode or silently fail
     expect(() => {
-      (builder.adapters as unknown[]).push(LoggerAdapter);
+      // @ts-expect-error Testing runtime immutability - TypeScript correctly marks as readonly
+      builder.adapters.push(LoggerAdapter);
     }).toThrow();
   });
 
@@ -271,11 +272,11 @@ describe("GraphBuilder complete workflow", () => {
     });
 
     // Runtime allows adding duplicates - duplicate detection is at compile time only.
-    // We use type assertion to bypass the compile-time error and test runtime behavior.
     // In real code, TypeScript would prevent this at compile time.
-    const builder = GraphBuilder.create()
-      .provide(adapter1)
-      .provide(adapter2 as never) as unknown as GraphBuilder<never, never>;
+    // We need to bypass the type system for this runtime test
+    const step1 = GraphBuilder.create().provide(adapter1);
+    // @ts-expect-error Testing runtime behavior - TypeScript correctly detects duplicate provider
+    const builder: GraphBuilder<typeof LoggerPort, never> = step1.provide(adapter2);
 
     // At runtime, the adapters are still added
     expect(builder.adapters.length).toBe(2);

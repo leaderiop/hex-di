@@ -56,11 +56,12 @@ export type { ContainerInspector, ContainerSnapshot, SingletonEntry, ScopeTree }
 export function getInternalAccessor(
   container: Container<Port<unknown, string>>
 ): () => ContainerInternalState {
-  const accessor = (container as Record<symbol, unknown>)[INTERNAL_ACCESS];
+  // Container type now includes [INTERNAL_ACCESS] property - no cast needed
+  const accessor = container[INTERNAL_ACCESS];
   if (typeof accessor !== "function") {
     throw new Error("Container does not expose INTERNAL_ACCESS accessor");
   }
-  return accessor as () => ContainerInternalState;
+  return accessor;
 }
 
 /**

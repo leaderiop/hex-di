@@ -11,6 +11,8 @@
  */
 
 import type { Port, InferService } from "@hex-di/ports";
+import { INTERNAL_ACCESS } from "./inspector-symbols.js";
+import type { ContainerInternalState, ScopeInternalState } from "./inspector-types.js";
 
 // =============================================================================
 // Brand Symbols
@@ -148,6 +150,14 @@ export type Container<TProvides extends Port<unknown, string>> = {
    * Value is undefined at runtime.
    */
   readonly [ContainerBrand]: { provides: TProvides };
+
+  /**
+   * Internal state accessor for DevTools inspection.
+   * Returns a frozen snapshot of the container's internal state.
+   *
+   * @internal Use createInspector() for a higher-level inspection API
+   */
+  readonly [INTERNAL_ACCESS]: () => ContainerInternalState;
 };
 
 // =============================================================================
@@ -252,6 +262,14 @@ export type Scope<TProvides extends Port<unknown, string>> = {
    * Value is undefined at runtime.
    */
   readonly [ScopeBrand]: { provides: TProvides };
+
+  /**
+   * Internal state accessor for DevTools inspection.
+   * Returns a frozen snapshot of the scope's internal state.
+   *
+   * @internal Use createInspector() for a higher-level inspection API
+   */
+  readonly [INTERNAL_ACCESS]: () => ScopeInternalState;
 };
 
 // =============================================================================

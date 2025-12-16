@@ -231,7 +231,7 @@ export class TestGraphBuilder<TProvides extends Port<unknown, string>> {
     adapter: A
   ): TestGraphBuilder<TProvides> {
     // Extract port name from the adapter's provides property
-    const portName = (adapter.provides as Port<unknown, string>).__portName;
+    const portName = adapter.provides.__portName;
 
     // Create new map with the override
     const newOverrides = new Map(this.overrides);
@@ -265,14 +265,15 @@ export class TestGraphBuilder<TProvides extends Port<unknown, string>> {
   build(): Graph<TProvides> {
     // Build the adapters array by applying overrides
     const adapters = this.originalGraph.adapters.map((adapter) => {
-      const portName = (adapter.provides as Port<unknown, string>).__portName;
+      const portName = adapter.provides.__portName;
       const override = this.overrides.get(portName);
       return override ?? adapter;
     });
 
+    // Omit __provides entirely - it's a phantom type property that only exists at the type level.
+    // With exactOptionalPropertyTypes, we cannot set it to undefined.
     return Object.freeze({
       adapters: Object.freeze(adapters),
-      __provides: undefined as unknown as TProvides,
     });
   }
 }
